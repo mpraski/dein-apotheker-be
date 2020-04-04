@@ -1,0 +1,7 @@
+questions:
+  symptom: "For which symptom are you looking for a drug?"
+answers:
+  running_nose: "Running nose"
+  yes: "Yes"
+  no_typing_error: "No, it was a typing error"
+
