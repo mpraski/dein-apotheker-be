@@ -1,0 +1,29 @@
+# docker-compose.yml
+version: "3.3"
+services:
+  database:
+    image: mysql:8.0
+    env_file:
+      - database.env
+    volumes:
+      - database-data:/var/lib/mysql
+    ports:
+      - 3306:3306
+  migration:
+    build: .
+    command: eval Domain.Migration.migrate
+    env_file:
+      - app.env
+    depends_on:
+      - database
+  app:
+    build: .
+    command: start
+    env_file:
+      - app.env
+    ports:
+      - 8080:8080
+    depends_on:
+      - migration
+volumes:
+  database-data:
