@@ -1,8 +1,9 @@
 defmodule Chat.Scenario do
-  @enforce_keys [:id, :questions, :translations]
+  @enforce_keys [:id, :start, :questions, :translations]
 
   defstruct(
     id: nil,
+    start: nil,
     questions: [],
     translations: %{}
   )

@@ -1,4 +1,4 @@
-defmodule Chat.Contextual do
+defmodule Api.Contextual do
   @enforce_keys [:context, :data]
 
   defstruct(

@@ -1,4 +1,4 @@
-defmodule Chat.Answer do
+defmodule Chat.Answer.Single do
   @enforce_keys [:id]
 
   defstruct(
@@ -6,7 +6,6 @@ defmodule Chat.Answer do
     leads_to: nil,
     jumps_to: nil,
     loads_scenario: nil,
-    comments: [],
-    terminal: false
+    comments: []
   )
 end

@@ -1,4 +1,4 @@
-defmodule Chat.Context do
+defmodule Api.Context do
   @enforce_keys [:scenarios, :data]
 
   defstruct(

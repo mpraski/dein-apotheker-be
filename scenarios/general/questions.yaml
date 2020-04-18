@@ -1,8 +1,15 @@
+start: symptom
+
 questions:
   symptom:
     type: multiple
     answers:
-      running_nose:
+      - running_nose
+    decisions:
+      - case: [running_nose]
+        leads_to: running_nose
+        loads_scenario: running_nose
+      - case: default
         leads_to: running_nose
         loads_scenario: running_nose
 
@@ -65,7 +72,7 @@ questions:
         leads_to: sex
       under_18:
         leads_to: sex
-        comments: 
+        comments:
           - type: text
             content: check_age_limits
 
@@ -81,7 +88,7 @@ questions:
     type: single
     answers:
       yes:
-        comments: 
+        comments:
           - type: text
             content: pregnant_risk
       no:
@@ -91,7 +98,7 @@ questions:
     type: single
     answers:
       yes:
-        comments: 
+        comments:
           - type: text
             content: breastfeeding_risk
       no:
@@ -119,7 +126,6 @@ questions:
       yes:
         leads_to: thanks_for_trying
       no:
-        terminal: true
 
   thanks_for_trying:
     type: prompt
