@@ -2,6 +2,7 @@ defmodule Chat.Loader do
   alias Chat.{Decoder, Scenario}
 
   @langauges ~w[en de pl]
+  @scenario_file "scenario.yaml"
 
   def load_scenarios(path) do
     File.ls!(path)
@@ -14,7 +15,7 @@ defmodule Chat.Loader do
 
   defp load_scenario(path) do
     id = String.to_atom(Path.basename(path))
-    scenario_path = Path.join(path, "scenario.yaml")
+    scenario_path = Path.join(path, @scenario_file)
     language_paths = @langauges |> Enum.map(&Path.join(path, "#{&1}.yaml"))
 
     questions =
@@ -26,13 +27,15 @@ defmodule Chat.Loader do
       raise error
     end
 
+    questions = questions |> Decoder.map_questions()
+
     translations =
       language_paths
       |> Enum.filter(&File.exists?/1)
       |> Enum.map(&YamlElixir.read_from_file!/1)
       |> Enum.map(&Decoder.decode_translations/1)
 
-    mapped_translations =
+    translations =
       @langauges
       |> Enum.map(&String.to_atom/1)
       |> Enum.zip(translations)
@@ -41,7 +44,7 @@ defmodule Chat.Loader do
     %Scenario{
       id: id,
       questions: questions,
-      translations: mapped_translations
+      translations: translations
     }
   end
 end

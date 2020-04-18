@@ -104,7 +104,7 @@ defmodule Chat.Decoder do
     answers |> Enum.all?(fn %Answer{id: id} -> Map.has_key?(mapped, id) end)
   end
 
-  def map_scenario(questions) do
+  def map_questions(questions) do
     questions |> Enum.map(fn %Question{id: id} = q -> {id, q} end) |> Map.new()
   end
 
