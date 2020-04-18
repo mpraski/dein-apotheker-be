@@ -13,7 +13,6 @@ defmodule DeinApotheker.MixProject do
           applications: [
             api: :permanent,
             domain: :permanent,
-            gateway: :permanent
           ]
         ]
       ]

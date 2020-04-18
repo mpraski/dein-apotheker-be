@@ -1,0 +1,125 @@
+questions:
+  symptom:
+    type: multiple
+    answers:
+      running_nose:
+        leads_to: running_nose
+        loads_scenario: running_nose
+
+  running_nose:
+    type: single
+    answers:
+      yes:
+        leads_to: medicine
+      no_typing_error:
+        jumps_to: general
+        comments:
+          - type: text
+            content: some_comment
+          - type: image
+            image: some_image
+            content: some_content_text
+
+  medicine:
+    type: single
+    answers:
+      yes:
+        leads_to: allergy_or_cold
+      no:
+        leads_to: age_disclaimer
+
+  age_disclaimer:
+    type: single
+    answers:
+      undestood:
+        leads_to: allergy_or_cold
+
+  allergy_or_cold:
+    type: single
+    answers:
+      probably_cold:
+        leads_to: time
+      probably_allergy:
+        leads_to: allergy
+
+  time:
+    type: single
+    answers:
+      less_than_a_week:
+        leads_to: frequency
+      more_than_a_week:
+        leads_to: frequency
+
+  frequency:
+    type: single
+    answers:
+      yes:
+        leads_to: already_tried
+      no:
+        leads_to: age
+
+  age:
+    type: single
+    answers:
+      over_18:
+        leads_to: sex
+      under_18:
+        leads_to: sex
+        comments: 
+          - type: text
+            content: check_age_limits
+
+  sex:
+    type: single
+    answers:
+      male:
+        leads_to: further_diseases
+      female:
+        leads_to: pregant
+
+  pregant:
+    type: single
+    answers:
+      yes:
+        comments: 
+          - type: text
+            content: pregnant_risk
+      no:
+        leads_to: breastfeeding
+
+  breastfeeding:
+    type: single
+    answers:
+      yes:
+        comments: 
+          - type: text
+            content: breastfeeding_risk
+      no:
+        leads_to: further_diseases
+
+  further_diseases:
+    type: single
+    answers:
+      yes:
+        leads_to: thanks_for_trying
+      no:
+        leads_to: further_medications
+
+  further_medications:
+    type: single
+    answers:
+      yes:
+        leads_to: thanks_for_trying
+      no:
+        leads_to: drug_allergies
+
+  drug_allergies:
+    type: single
+    answers:
+      yes:
+        leads_to: thanks_for_trying
+      no:
+        terminal: true
+
+  thanks_for_trying:
+    type: prompt
