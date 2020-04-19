@@ -47,7 +47,7 @@ questions:
       probably_cold:
         leads_to: time
       probably_allergy:
-        leads_to: allergy
+        jumps_to: allergy
 
   time:
     type: single
@@ -61,7 +61,7 @@ questions:
     type: single
     answers:
       yes:
-        leads_to: already_tried
+        leads_to: age
       no:
         leads_to: age
 

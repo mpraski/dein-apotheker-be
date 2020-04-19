@@ -1,5 +1,5 @@
 defmodule Chat.Loader do
-  alias Chat.{Decoder, Validator, Scenario, Question}
+  alias Chat.{Decoder, Validator, Scenario, Util}
 
   @langauges ~w[en de pl]
   @scenario_file "questions.yaml"
@@ -9,61 +9,47 @@ defmodule Chat.Loader do
     |> Enum.map(&Path.join(path, &1))
     |> Enum.filter(&File.dir?/1)
     |> Enum.map(&load_scenario/1)
-    |> Enum.map(fn %Scenario{id: id} = s -> {id, s} end)
-    |> Map.new()
+    |> by_id()
   end
 
   defp load_scenario(path) do
     id = String.to_atom(Path.basename(path))
-    scenario_path = Path.join(path, @scenario_file)
-    language_paths = @langauges |> Enum.map(&Path.join(path, "#{&1}.yaml"))
 
-    scenario = scenario_path |> YamlElixir.read_from_file!()
+    scenario =
+      path
+      |> Path.join(@scenario_file)
+      |> YamlElixir.read_from_file!()
 
     start = scenario |> Decoder.decode_start()
     questions = scenario |> Decoder.decode_questions()
 
     translations =
-      language_paths
-      |> Enum.filter(&File.exists?/1)
-      |> Enum.map(&YamlElixir.read_from_file!/1)
-      |> Enum.map(&Decoder.decode_translations/1)
-
-    # wroong
-    translations =
       @langauges
       |> Enum.map(&String.to_atom/1)
-      |> Enum.zip(translations)
+      |> Enum.zip(@langauges |> Enum.map(&Path.join(path, "#{&1}.yaml")))
+      |> Enum.filter(fn {_, p} -> File.exists?(p) end)
+      |> Enum.map(fn {l, p} -> {l, YamlElixir.read_from_file!(p)} end)
+      |> Enum.map(fn {l, p} -> {l, Decoder.decode_translations(p)} end)
       |> Map.new()
 
-    with {:error, error} <- Validator.validate_questions(questions) do
-      raise error
-    end
-
-    for {_, t} <- translations do
-      with {:error, error} <- Validator.validate_translations(questions, t) do
-        raise error
-      end
-    end
-
-    questions = questions |> map_questions()
-
-    %Scenario{
+    scenario = %Scenario{
       id: id,
       start: start,
       questions: questions,
       translations: translations
     }
+
+    with {:error, error} <- Validator.validate(scenario) do
+      raise error
+    end
+
+    %Scenario{scenario | questions: questions |> by_id()}
   end
 
-  defp map_questions(questions) do
-    questions
-    |> Enum.map(&extract_id/1)
-    |> Enum.zip(questions)
+  defp by_id(items) do
+    items
+    |> Enum.map(&Util.pluck(&1, :id))
+    |> Enum.zip(items)
     |> Map.new()
   end
-
-  defp extract_id(%Question.Single{id: id}), do: id
-  defp extract_id(%Question.Multiple{id: id}), do: id
-  defp extract_id(%Question.Prompt{id: id}), do: id
 end
