@@ -20,7 +20,9 @@ defmodule Chat.Util do
     m |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
   end
 
-  def equal(:default, _), do: false
-  def equal(_, :default), do: false
-  def equal(one, two), do: one -- two == [] and two -- one == []
+  def equal(one, two) when is_list(one) and is_list(two) do
+    one -- two == two -- one
+  end
+
+  def equal(_, _), do: false
 end

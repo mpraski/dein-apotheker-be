@@ -1,14 +1,15 @@
 defmodule Chat.Transitioner do
   alias Chat.{Scenario, Question, Answer, Util}
 
-  @general_scenario :general
+  @initial_scenario :general
+  @terminal_scenario :terminal
 
   def transition({[], _, _}, _) do
-    %Scenario{start: start, questions: questions} = Chat.scenario(@general_scenario)
+    %Scenario{start: start, questions: questions} = Chat.scenario(@initial_scenario)
 
     {
       {
-        [@general_scenario],
+        [@initial_scenario],
         start,
         %{}
       },
@@ -19,32 +20,46 @@ defmodule Chat.Transitioner do
   def transition({scenarios, question, data}, {:single, answer}) do
     [current | rest] = scenarios
 
-    %Question.Single{answers: a} = Chat.question(current, question)
+    %Question.Single{
+      answers: answers
+    } = Chat.question(current, question)
 
     %Answer.Single{
       leads_to: next_question,
       jumps_to: next_scenario,
-      loads_scenario: new_scenario
-    } = a |> Enum.find(nil, &(&1.id == answer))
+      loads_scenario: new_scenario,
+      comments: comments
+    } = answers |> Enum.find(nil, &(&1.id == answer))
 
-    {scenario, question} =
+    {scenarios, question} =
       cond do
         next_question ->
           {
-            current,
-            Chat.question(current, next_question)
+            [current | rest],
+            next_question
           }
 
         next_scenario ->
           %Scenario{start: start} = Chat.scenario(next_scenario)
 
           {
-            next_scenario,
-            Chat.question(next_scenario, start)
+            [next_scenario | rest],
+            start
+          }
+
+        true ->
+          [previous_scenario | _] = rest
+
+          %Scenario{start: start} = Chat.scenario(previous_scenario)
+
+          {
+            rest,
+            start
           }
       end
 
-    scenarios = [scenario | rest |> load_scenario(new_scenario)]
+    scenarios = scenarios |> load_scenario(new_scenario)
+    data = data |> Map.put(:comments, comments)
 
     {scenarios, question, data}
   end
@@ -52,47 +67,61 @@ defmodule Chat.Transitioner do
   def transition({scenarios, question, data}, {:multiple, answer}) do
     [current | rest] = scenarios
 
-    %Question.Multiple{decisions: ds} = Chat.question(current, question)
+    %Question.Multiple{
+      decisions: decisions
+    } = Chat.question(current, question)
 
     %Answer.Multiple{
       leads_to: next_question,
       jumps_to: next_scenario,
-      loads_scenario: new_scenario
-    } = ds |> find_decision(answer)
+      loads_scenario: new_scenario,
+      comments: comments
+    } = decisions |> find_decision(answer)
 
-    {scenario, question} =
+    {scenarios, question} =
       cond do
         next_question ->
           {
-            current,
-            Chat.question(current, next_question)
+            [current | rest],
+            next_question
           }
 
         next_scenario ->
           %Scenario{start: start} = Chat.scenario(next_scenario)
 
           {
-            next_scenario,
-            Chat.question(next_scenario, start)
+            [next_scenario | rest],
+            start
+          }
+
+        # To-Do what when this is the last scenario?
+        true ->
+          [previous_scenario | _] = rest
+
+          %Scenario{start: start} = Chat.scenario(previous_scenario)
+
+          {
+            rest,
+            start
           }
       end
 
-    scenarios = [scenario | rest |> load_scenario(new_scenario)]
+    scenarios = scenarios |> load_scenario(new_scenario)
+    data = data |> Map.put(:comments, comments)
 
     {scenarios, question, data}
   end
 
   def transition({scenarios, question, data}, {:prompt, answer}) do
-    [current | _] = scenarios
+    [current | rest] = scenarios
 
-    %Question.Prompt{id: id, leads_to: next_question} = Chat.question(current, question)
+    %Question.Prompt{
+      id: id,
+      leads_to: next_question
+    } = Chat.question(current, question)
 
+    scenarios = if next_question, do: scenarios, else: rest
     data = data |> Map.put(id, answer)
-
-    next_question =
-      if next_question != nil do
-        Chat.question(current, next_question)
-      end
 
     {scenarios, next_question, data}
   end
