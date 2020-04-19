@@ -1,5 +1,5 @@
 defmodule Chat.Transitioner do
-  alias Chat.{Scenario, Question, Answer}
+  alias Chat.{Scenario, Question, Answer, Util}
 
   @general_scenario :general
 
@@ -29,13 +29,46 @@ defmodule Chat.Transitioner do
 
     {scenario, question} =
       cond do
-        next_question != nil ->
+        next_question ->
           {
             current,
             Chat.question(current, next_question)
           }
 
-        next_scenario != nil ->
+        next_scenario ->
+          %Scenario{start: start} = Chat.scenario(next_scenario)
+
+          {
+            next_scenario,
+            Chat.question(next_scenario, start)
+          }
+      end
+
+    scenarios = [scenario | rest |> load_scenario(new_scenario)]
+
+    {scenarios, question, data}
+  end
+
+  def transition({scenarios, question, data}, {:multiple, answer}) do
+    [current | rest] = scenarios
+
+    %Question.Multiple{decisions: ds} = Chat.question(current, question)
+
+    %Answer.Multiple{
+      leads_to: next_question,
+      jumps_to: next_scenario,
+      loads_scenario: new_scenario
+    } = ds |> find_decision(answer)
+
+    {scenario, question} =
+      cond do
+        next_question ->
+          {
+            current,
+            Chat.question(current, next_question)
+          }
+
+        next_scenario ->
           %Scenario{start: start} = Chat.scenario(next_scenario)
 
           {
@@ -62,6 +95,11 @@ defmodule Chat.Transitioner do
       end
 
     {scenarios, next_question, data}
+  end
+
+  def find_decision(decisions, answer) do
+    default = decisions |> Enum.find(nil, &(&1.case == :default))
+    decisions |> Enum.find(default, &Util.equal(&1.case, answer))
   end
 
   defp load_scenario(scenarios, nil), do: scenarios

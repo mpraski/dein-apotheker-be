@@ -69,8 +69,6 @@ defmodule Chat.Validator do
         scenario |> Enum.all?(&validate_translation(&1, t))
       end
 
-    IO.inspect(Enum.all?(validated))
-
     Enum.all?(validated)
   end
 

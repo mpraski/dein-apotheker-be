@@ -1,13 +1,13 @@
 defmodule Chat.Decoder do
-  alias Chat.{Question, Answer, Comment}
+  alias Chat.{Question, Answer, Comment, Util}
 
   def decode_start(%{"start" => start}), do: String.to_atom(start)
 
-  def decode_questions(%{"questions" => questions}) when is_map(questions) do
+  def decode_questions(%{"questions" => questions}) do
     questions |> Enum.map(&decode_question/1)
   end
 
-  def decode_translations(translations) when is_map(translations) do
+  def decode_translations(translations) do
     translations |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end) |> Map.new()
   end
 
@@ -17,8 +17,7 @@ defmodule Chat.Decoder do
             "type" => "single",
             "answers" => answers
           }}
-       )
-       when is_map(answers) do
+       ) do
     %Question.Single{
       id: String.to_atom(id),
       answers: answers |> Enum.map(&decode_answer_single/1)
@@ -60,7 +59,7 @@ defmodule Chat.Decoder do
   end
 
   defp decode_answer_single({id, props}) do
-    %Answer.Single{id: String.to_atom(id)} |> decode_answer_single(props |> to_keywords())
+    %Answer.Single{id: String.to_atom(id)} |> decode_answer_single(props |> Util.to_keywords())
   end
 
   defp decode_answer_single(%Answer.Single{} = a, [{:leads_to, leads_to} | rest]) do
@@ -84,17 +83,16 @@ defmodule Chat.Decoder do
   defp decode_answer_single(%Answer.Single{} = a, []), do: a
 
   defp decode_answer_multiple(decision) when is_map(decision) do
-    %Answer.Multiple{} |> decode_answer_multiple(decision |> to_keywords())
+    %Answer.Multiple{} |> decode_answer_multiple(decision |> Util.to_keywords())
   end
 
   defp decode_answer_multiple(%Answer.Multiple{} = d, [{:case, "default"} | rest]) do
     %Answer.Multiple{d | case: :default} |> decode_answer_multiple(rest)
   end
 
-  defp decode_answer_multiple(%Answer.Multiple{} = d, [{:case, cases} | rest])
-       when is_list(cases) do
-    %Answer.Multiple{d | case: cases |> Enum.map(&String.to_atom/1)}
-    |> decode_answer_multiple(rest)
+  defp decode_answer_multiple(%Answer.Multiple{} = d, [{:case, cases} | rest]) do
+    cases = cases |> Enum.map(&String.to_atom/1)
+    %Answer.Multiple{d | case: cases} |> decode_answer_multiple(rest)
   end
 
   defp decode_answer_multiple(%Answer.Multiple{} = d, [{:leads_to, leads_to} | rest]) do
@@ -106,12 +104,13 @@ defmodule Chat.Decoder do
   end
 
   defp decode_answer_multiple(%Answer.Multiple{} = d, [{:loads_scenario, loads_scenario} | rest]) do
-    %Answer.Multiple{d | loads_scenario: String.to_atom(loads_scenario)}
-    |> decode_answer_multiple(rest)
+    loads_scenario = String.to_atom(loads_scenario)
+    %Answer.Multiple{d | loads_scenario: loads_scenario} |> decode_answer_multiple(rest)
   end
 
   defp decode_answer_multiple(%Answer.Multiple{} = d, [{:comments, comments} | rest]) do
-    %Answer.Multiple{d | comments: String.to_atom(comments)} |> decode_answer_multiple(rest)
+    comments = comments |> Enum.map(&decode_comment/1)
+    %Answer.Multiple{d | comments: comments} |> decode_answer_multiple(rest)
   end
 
   defp decode_answer_multiple(%Answer.Multiple{} = d, []), do: d
@@ -127,11 +126,5 @@ defmodule Chat.Decoder do
       content: String.to_atom(content),
       image: String.to_atom(image)
     }
-  end
-
-  defp to_keywords(nil), do: []
-
-  defp to_keywords(m) when is_map(m) do
-    m |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
   end
 end

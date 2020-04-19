@@ -51,21 +51,21 @@ defimpl Enumerable, for: Chat.Scenario do
     reduce_scenario(t, fun.(q, acc), fun)
   end
 
-  defp reduce_scenario([%Answer.Single{} = a | t], {:cont, acc}, fun) do
+  defp reduce_scenario([%Answer.Single{comments: comments} = a | t], {:cont, acc}, fun) do
     rest =
-      case a |> Map.fetch(:comments) do
-        {:ok, comments} -> comments ++ t
-        _ -> t
+      case comments do
+        nil -> t
+        comments -> comments ++ t
       end
 
     reduce_scenario(rest, fun.(a, acc), fun)
   end
 
-  defp reduce_scenario([%Answer.Multiple{} = a | t], {:cont, acc}, fun) do
+  defp reduce_scenario([%Answer.Multiple{comments: comments} = a | t], {:cont, acc}, fun) do
     rest =
-      case a |> Map.fetch(:comments) do
-        {:ok, comments} -> comments ++ t
-        _ -> t
+      case comments do
+        nil -> t
+        comments -> comments ++ t
       end
 
     reduce_scenario(rest, fun.(a, acc), fun)
