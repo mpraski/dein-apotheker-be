@@ -59,17 +59,29 @@ defmodule Chat.Transitioner do
   end
 
   def transition({scenarios, question, data}, {:prompt, answer}) do
-    [current | rest] = scenarios
+    [current | _] = scenarios
 
     %Question.Prompt{
       id: id,
-      leads_to: next_question
+      leads_to: next_question,
+      jumps_to: next_scenario,
+      loads_scenario: new_scenario,
+      comments: comments
     } = Chat.question(current, question)
 
-    scenarios = if next_question, do: scenarios, else: rest
-    data = data |> Map.put(id, answer)
+    {scenarios, question} =
+      next(
+        next_question,
+        next_scenario,
+        new_scenario,
+        scenarios
+      )
 
-    {scenarios, next_question, data}
+    data = data 
+    |> Map.put(id, answer) 
+    |> Map.put(:comments, comments)
+
+    {scenarios, question, data}
   end
 
   def transition do
