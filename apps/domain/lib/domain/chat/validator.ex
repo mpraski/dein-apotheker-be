@@ -16,10 +16,10 @@ defmodule Chat.Validator do
   defp validate_all(_, []), do: :ok
 
   defp validate_all(scenario, [{f, error} | checks]) do
-    unless f.(scenario) do
-      {:error, error}
+    if f.(scenario) do
+      scenario |> validate_all(checks)
     else
-      validate_all(scenario, checks)
+      {:error, error}
     end
   end
 
@@ -43,7 +43,7 @@ defmodule Chat.Validator do
   defp validate_consistency(%Answer.Single{leads_to: id}, m), do: m |> Util.has_key?(id)
   defp validate_consistency(%Answer.Multiple{leads_to: id}, m), do: m |> Util.has_key?(id)
   defp validate_consistency(%Question.Prompt{leads_to: id}, m), do: m |> Util.has_key?(id)
-  defp validate_consistency(a, m) when is_atom(a), do: m |> Util.has_key?(a)
+  defp validate_consistency(a, m) when is_binary(a), do: m |> Util.has_key?(a)
   defp validate_consistency(_, _), do: true
 
   defp validate_cases(%Scenario{questions: questions} = scenario) do

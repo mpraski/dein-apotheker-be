@@ -9,5 +9,6 @@ defmodule Api.Router do
     pipe_through(:api)
 
     resources("/bookings", BookingController, only: [:index])
+    resources("/chat", ChatController)
   end
 end

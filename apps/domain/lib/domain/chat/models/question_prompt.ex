@@ -3,6 +3,9 @@ defmodule Chat.Question.Prompt do
 
   defstruct(
     id: nil,
-    leads_to: nil
+    leads_to: nil,
+    jumps_to: nil,
+    loads_scenario: nil,
+    comments: []
   )
 end

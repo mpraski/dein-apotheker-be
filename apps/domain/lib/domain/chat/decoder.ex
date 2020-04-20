@@ -1,7 +1,7 @@
 defmodule Chat.Decoder do
   alias Chat.{Question, Answer, Comment, Util}
 
-  def decode_start(%{"start" => start}), do: String.to_atom(start)
+  def decode_start(%{"start" => start}), do: start
 
   def decode_questions(%{"questions" => questions}) do
     questions |> Enum.map(&decode_question/1)
@@ -18,9 +18,11 @@ defmodule Chat.Decoder do
             "answers" => answers
           }}
        ) do
+    answers = answers |> Enum.map(&decode_answer_single/1)
+
     %Question.Single{
-      id: String.to_atom(id),
-      answers: answers |> Enum.map(&decode_answer_single/1)
+      id: id,
+      answers: answers
     }
   end
 
@@ -33,46 +35,59 @@ defmodule Chat.Decoder do
           }}
        )
        when is_list(answers) and is_list(decisions) do
+    decisions = decisions |> Enum.map(&decode_answer_multiple/1)
+
     %Question.Multiple{
-      id: String.to_atom(id),
-      answers: answers |> Enum.map(&String.to_atom/1),
-      decisions: decisions |> Enum.map(&decode_answer_multiple/1)
+      id: id,
+      answers: answers,
+      decisions: decisions
     }
   end
 
-  defp decode_question(
-         {id,
-          %{
-            "type" => "prompt"
-          } = question}
-       ) do
-    leads_to =
-      case question |> Map.fetch("leads_to") do
-        {:ok, leads_to} -> String.to_atom(leads_to)
-        _ -> nil
-      end
+  defp decode_question({
+         id,
+         %{
+           "type" => "prompt"
+         } = question
+       }) do
+    {_, question} = question |> Map.pop("type")
 
-    %Question.Prompt{
-      id: String.to_atom(id),
-      leads_to: leads_to
-    }
+    %Question.Prompt{id: id} |> decode_question_prompt(Util.to_keywords(question))
   end
+
+  defp decode_question_prompt(%Question.Prompt{} = q, [{:leads_to, leads_to} | rest]) do
+    %Question.Prompt{q | leads_to: leads_to} |> decode_question_prompt(rest)
+  end
+
+  defp decode_question_prompt(%Question.Prompt{} = q, [{:jumps_to, jumps_to} | rest]) do
+    %Question.Prompt{q | jumps_to: jumps_to} |> decode_question_prompt(rest)
+  end
+
+  defp decode_question_prompt(%Question.Prompt{} = q, [{:loads_scenario, loads_scenario} | rest]) do
+    %Question.Prompt{q | loads_scenario: loads_scenario} |> decode_question_prompt(rest)
+  end
+
+  defp decode_question_prompt(%Question.Prompt{} = q, [{:comments, comments} | rest]) do
+    comments = comments |> Enum.map(&decode_comment/1)
+    %Question.Prompt{q | comments: comments} |> decode_question_prompt(rest)
+  end
+
+  defp decode_question_prompt(%Question.Prompt{} = q, []), do: q
 
   defp decode_answer_single({id, props}) do
-    %Answer.Single{id: String.to_atom(id)} |> decode_answer_single(props |> Util.to_keywords())
+    %Answer.Single{id: id} |> decode_answer_single(Util.to_keywords(props))
   end
 
   defp decode_answer_single(%Answer.Single{} = a, [{:leads_to, leads_to} | rest]) do
-    %Answer.Single{a | leads_to: String.to_atom(leads_to)} |> decode_answer_single(rest)
+    %Answer.Single{a | leads_to: leads_to} |> decode_answer_single(rest)
   end
 
   defp decode_answer_single(%Answer.Single{} = a, [{:jumps_to, jumps_to} | rest]) do
-    %Answer.Single{a | jumps_to: String.to_atom(jumps_to)} |> decode_answer_single(rest)
+    %Answer.Single{a | jumps_to: jumps_to} |> decode_answer_single(rest)
   end
 
   defp decode_answer_single(%Answer.Single{} = a, [{:loads_scenario, loads_scenario} | rest]) do
-    load_scenario = String.to_atom(loads_scenario)
-    %Answer.Single{a | loads_scenario: load_scenario} |> decode_answer_single(rest)
+    %Answer.Single{a | loads_scenario: loads_scenario} |> decode_answer_single(rest)
   end
 
   defp decode_answer_single(%Answer.Single{} = a, [{:comments, comments} | rest]) do
@@ -83,7 +98,7 @@ defmodule Chat.Decoder do
   defp decode_answer_single(%Answer.Single{} = a, []), do: a
 
   defp decode_answer_multiple(decision) when is_map(decision) do
-    %Answer.Multiple{} |> decode_answer_multiple(decision |> Util.to_keywords())
+    %Answer.Multiple{} |> decode_answer_multiple(Util.to_keywords(decision))
   end
 
   defp decode_answer_multiple(%Answer.Multiple{} = d, [{:case, "default"} | rest]) do
@@ -91,20 +106,18 @@ defmodule Chat.Decoder do
   end
 
   defp decode_answer_multiple(%Answer.Multiple{} = d, [{:case, cases} | rest]) do
-    cases = cases |> Enum.map(&String.to_atom/1)
     %Answer.Multiple{d | case: cases} |> decode_answer_multiple(rest)
   end
 
   defp decode_answer_multiple(%Answer.Multiple{} = d, [{:leads_to, leads_to} | rest]) do
-    %Answer.Multiple{d | leads_to: String.to_atom(leads_to)} |> decode_answer_multiple(rest)
+    %Answer.Multiple{d | leads_to: leads_to} |> decode_answer_multiple(rest)
   end
 
   defp decode_answer_multiple(%Answer.Multiple{} = d, [{:jumps_to, jumps_to} | rest]) do
-    %Answer.Multiple{d | jumps_to: String.to_atom(jumps_to)} |> decode_answer_multiple(rest)
+    %Answer.Multiple{d | jumps_to: jumps_to} |> decode_answer_multiple(rest)
   end
 
   defp decode_answer_multiple(%Answer.Multiple{} = d, [{:loads_scenario, loads_scenario} | rest]) do
-    loads_scenario = String.to_atom(loads_scenario)
     %Answer.Multiple{d | loads_scenario: loads_scenario} |> decode_answer_multiple(rest)
   end
 
@@ -115,16 +128,23 @@ defmodule Chat.Decoder do
 
   defp decode_answer_multiple(%Answer.Multiple{} = d, []), do: d
 
-  defp decode_comment(%{"type" => "text", "content" => content}) do
+  defp decode_comment(%{
+         "type" => "text",
+         "content" => content
+       }) do
     %Comment.Text{
-      content: String.to_atom(content)
+      content: content
     }
   end
 
-  defp decode_comment(%{"type" => "image", "content" => content, "image" => image}) do
+  defp decode_comment(%{
+         "type" => "image",
+         "content" => content,
+         "image" => image
+       }) do
     %Comment.Image{
-      content: String.to_atom(content),
-      image: String.to_atom(image)
+      content: content,
+      image: image
     }
   end
 end

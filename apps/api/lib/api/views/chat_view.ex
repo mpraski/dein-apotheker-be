@@ -1,7 +1,17 @@
 defmodule Api.ChatView do
   use Api, :view
 
-  def render("index.json", %{items: items}) do
-    items |> Enum.map(&Map.from_struct/1)
+  alias Chat.Util
+
+  def render("index.json", %{scenario: scenario}) do
+    scenario |> Util.to_map()
+  end
+
+  def render("create.json", %{context: {scenarios, question, data}}) do
+    %{
+      scenarios: scenarios,
+      question: question,
+      data: data
+    }
   end
 end

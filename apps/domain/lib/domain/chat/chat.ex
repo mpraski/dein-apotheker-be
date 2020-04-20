@@ -8,7 +8,7 @@ defmodule Chat do
 
   def question(scenario, question) do
     case scenario(scenario) do
-      %Scenario{questions: qs} -> qs |> Map.get(question)
+      %Scenario{questions: qs} -> qs |> Enum.find(nil, &(&1.id == question))
       _ -> nil
     end
   end

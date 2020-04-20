@@ -1,0 +1,5 @@
+start: feedback
+
+questions:
+  feedback:
+    type: prompt

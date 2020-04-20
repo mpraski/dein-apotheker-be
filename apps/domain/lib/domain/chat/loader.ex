@@ -14,7 +14,7 @@ defmodule Chat.Loader do
   end
 
   defp load_scenario(path) do
-    id = String.to_atom(Path.basename(path))
+    id = Path.basename(path)
 
     scenario =
       path
@@ -44,7 +44,7 @@ defmodule Chat.Loader do
       raise error
     end
 
-    %Scenario{scenario | questions: questions |> by_id()}
+    scenario
   end
 
   defp by_id(items) do

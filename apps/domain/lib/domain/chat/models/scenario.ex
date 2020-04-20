@@ -79,7 +79,7 @@ defimpl Enumerable, for: Chat.Scenario do
     reduce_scenario(t, fun.(c, acc), fun)
   end
 
-  defp reduce_scenario([a | t], {:cont, acc}, fun) when is_atom(a) do
+  defp reduce_scenario([a | t], {:cont, acc}, fun) when is_binary(a) do
     reduce_scenario(t, fun.(a, acc), fun)
   end
 end

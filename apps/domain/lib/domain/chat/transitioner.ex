@@ -1,24 +1,11 @@
 defmodule Chat.Transitioner do
   alias Chat.{Scenario, Question, Answer, Util}
 
-  @initial_scenario :general
-  @terminal_scenario :terminal
-
-  def transition({[], _, _}, _) do
-    %Scenario{start: start, questions: questions} = Chat.scenario(@initial_scenario)
-
-    {
-      {
-        [@initial_scenario],
-        start,
-        %{}
-      },
-      questions |> Map.get(start)
-    }
-  end
+  @initial_scenario "initial"
+  @terminal_scenario "terminal"
 
   def transition({scenarios, question, data}, {:single, answer}) do
-    [current | rest] = scenarios
+    [current | _] = scenarios
 
     %Question.Single{
       answers: answers
@@ -32,40 +19,20 @@ defmodule Chat.Transitioner do
     } = answers |> Enum.find(nil, &(&1.id == answer))
 
     {scenarios, question} =
-      cond do
-        next_question ->
-          {
-            [current | rest],
-            next_question
-          }
+      next(
+        next_question,
+        next_scenario,
+        new_scenario,
+        scenarios
+      )
 
-        next_scenario ->
-          %Scenario{start: start} = Chat.scenario(next_scenario)
-
-          {
-            [next_scenario | rest],
-            start
-          }
-
-        true ->
-          [previous_scenario | _] = rest
-
-          %Scenario{start: start} = Chat.scenario(previous_scenario)
-
-          {
-            rest,
-            start
-          }
-      end
-
-    scenarios = scenarios |> load_scenario(new_scenario)
     data = data |> Map.put(:comments, comments)
 
     {scenarios, question, data}
   end
 
   def transition({scenarios, question, data}, {:multiple, answer}) do
-    [current | rest] = scenarios
+    [current | _] = scenarios
 
     %Question.Multiple{
       decisions: decisions
@@ -79,34 +46,13 @@ defmodule Chat.Transitioner do
     } = decisions |> find_decision(answer)
 
     {scenarios, question} =
-      cond do
-        next_question ->
-          {
-            [current | rest],
-            next_question
-          }
+      next(
+        next_question,
+        next_scenario,
+        new_scenario,
+        scenarios
+      )
 
-        next_scenario ->
-          %Scenario{start: start} = Chat.scenario(next_scenario)
-
-          {
-            [next_scenario | rest],
-            start
-          }
-
-        # To-Do what when this is the last scenario?
-        true ->
-          [previous_scenario | _] = rest
-
-          %Scenario{start: start} = Chat.scenario(previous_scenario)
-
-          {
-            rest,
-            start
-          }
-      end
-
-    scenarios = scenarios |> load_scenario(new_scenario)
     data = data |> Map.put(:comments, comments)
 
     {scenarios, question, data}
@@ -126,7 +72,44 @@ defmodule Chat.Transitioner do
     {scenarios, next_question, data}
   end
 
-  def find_decision(decisions, answer) do
+  def transition do
+    %Scenario{start: start} = Chat.scenario(@initial_scenario)
+    {[@initial_scenario], start, %{}}
+  end
+
+  defp next(next_question, next_scenario, new_scenario, scenarios) do
+    {scenarios, question} =
+      cond do
+        next_question ->
+          {scenarios, next_question}
+
+        next_scenario ->
+          %Scenario{start: start} = Chat.scenario(next_scenario)
+          [_ | rest] = scenarios
+
+          {[next_scenario | rest], start}
+
+        true ->
+          case scenarios do
+            [_, previous | rest] ->
+              %Scenario{start: start} = Chat.scenario(previous)
+              {[previous | rest], start}
+
+            [_] ->
+              %Scenario{start: start} = Chat.scenario(@terminal_scenario)
+              {[@terminal_scenario], start}
+
+            [] ->
+              raise "Should not reach here"
+          end
+      end
+
+    scenarios = scenarios |> load_scenario(new_scenario)
+
+    {scenarios, question}
+  end
+
+  defp find_decision(decisions, answer) do
     default = decisions |> Enum.find(nil, &(&1.case == :default))
     decisions |> Enum.find(default, &Util.equal(&1.case, answer))
   end
