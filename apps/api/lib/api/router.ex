@@ -8,7 +8,6 @@ defmodule Api.Router do
   scope "/api", Api do
     pipe_through(:api)
 
-    resources("/bookings", BookingController, only: [:index])
     resources("/chat", ChatController)
   end
 end

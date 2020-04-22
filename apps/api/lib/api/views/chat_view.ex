@@ -1,17 +1,28 @@
 defmodule Api.ChatView do
   use Api, :view
 
-  alias Chat.Util
+  alias Api.ChatHelpers
 
-  def render("index.json", %{scenario: scenario}) do
-    scenario |> Util.to_map()
+  def render("create.json", %{context: context}) do
+    with response <- %{
+           id: ChatHelpers.id(context),
+           input: ChatHelpers.input(context),
+           messages: ChatHelpers.messages(context)
+         } do
+      context |> with_context(response)
+    end
   end
 
-  def render("create.json", %{context: {scenarios, question, data}}) do
+  defp with_context({scenarios, question, data}, content) do
+    {_, data} = data |> Map.pop(:comments)
+
     %{
-      scenarios: scenarios,
-      question: question,
-      data: data
+      context: %{
+        scenarios: scenarios,
+        question: question,
+        data: data
+      },
+      data: content
     }
   end
 end

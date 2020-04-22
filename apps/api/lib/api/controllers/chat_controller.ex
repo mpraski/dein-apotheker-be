@@ -1,31 +1,28 @@
 defmodule Api.ChatController do
   use Api, :controller
 
-  alias Chat.{Util, Transitioner}
+  alias Chat.Transitioner
 
   @question_types ~w[single multiple prompt]
 
-  def index(conn, _params) do
-    scenario = Chat.scenario(:initial)
-    render(conn, "index.json", scenario: scenario)
-  end
+  plug(Api.Plugs.FromContext)
 
   def create(conn, %{
-        "context" => %{
-          "scenarios" => scenarios,
-          "question" => question,
-          "data" => data
-        },
         "answer" => %{
           "type" => type,
           "value" => value
         }
       })
       when type in @question_types do
-    context = {scenarios, question, data}
-    answer = {String.to_atom(type), value}
-    new_context = Transitioner.transition(context, answer)
-    render(conn, "create.json", context: new_context)
+    if conn.assigns.has_context? do
+      context = conn.assigns.context
+      answer = {String.to_atom(type), value}
+      conn |> render("create.json", context: Transitioner.transition(context, answer))
+    else
+      conn
+      |> put_flash(:error, "You need to sign in or sign up before continuing.")
+      |> halt()
+    end
   end
 
   def create(conn, _) do

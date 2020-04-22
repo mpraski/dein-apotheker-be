@@ -3,13 +3,19 @@ defmodule Chat do
 
   @scenarios_path Path.join(File.cwd!(), "../../scenarios")
   @scenarios Loader.load_scenarios(@scenarios_path)
+  @question_types ~w[single multiple prompt]
 
   def scenario(scenario), do: @scenarios |> Map.get(scenario)
 
-  def question(scenario, question) do
-    case scenario(scenario) do
-      %Scenario{questions: qs} -> qs |> Enum.find(nil, &(&1.id == question))
-      _ -> nil
-    end
+  def question(nil, _), do: nil
+
+  def question(%Scenario{questions: questions}, q) do
+    questions |> Map.get(q)
   end
+
+  def question(scenario, question) do
+    question(scenario(scenario), question)
+  end
+
+  def question_type, do: @question_types
 end

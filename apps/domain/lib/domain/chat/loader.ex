@@ -30,7 +30,6 @@ defmodule Chat.Loader do
       |> Enum.zip(@langauges |> Enum.map(&Path.join(path, "#{&1}.yaml")))
       |> Enum.filter(fn {_, p} -> File.exists?(p) end)
       |> Enum.map(fn {l, p} -> {l, @yaml.read_from_file!(p)} end)
-      |> Enum.map(fn {l, p} -> {l, Decoder.decode_translations(p)} end)
       |> Map.new()
 
     scenario = %Scenario{
@@ -44,7 +43,7 @@ defmodule Chat.Loader do
       raise error
     end
 
-    scenario
+    %Scenario{scenario | questions: by_id(questions)}
   end
 
   defp by_id(items) do

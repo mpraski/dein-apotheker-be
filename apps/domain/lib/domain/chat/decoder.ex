@@ -7,10 +7,6 @@ defmodule Chat.Decoder do
     questions |> Enum.map(&decode_question/1)
   end
 
-  def decode_translations(translations) do
-    translations |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end) |> Map.new()
-  end
-
   defp decode_question(
          {id,
           %{
