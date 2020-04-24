@@ -3,18 +3,29 @@ defmodule Api.ChatView do
 
   alias Api.ChatHelpers
 
-  def render("create.json", %{context: context}) do
-    with response <- %{
-           id: ChatHelpers.id(context),
-           input: ChatHelpers.input(context),
-           messages: ChatHelpers.messages(context)
-         } do
-      context |> with_context(response)
-    end
+  @temporary_data ~w[comments]a
+
+  def render("answer.json", %{context: context}) do
+    %{
+      id: ChatHelpers.id(context),
+      input: ChatHelpers.input(context),
+      messages: ChatHelpers.messages(context)
+    }
+    |> in_context(context)
+    |> in_envelope()
   end
 
-  defp with_context({scenarios, question, data}, content) do
-    {_, data} = data |> Map.pop(:comments)
+  defp in_envelope(item) do
+    %{
+      error: nil,
+      content: item
+    }
+  end
+
+  defp in_context(item, {scenarios, question, data}) do
+    data =
+      @temporary_data
+      |> Enum.reduce(data, fn k, m -> Map.delete(m, k) end)
 
     %{
       context: %{
@@ -22,7 +33,7 @@ defmodule Api.ChatView do
         question: question,
         data: data
       },
-      data: content
+      data: item
     }
   end
 end

@@ -25,18 +25,4 @@ defmodule Chat.Util do
   end
 
   def equal(_, _), do: false
-
-  def to_map(item) when is_struct(item), do: to_map(Map.from_struct(item))
-
-  def to_map(item) when is_map(item) do
-    item
-    |> Enum.map(fn {k, v} -> {k, to_map(v)} end)
-    |> Map.new()
-  end
-
-  def to_map(item) when is_list(item) do
-    item |> Enum.map(&to_map/1)
-  end
-
-  def to_map(item), do: item
 end

@@ -14,12 +14,12 @@ defmodule Api.Plugs.FromContext do
               "question" => question,
               "scenarios" => scenarios
             },
-            "data" => data
+            "data" => content
           }
         } = conn,
         _params
       ) do
-    %Conn{conn | body_params: data}
+    %Conn{conn | params: content}
     |> assign(:context, {scenarios, question, data})
     |> assign(:has_context?, true)
   end

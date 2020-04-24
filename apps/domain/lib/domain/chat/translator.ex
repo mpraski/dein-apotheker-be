@@ -1,5 +1,5 @@
 defmodule Chat.Translator do
-  alias Chat.{Decoder, Validator, Scenario, Util}
+  alias Chat.Scenario
 
   @defaults %{scenario: nil, keys: [], language: :en}
 
@@ -20,7 +20,7 @@ defmodule Chat.Translator do
     |> Map.new()
   end
 
-  defp do_translate(item, %{keys: keys} = opts) when is_list(item) do
+  defp do_translate(item, opts) when is_list(item) do
     item |> Enum.map(&do_translate(&1, opts))
   end
 

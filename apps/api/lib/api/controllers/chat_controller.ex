@@ -2,12 +2,16 @@ defmodule Api.ChatController do
   use Api, :controller
 
   alias Chat.Transitioner
+  alias Api.Plugs.FromContext
+  alias Api.FallbackController
 
   @question_types ~w[single multiple prompt]
 
-  plug(Api.Plugs.FromContext)
+  plug(FromContext)
 
-  def create(conn, %{
+  action_fallback(FallbackController)
+
+  def answer(conn, %{
         "answer" => %{
           "type" => type,
           "value" => value
@@ -15,17 +19,21 @@ defmodule Api.ChatController do
       })
       when type in @question_types do
     if conn.assigns.has_context? do
-      context = conn.assigns.context
-      answer = {String.to_atom(type), value}
-      conn |> render("create.json", context: Transitioner.transition(context, answer))
+      with context <- conn.assigns.context,
+           answer <- {String.to_atom(type), value},
+           new_context <- Transitioner.transition(context, answer) do
+        conn |> render("answer.json", context: new_context)
+      end
     else
-      conn
-      |> put_flash(:error, "You need to sign in or sign up before continuing.")
-      |> halt()
+      {:error, 400, "Badly formed request"}
     end
   end
 
-  def create(conn, _) do
-    render(conn, "create.json", context: Transitioner.transition())
+  def answer(conn, _params) do
+    if conn.assigns.has_context? do
+      conn |> render("answer.json", context: Transitioner.transition())
+    else
+      {:error, 400, "Badly formed request"}
+    end
   end
 end

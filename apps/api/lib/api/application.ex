@@ -6,28 +6,17 @@ defmodule Api.Application do
   use Application
 
   alias Api.Endpoint
-  alias Api.HealthCheck
-  alias Api.Metrics
 
   def start(_type, _args) do
     # List all child processes to be supervised
     children = [
-      HealthCheck,
       Endpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Api.Supervisor]
-    {:ok, pid} = Supervisor.start_link(children, opts)
-
-    # Configure health checks
-    HealthCheck.add_readiness(HealthCheck.ping_repo(Domain.Repo))
-
-    # Configure Prometheus metrics exporter
-    Metrics.Exporter.setup()
-
-    {:ok, pid}
+    Supervisor.start_link(children, opts)
   end
 
   # Tell Phoenix to update the endpoint configuration

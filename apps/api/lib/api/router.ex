@@ -8,6 +8,8 @@ defmodule Api.Router do
   scope "/api", Api do
     pipe_through(:api)
 
-    resources("/chat", ChatController)
+    resources "/chat", ChatController, singleton: true do
+      post("/answer", ChatController, :answer, as: :answer)
+    end
   end
 end
