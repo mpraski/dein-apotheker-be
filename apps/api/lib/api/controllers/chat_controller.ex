@@ -36,4 +36,10 @@ defmodule Api.ChatController do
       {:error, 400, "Badly formed request"}
     end
   end
+
+  def token(conn, _params) do
+    with token <- UUID.uuid4() do
+      conn |> render("token.json", token: token)
+    end
+  end
 end

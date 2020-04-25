@@ -15,6 +15,10 @@ defmodule Api.ChatView do
     |> in_envelope()
   end
 
+  def render("token.json", %{token: token}) do
+    %{token: token} |> in_envelope()
+  end
+
   defp in_envelope(item) do
     %{
       error: nil,

@@ -43,6 +43,7 @@ defmodule Api.MixProject do
       {:prometheus_ex, "~> 3.0"},
       {:prometheus_plugs, "~> 1.1.1"},
       {:dns, "~> 2.1.2"},
+      {:elixir_uuid, "~> 1.2"},
       {:domain, in_umbrella: true}
     ]
   end
