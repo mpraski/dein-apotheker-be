@@ -3,15 +3,21 @@ defmodule Chat.Translator do
 
   @defaults %{scenario: nil, keys: [], language: :en}
 
+  alias Chat.Util
+
   def translate(item, opts \\ []) do
-    opts = Enum.into(opts, @defaults)
+    opts =
+      opts
+      |> Enum.into(@defaults)
+      |> Map.update!(:keys, &Util.index/1)
+
     do_translate(item, opts)
   end
 
   defp do_translate(item, %{keys: keys} = opts) when is_map(item) do
     item
     |> Enum.map(fn {k, v} ->
-      if in_list(keys, k) do
+      if has_key(keys, k) do
         do_translate({k, v}, opts)
       else
         {k, do_translate(v, opts)}
@@ -25,18 +31,18 @@ defmodule Chat.Translator do
   end
 
   defp do_translate({key, value}, %{
-        scenario: scenario,
-        language: language
-      })
-      when is_binary(value) do
+         scenario: scenario,
+         language: language
+       })
+       when is_binary(value) do
     {key, fetch(value, scenario, language)}
   end
 
   defp do_translate({key, value}, %{
-        scenario: scenario,
-        language: language
-      })
-      when is_list(value) do
+         scenario: scenario,
+         language: language
+       })
+       when is_list(value) do
     {key, value |> Enum.map(&fetch(&1, scenario, language))}
   end
 
@@ -48,6 +54,6 @@ defmodule Chat.Translator do
     value
   end
 
-  defp in_list([], _), do: true
-  defp in_list(l, i), do: l |> Enum.member?(i)
+  defp has_key([], _), do: true
+  defp has_key(l, i), do: l |> Map.has_key?(i)
 end

@@ -23,9 +23,7 @@ defmodule Api.ChatView do
   end
 
   defp in_context(item, {scenarios, question, data}) do
-    data =
-      @temporary_data
-      |> Enum.reduce(data, fn k, m -> Map.delete(m, k) end)
+    data = @temporary_data |> Enum.reduce(data, &Map.delete(&2, &1))
 
     %{
       context: %{

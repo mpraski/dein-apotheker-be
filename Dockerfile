@@ -24,6 +24,7 @@ RUN mkdir /$APP
 WORKDIR /$APP
 
 # Copy over all the necessary application files and directories
+COPY scenarios ./scenarios
 COPY config ./config
 COPY apps ./apps
 COPY mix.exs .

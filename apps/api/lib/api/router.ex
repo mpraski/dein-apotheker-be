@@ -5,11 +5,9 @@ defmodule Api.Router do
     plug(:accepts, ["json"])
   end
 
-  scope "/api", Api do
+  scope "/chat", Api do
     pipe_through(:api)
 
-    resources "/chat", ChatController, singleton: true do
-      post("/answer", ChatController, :answer, as: :answer)
-    end
+    post("/answer", ChatController, :answer, as: :answer)
   end
 end

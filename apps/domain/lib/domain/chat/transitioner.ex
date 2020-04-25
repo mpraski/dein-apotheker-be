@@ -77,9 +77,10 @@ defmodule Chat.Transitioner do
         scenarios
       )
 
-    data = data 
-    |> Map.put(id, answer) 
-    |> Map.put(:comments, comments)
+    data =
+      data
+      |> Map.put(id, answer)
+      |> Map.put(:comments, comments)
 
     {scenarios, question, data}
   end
@@ -122,8 +123,9 @@ defmodule Chat.Transitioner do
   end
 
   defp find_decision(decisions, answer) do
-    default = decisions |> Enum.find(nil, &(&1.case == :default))
-    decisions |> Enum.find(default, &Util.equal(&1.case, answer))
+    with default <- decisions |> Enum.find(nil, &(&1.case == :default)) do
+      decisions |> Enum.find(default, &Util.equal(&1.case, answer))
+    end
   end
 
   defp load_scenario(scenarios, nil), do: scenarios

@@ -3,7 +3,6 @@ defmodule Chat do
 
   @scenarios_path Path.join(File.cwd!(), "../../scenarios")
   @scenarios Loader.load_scenarios(@scenarios_path)
-  @question_types ~w[single multiple prompt]
 
   def scenario(scenario), do: @scenarios |> Map.get(scenario)
 
@@ -16,6 +15,4 @@ defmodule Chat do
   def question(scenario, question) do
     question(scenario(scenario), question)
   end
-
-  def question_type, do: @question_types
 end
