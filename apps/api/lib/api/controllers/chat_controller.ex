@@ -2,20 +2,19 @@ defmodule Api.ChatController do
   use Api, :controller
 
   alias Chat.Transitioner
-  alias Api.Plugs.FromContext
+  alias Api.Plugs.{FromContext, RequireToken}
   alias Api.FallbackController
 
   @question_types ~w[single multiple prompt]
 
+  plug(RequireToken)
   plug(FromContext)
-
+  
   action_fallback(FallbackController)
 
   def answer(conn, %{
-        "answer" => %{
-          "type" => type,
-          "value" => value
-        }
+        "type" => type,
+        "value" => value
       })
       when type in @question_types do
     if conn.assigns.has_context? do
@@ -34,12 +33,6 @@ defmodule Api.ChatController do
       conn |> render("answer.json", context: Transitioner.transition())
     else
       {:error, 400, "Badly formed request"}
-    end
-  end
-
-  def token(conn, _params) do
-    with token <- UUID.uuid4() do
-      conn |> render("token.json", token: token)
     end
   end
 end

@@ -36,6 +36,13 @@ defmodule Api do
 
       import Api.ErrorHelpers
       alias Api.Router.Helpers, as: Routes
+
+      defp in_envelope(item) do
+        %{
+          error: nil,
+          content: item
+        }
+      end
     end
   end
 

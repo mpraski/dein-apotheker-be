@@ -1,6 +1,13 @@
 symptom: "For which symptom are you looking for a drug?"
 running_nose: "Running nose"
+have_running_nose: "Do you have a running nose?"
+some_comment: "This is some comment"
 yes: "Yes"
 no: "No"
 no_typing_error: "No, it was a typing error"
 further_diseases: "Do you have any fucked up diseases?"
+some_image: https://www.meme-arsenal.com/memes/772e249f7922471e6763c9ec594b9e5f.jpg
+medicine: "Is this medicine for you?"
+allergy_or_cold: "You have allergy or cold?"
+age_disclaimer: "Age disclaimer bla bla bla"
+some_content_text: "Some other comment"

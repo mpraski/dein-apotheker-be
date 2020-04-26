@@ -91,6 +91,8 @@ defmodule Chat.Transitioner do
   end
 
   defp next(next_question, next_scenario, new_scenario, scenarios) do
+    IO.inspect({next_question, next_scenario, new_scenario, scenarios})
+
     {scenarios, question} =
       cond do
         next_question ->
@@ -98,9 +100,14 @@ defmodule Chat.Transitioner do
 
         next_scenario ->
           %Scenario{start: start} = Chat.scenario(next_scenario)
-          [_ | rest] = scenarios
+          [current | rest] = scenarios
 
-          {[next_scenario | rest], start}
+          #To-Do how to implement erasing contexts?
+          if current == @initial_scenario do
+            {[next_scenario], start}
+          else
+            {[next_scenario | rest], start}
+          end
 
         true ->
           case scenarios do

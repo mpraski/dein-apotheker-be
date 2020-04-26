@@ -7,22 +7,22 @@ questions:
       - running_nose
     decisions:
       - case: [running_nose]
-        leads_to: running_nose
+        leads_to: have_running_nose
         loads_scenario: running_nose
         comments:
           - type: text
             content: some_comment
       - case: default
-        leads_to: running_nose
+        leads_to: have_running_nose
         loads_scenario: running_nose
 
-  running_nose:
+  have_running_nose:
     type: single
     answers:
       yes:
         leads_to: medicine
       no_typing_error:
-        jumps_to: general
+        jumps_to: initial
         comments:
           - type: text
             content: some_comment

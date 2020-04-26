@@ -35,6 +35,6 @@ defmodule Api.Endpoint do
   plug(Plug.MethodOverride)
   plug(Plug.Head)
   plug(Plug.Session, @session_options)
-  plug(Api.Metrics.Exporter)
+  plug(Corsica, origins: "*", allow_headers: :all)
   plug(Api.Router)
 end

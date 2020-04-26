@@ -43,25 +43,24 @@ defmodule Chat.Validator do
   defp validate_consistency(%Answer.Single{leads_to: id}, m), do: m |> Util.has_key?(id)
   defp validate_consistency(%Answer.Multiple{leads_to: id}, m), do: m |> Util.has_key?(id)
   defp validate_consistency(%Question.Prompt{leads_to: id}, m), do: m |> Util.has_key?(id)
-  defp validate_consistency(a, m) when is_binary(a), do: m |> Util.has_key?(a)
   defp validate_consistency(_, _), do: true
 
-  defp validate_cases(%Scenario{questions: questions} = scenario) do
-    question_ids =
-      questions
-      |> Enum.map(&Util.pluck(&1, :id))
-      |> Util.index()
-
-    scenario |> Enum.all?(&validate_cases(&1, question_ids))
+  defp validate_cases(%Scenario{questions: questions}) do
+    questions |> Enum.all?(&validate_cases/1)
   end
+
+  defp validate_cases(%Question.Multiple{decisions: decisions, answers: answers}) do
+    answers = answers |> Util.index()
+    decisions |> Enum.all?(&validate_cases(&1, answers))
+  end
+
+  defp validate_cases(_), do: true
 
   defp validate_cases(%Answer.Multiple{case: :default}, _), do: true
 
   defp validate_cases(%Answer.Multiple{case: cases}, t) do
     cases |> Enum.all?(&Map.has_key?(t, &1))
   end
-
-  defp validate_cases(_, _), do: true
 
   defp validate_translation(%Scenario{translations: ts} = scenario) do
     validated =

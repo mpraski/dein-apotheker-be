@@ -15,15 +15,6 @@ defmodule Api.ChatView do
     |> in_envelope()
   end
 
-  def render("token.json", %{token: token}), do: token
-
-  defp in_envelope(item) do
-    %{
-      error: nil,
-      content: item
-    }
-  end
-
   defp in_context(item, {scenarios, question, data}) do
     data = @temporary_data |> Enum.reduce(data, &Map.delete(&2, &1))
 

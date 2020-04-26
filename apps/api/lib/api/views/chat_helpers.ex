@@ -25,7 +25,7 @@ defmodule Api.ChatHelpers do
     answers = answers |> Enum.map(&input/1)
 
     %{
-      type: :single,
+      type: :multiple,
       options: answers
     }
   end
@@ -96,8 +96,8 @@ defmodule Api.ChatHelpers do
       }) do
     %{
       type: :image,
-      content: image,
-      image: content
+      content: content,
+      image: image
     }
   end
 end
