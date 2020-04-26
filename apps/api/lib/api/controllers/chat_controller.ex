@@ -9,7 +9,7 @@ defmodule Api.ChatController do
 
   plug(RequireToken)
   plug(FromContext)
-  
+
   action_fallback(FallbackController)
 
   def answer(conn, %{

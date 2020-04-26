@@ -26,7 +26,6 @@ defmodule Chat.Loader do
 
     translations =
       @langauges
-      |> Enum.map(&String.to_atom/1)
       |> Enum.zip(@langauges |> Enum.map(&Path.join(path, "#{&1}.yaml")))
       |> Enum.filter(fn {_, p} -> File.exists?(p) end)
       |> Enum.map(fn {l, p} -> {l, @yaml.read_from_file!(p)} end)

@@ -15,7 +15,7 @@ build:
 
 run:
 	@echo "$(OK_COLOR)==> Running $(SERVICE_NAME)... $(NO_COLOR)"
-	@mix do deps.get, phx.server
+	@mix do deps.get, compile --force, phx.server
 
 test: lint
 	@echo "$(OK_COLOR)==> Running tests$(NO_COLOR)..."
@@ -28,3 +28,7 @@ lint:
 clean:
 	@echo "$(OK_COLOR)==> Cleaning unused deps$(NO_COLOR)..."
 	@mix do deps.clean --unused
+
+verify:
+	@echo "$(OK_COLOR)==> Verifying $(SERVICE_NAME)... $(NO_COLOR)"
+	@mix compile --force

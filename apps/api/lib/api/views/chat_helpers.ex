@@ -1,15 +1,25 @@
 defmodule Api.ChatHelpers do
   alias Chat.{Translator, Question, Question, Answer, Comment}
 
+  @default_language "en"
+
   def id({_, question, _}), do: question
 
   def input({[], _, _}), do: nil
 
-  def input({[current | _], question, _}) do
+  def input({[current | _], question, data}) do
+    language =
+      data
+      |> Map.get("language", @default_language)
+
     current
     |> Chat.question(question)
     |> input()
-    |> Translator.translate(scenario: current, keys: [:content])
+    |> Translator.translate(
+      language: language,
+      scenario: current,
+      keys: [:content]
+    )
   end
 
   def input(%Question.Single{answers: answers}) do
@@ -53,12 +63,17 @@ defmodule Api.ChatHelpers do
   def messages({[], _, _}), do: []
 
   def messages({[current | _], question, data}) do
-    with question <- Chat.question(current, question),
+    with language <- data |> Map.get("language", @default_language),
+         question <- Chat.question(current, question),
          comments <- data |> Map.get(:comments, []),
          messages <- comments ++ [question] do
       messages
       |> Enum.map(&message/1)
-      |> Translator.translate(scenario: current, keys: [:content, :image])
+      |> Translator.translate(
+        language: language,
+        scenario: current,
+        keys: [:content, :image]
+      )
     end
   end
 

@@ -10,6 +10,6 @@ defmodule Api.FallbackController do
     conn
     |> put_status(code)
     |> put_view(Api.ErrorView)
-    |> render("api_error.json", error: error)
+    |> render("api.json", error: error)
   end
 end

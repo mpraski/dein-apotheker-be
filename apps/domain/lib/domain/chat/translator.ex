@@ -1,7 +1,7 @@
 defmodule Chat.Translator do
   alias Chat.Scenario
 
-  @defaults %{scenario: nil, keys: [], language: :en}
+  @defaults %{scenario: nil, keys: [], language: "en"}
 
   alias Chat.Util
 
