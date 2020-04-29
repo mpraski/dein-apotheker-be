@@ -91,8 +91,6 @@ defmodule Chat.Transitioner do
   end
 
   defp next(next_question, next_scenario, new_scenario, scenarios) do
-    IO.inspect({next_question, next_scenario, new_scenario, scenarios})
-
     {scenarios, question} =
       cond do
         next_question ->
