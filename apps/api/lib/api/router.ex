@@ -13,8 +13,9 @@ defmodule Api.Router do
   scope "/chat", Api do
     pipe_through(:api)
 
-    post("/answer", ChatController, :answer, as: :answer)
-    post("/token", TokenController, :token, as: :token)
+    post("/answer", ChatController, :answer)
+    post("/languages", ChatController, :languages)
+    post("/token", TokenController, :token)
   end
 
   def handle_errors(conn, %{kind: _kind, reason: _reason, stack: _stack}) do

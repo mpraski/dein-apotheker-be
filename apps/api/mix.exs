@@ -24,7 +24,7 @@ defmodule Api.MixProject do
   def application do
     [
       mod: {Api.Application, []},
-      extra_applications: [:logger, :runtime_tools, :prometheus_ex, :prometheus_plugs, :corsica]
+      extra_applications: [:logger, :runtime_tools, :corsica]
     ]
   end
 
@@ -40,9 +40,6 @@ defmodule Api.MixProject do
       {:phoenix, "~> 1.4.15"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:prometheus_ex, "~> 3.0"},
-      {:prometheus_plugs, "~> 1.1.1"},
-      {:dns, "~> 2.1.2"},
       {:elixir_uuid, "~> 1.2"},
       {:corsica, "~> 1.0"},
       {:domain, in_umbrella: true}

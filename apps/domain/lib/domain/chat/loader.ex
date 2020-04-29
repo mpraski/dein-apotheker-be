@@ -1,8 +1,7 @@
 defmodule Chat.Loader do
-  alias Chat.{Decoder, Validator, Scenario, Util}
+  alias Chat.{Decoder, Validator, Scenario, Translator, Util}
 
   @yaml YamlElixir
-  @langauges ~w[en de pl]
   @scenario_file "questions.yaml"
 
   def load_scenarios(path) do
@@ -25,8 +24,8 @@ defmodule Chat.Loader do
     questions = scenario |> Decoder.decode_questions()
 
     translations =
-      @langauges
-      |> Enum.zip(@langauges |> Enum.map(&Path.join(path, "#{&1}.yaml")))
+      Translator.languages()
+      |> Enum.zip(Translator.languages() |> Enum.map(&Path.join(path, "#{&1}.yaml")))
       |> Enum.filter(fn {_, p} -> File.exists?(p) end)
       |> Enum.map(fn {l, p} -> {l, @yaml.read_from_file!(p)} end)
       |> Map.new()

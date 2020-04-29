@@ -1,7 +1,7 @@
 defmodule Api.ChatController do
   use Api, :controller
 
-  alias Chat.Transitioner
+  alias Chat.{Transitioner, Translator}
   alias Api.Plugs.{FromContext, RequireToken}
   alias Api.FallbackController
 
@@ -34,5 +34,9 @@ defmodule Api.ChatController do
     else
       {:error, 400, "Badly formed request"}
     end
+  end
+
+  def languages(conn, _params) do
+    conn |> render("languages.json", languages: Translator.languages())
   end
 end

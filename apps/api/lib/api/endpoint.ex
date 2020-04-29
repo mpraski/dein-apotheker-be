@@ -30,8 +30,6 @@ defmodule Api.Endpoint do
     json_decoder: Phoenix.json_library()
   )
 
-  plug(Api.HealthCheck.Plug)
-
   plug(Plug.MethodOverride)
   plug(Plug.Head)
   plug(Plug.Session, @session_options)
