@@ -1,7 +1,7 @@
 start: symptom
 
 questions:
-#symptom_check
+  #symptom_check
   symptom:
     type: multiple
     answers:
@@ -9,7 +9,6 @@ questions:
     decisions:
       - case: [running_nose]
         leads_to: have_running_nose
-        #loads_scenario: running_nose - does that work here ??
       - case: default
         jumps_to: initial
 
@@ -22,12 +21,13 @@ questions:
       no_typing_error:
         jumps_to: initial
 
-#safety_questions
-    #_q = question
-    #_ag = answer to go on
-    #_ad = answer to drop out 
-    #_do = dropout 
-    #_di = dropin
+  #safety_questions
+  #_q = question
+  #_ag = answer to go on
+  #_ad = answer to drop out 
+  #_do = dropout 
+  #_di = dropin
+
   #patient
   patient_q:
     type: single
@@ -54,6 +54,7 @@ questions:
           - type: text
             content: standard_do
         jumps_to: terminal
+
   #frequency
   frequency_q:
     type: single
@@ -65,6 +66,7 @@ questions:
           - type: text
             content: standard_do
         jumps_to: terminal
+
   #age
   age_q:
     type: single
@@ -76,6 +78,7 @@ questions:
           - type: text
             content: standard_do
         jumps_to: terminal
+
   #gender pregnancy breastfeeding 
   gender_q:
     type: single
@@ -84,6 +87,7 @@ questions:
         leads_to: further_medication_q
       gender_ad:
         leads_to: pregnancy_q
+
   pregnancy_q:
     type: single
     answers:
@@ -94,16 +98,18 @@ questions:
             - type: text
               content: standard_do
           jumps_to: terminal
-      breastfeeding_q:
-        type: single
-        answers:
-          breastfeeding_ag:
-            leads_to: further_medication_q
-          breastfeeding_do:
-            comments:
-              - type: text
-                content: standard_do
-            jumps_to: terminal
+
+  breastfeeding_q:
+    type: single
+    answers:
+      breastfeeding_ag:
+        leads_to: further_medication_q
+      breastfeeding_do:
+        comments:
+          - type: text
+            content: standard_do
+        jumps_to: terminal
+
   #further_medication
   further_medication_q:
     type: single
@@ -113,6 +119,6 @@ questions:
       further_medication_ad:
         leads_to: thanks_for_trying
 
-    thanks_for_trying:
-      type: prompt
-      jumps_to: terminal
+  thanks_for_trying:
+    type: prompt
+    jumps_to: terminal

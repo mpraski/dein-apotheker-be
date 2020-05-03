@@ -38,7 +38,7 @@ defmodule Chat.Loader do
     }
 
     with {:error, error} <- Validator.validate(scenario) do
-      raise error
+      raise "Error validating scenario #{id}: #{error}"
     end
 
     %Scenario{scenario | questions: by_id(questions)}

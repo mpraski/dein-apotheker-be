@@ -26,7 +26,10 @@ defmodule Chat.Transitioner do
         scenarios
       )
 
-    data = data |> Map.put(:comments, comments)
+    data =
+      data
+      |> Map.put(:comments, comments)
+      |> Map.put(:comments_scenario, current)
 
     {scenarios, question, data}
   end
@@ -53,7 +56,10 @@ defmodule Chat.Transitioner do
         scenarios
       )
 
-    data = data |> Map.put(:comments, comments)
+    data =
+      data
+      |> Map.put(:comments, comments)
+      |> Map.put(:comments_scenario, current)
 
     {scenarios, question, data}
   end
@@ -81,13 +87,14 @@ defmodule Chat.Transitioner do
       data
       |> Map.put(id, answer)
       |> Map.put(:comments, comments)
+      |> Map.put(:comments_scenario, current)
 
     {scenarios, question, data}
   end
 
   def transition do
     %Scenario{start: start} = Chat.scenario(@initial_scenario)
-    {[@initial_scenario], start, %{}}
+    {[@initial_scenario], start, %{:comments_scenario => @initial_scenario}}
   end
 
   defp next(next_question, next_scenario, new_scenario, scenarios) do
@@ -98,14 +105,9 @@ defmodule Chat.Transitioner do
 
         next_scenario ->
           %Scenario{start: start} = Chat.scenario(next_scenario)
-          [current | rest] = scenarios
+          [_ | rest] = scenarios
 
-          #To-Do how to implement erasing contexts?
-          if current == @initial_scenario do
-            {[next_scenario], start}
-          else
-            {[next_scenario | rest], start}
-          end
+          {[next_scenario | rest], start}
 
         true ->
           case scenarios do

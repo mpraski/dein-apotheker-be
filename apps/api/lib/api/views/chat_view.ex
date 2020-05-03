@@ -3,7 +3,7 @@ defmodule Api.ChatView do
 
   alias Api.ChatHelpers
 
-  @temporary_data ~w[comments]a
+  @temporary_data ~w[comments comments_scenario]a
 
   def render("answer.json", %{context: context}) do
     %{
@@ -20,7 +20,7 @@ defmodule Api.ChatView do
         %{
           languages: languages,
           default: default
-        } = data
+        }
       ) do
     %{
       languages: languages,

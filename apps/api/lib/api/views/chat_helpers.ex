@@ -1,8 +1,6 @@
 defmodule Api.ChatHelpers do
   alias Chat.{Translator, Question, Question, Answer, Comment}
 
-  @default_language "en"
-
   def id({_, question, _}), do: question
 
   def input({[], _, _}), do: nil
@@ -10,7 +8,7 @@ defmodule Api.ChatHelpers do
   def input({[current | _], question, data}) do
     language =
       data
-      |> Map.get("language", @default_language)
+      |> Map.get("language", Translator.default_language())
 
     current
     |> Chat.question(question)
@@ -63,56 +61,73 @@ defmodule Api.ChatHelpers do
   def messages({[], _, _}), do: []
 
   def messages({[current | _], question, data}) do
-    with language <- data |> Map.get("language", @default_language),
+    with language <- data |> Map.get("language", Translator.default_language()),
          question <- Chat.question(current, question),
          comments <- data |> Map.get(:comments, []),
-         messages <- comments ++ [question] do
-      messages
-      |> Enum.map(&message/1)
-      |> Translator.translate(
-        language: language,
-        scenario: current,
-        keys: [:content, :image]
-      )
+         comments_scenario <- data |> Map.get(:comments_scenario),
+         messages <- comments ++ [question],
+         translate_question <-
+           &Translator.translate(
+             &1,
+             language: language,
+             scenario: current,
+             keys: [:content]
+           ),
+         translate_comment <-
+           &Translator.translate(
+             &1,
+             language: language,
+             scenario: comments_scenario,
+             keys: [:content, :image]
+           ) do
+      messages |> Enum.map(&message(&1, {translate_question, translate_comment}))
     end
   end
 
-  def message(%Question.Single{id: id}) do
+  def message(%Question.Single{id: id}, {a, _}) do
     %{
       type: :text,
       content: id
     }
+    |> a.()
   end
 
-  def message(%Question.Multiple{id: id}) do
+  def message(%Question.Multiple{id: id}, {a, _}) do
     %{
       type: :text,
       content: id
     }
+    |> a.()
   end
 
-  def message(%Question.Prompt{id: id}) do
+  def message(%Question.Prompt{id: id}, {a, _}) do
     %{
       type: :text,
       content: id
     }
+    |> a.()
   end
 
-  def message(%Comment.Text{content: content}) do
+  def message(%Comment.Text{content: content}, {_, b}) do
     %{
       type: :text,
       content: content
     }
+    |> b.()
   end
 
-  def message(%Comment.Image{
-        content: content,
-        image: image
-      }) do
+  def message(
+        %Comment.Image{
+          content: content,
+          image: image
+        },
+        {_, b}
+      ) do
     %{
       type: :image,
       content: content,
       image: image
     }
+    |> b.()
   end
 end

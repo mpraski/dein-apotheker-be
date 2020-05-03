@@ -5,7 +5,7 @@ questions:
     type: single
     answers:
       another_symptom:
-        jump_to: initial
+        jumps_to: initial
       not_another_symptom: 
         leads_to: feedback
   feedback:

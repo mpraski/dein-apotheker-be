@@ -20,6 +20,10 @@ defmodule Chat.Translator do
     do_translate(item, opts)
   end
 
+  defp do_translate(item, opts) when is_struct(item) do
+    item |> Map.from_struct() |> do_translate(opts)
+  end
+
   defp do_translate(item, %{keys: keys} = opts) when is_map(item) do
     item
     |> Enum.map(fn {k, v} ->

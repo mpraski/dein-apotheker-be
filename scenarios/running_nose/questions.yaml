@@ -1,7 +1,7 @@
 start: limit_1
 
 questions:
-#symptom_specific
+  #symptom_specific
   #allergy
   allergy_q:
     type: single
@@ -10,6 +10,7 @@ questions:
         leads_to: limit1_q
       allergy_ad:
         jumps_to: allergy 
+
   #limit1
   limit1_q:
     type: single
@@ -20,7 +21,8 @@ questions:
         comments:
           - type: text
             content: standard_do
-        loads_scenario: terminal
+        jumps_to: terminal
+
   #limit2
   limit2_q:
     type: single
@@ -39,9 +41,9 @@ questions:
         comments:
           - type: text
             content: standard_do
-        loads_scenario: terminal
+        jumps_to: terminal
 
-#general questions - symptom specific answers
+  #general questions - symptom specific answers
   #usage
   usage_q:
     type: single
@@ -54,34 +56,34 @@ questions:
 #          - type: text
 #            content: usage_di
 #        leads_to: explanation_q
-    usage_do:
-      type: multiple
-      answers:
-        - usage_di
-      decisions:
-        - case: [usage_di]
-          leads_to: explanation_q
-        - case: default
-          leads_to: usage_q
+  usage_do:
+    type: multiple
+    answers:
+      - usage_di
+    decisions:
+      - case: [usage_di]
+        leads_to: explanation_q
+      - case: default
+        leads_to: usage_q
   
   #explanation
   explanation_q:
     type: single
     answers:
       explanation_ag:
-        loads_scenario: terminal
+        jumps_to: terminal
       explanation_ad:
         leads_to: explanation_do
 #        comments:
 #          - type: text
 #            content: explanation_di
-#        loads_scenario: terminal
-    explanation_do:
-      type: multiple
-      answers:
-        - explanation_di
-      decisions:
-        - case: [explanation_di]
-          loads_scenario: terminal
-        - case: default
-          leads_to: explanation_q
+#        jumps_to: terminal
+  explanation_do:
+    type: multiple
+    answers:
+      - explanation_di
+    decisions:
+      - case: [explanation_di]
+        jumps_to: terminal
+      - case: default
+        leads_to: explanation_q
