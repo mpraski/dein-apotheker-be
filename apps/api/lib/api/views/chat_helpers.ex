@@ -73,7 +73,7 @@ defmodule Api.ChatHelpers do
     end
   end
 
-  def message(%Question.Single{id: id}) do
+  defp message(%Question.Single{id: id}) do
     %{
       kind: :question,
       type: :text,
@@ -81,7 +81,7 @@ defmodule Api.ChatHelpers do
     }
   end
 
-  def message(%Question.Multiple{id: id}) do
+  defp message(%Question.Multiple{id: id}) do
     %{
       kind: :question,
       type: :text,
@@ -89,7 +89,7 @@ defmodule Api.ChatHelpers do
     }
   end
 
-  def message(%Question.Prompt{id: id}) do
+  defp message(%Question.Prompt{id: id}) do
     %{
       kind: :question,
       type: :text,
@@ -97,7 +97,7 @@ defmodule Api.ChatHelpers do
     }
   end
 
-  def message(%Comment.Text{content: content}) do
+  defp message(%Comment.Text{content: content}) do
     %{
       kind: :comment,
       type: :text,
@@ -105,7 +105,7 @@ defmodule Api.ChatHelpers do
     }
   end
 
-  def message(%Comment.Image{
+  defp message(%Comment.Image{
         content: content,
         image: image
       }) do
@@ -117,7 +117,7 @@ defmodule Api.ChatHelpers do
     }
   end
 
-  def translate_message(item, language, scenario, comments_scenario) do
+  defp translate_message(item, language, scenario, comments_scenario) do
     with translate_question <-
            &Translator.translate(
              &1,
