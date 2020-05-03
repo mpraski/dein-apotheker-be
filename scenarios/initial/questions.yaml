@@ -9,7 +9,7 @@ questions:
     decisions:
       - case: [running_nose]
         leads_to: have_running_nose
-        #loads_scenario: running_nose
+        #loads_scenario: running_nose - does that work here ??
       - case: default
         jumps_to: initial
 
@@ -37,26 +37,23 @@ questions:
       patient_ad:
         leads_to: patient_do
 
-     patient_do:
-      type: multiple
-      answers:
-        - patient_di
-      decisions:
-        - case: [patient_di]
-          leads_to: time_q
-        - case: default
-          leads_to: symptom 
+  patient_do:
+    type: single
+    answers:
+      patient_di:
+        leads_to: time_q
+ 
   #time
   time_q:
     type: single
     answers:
       time_ag:
         leads_to: frequency_q
-      patient_ad: 
+      time_ad: 
         comments:
           - type: text
             content: standard_do
-        loads_scenario: terminal
+        jumps_to: terminal
   #frequency
   frequency_q:
     type: single
@@ -67,7 +64,7 @@ questions:
         comments:
           - type: text
             content: standard_do
-        loads_scenario: terminal
+        jumps_to: terminal
   #age
   age_q:
     type: single
@@ -78,7 +75,7 @@ questions:
         comments:
           - type: text
             content: standard_do
-        loads_scenario: terminal
+        jumps_to: terminal
   #gender pregnancy breastfeeding 
   gender_q:
     type: single
@@ -87,16 +84,16 @@ questions:
         leads_to: further_medication_q
       gender_ad:
         leads_to: pregnancy_q
-    pregnancy_q:
-      type: single
-      answers:
-        pregnancy_ag:
-          leads_to: breastfeeding_q
-        pregnancy_do:
+  pregnancy_q:
+    type: single
+    answers:
+      pregnancy_ag:
+        leads_to: breastfeeding_q
+      pregnancy_do:
           comments:
             - type: text
               content: standard_do
-          loads_scenario: terminal
+          jumps_to: terminal
       breastfeeding_q:
         type: single
         answers:
@@ -106,16 +103,16 @@ questions:
             comments:
               - type: text
                 content: standard_do
-            loads_scenario: terminal
+            jumps_to: terminal
   #further_medication
   further_medication_q:
     type: single
     answers:
       further_medication_ag:
-        #jump to: loaded szenario ?!
+        #end of szenario
       further_medication_ad:
         leads_to: thanks_for_trying
-        loads_scenario: terminal
 
     thanks_for_trying:
       type: prompt
+      jumps_to: terminal
