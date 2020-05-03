@@ -1,10 +1,19 @@
 defmodule Chat.Util do
   def pluck(item, key) when is_struct(item) do
-    item |> Map.from_struct() |> Map.get(key)
+    item |> Map.from_struct() |> pluck(key)
   end
 
   def pluck(item, key) when is_map(item) do
     item |> Map.get(key)
+  end
+
+  def pop(item, key) when is_struct(item) do
+    item |> Map.from_struct() |> pop(key)
+  end
+
+  def pop(item, key) when is_map(item) do
+    {_, item} = item |> Map.pop(key)
+    item
   end
 
   def index(items) do

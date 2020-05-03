@@ -1,5 +1,5 @@
 defmodule Api.ChatHelpers do
-  alias Chat.{Translator, Question, Question, Answer, Comment}
+  alias Chat.{Translator, Util, Question, Question, Answer, Comment}
 
   def id({_, question, _}), do: question
 
@@ -65,12 +65,64 @@ defmodule Api.ChatHelpers do
          question <- Chat.question(current, question),
          comments <- data |> Map.get(:comments, []),
          comments_scenario <- data |> Map.get(:comments_scenario),
-         messages <- comments ++ [question],
-         translate_question <-
+         messages <- comments ++ [question] do
+      messages
+      |> Enum.map(&message/1)
+      |> Enum.map(&translate_message(&1, language, current, comments_scenario))
+      |> Enum.map(&Util.pop(&1, :kind))
+    end
+  end
+
+  def message(%Question.Single{id: id}) do
+    %{
+      kind: :question,
+      type: :text,
+      content: id
+    }
+  end
+
+  def message(%Question.Multiple{id: id}) do
+    %{
+      kind: :question,
+      type: :text,
+      content: id
+    }
+  end
+
+  def message(%Question.Prompt{id: id}) do
+    %{
+      kind: :question,
+      type: :text,
+      content: id
+    }
+  end
+
+  def message(%Comment.Text{content: content}) do
+    %{
+      kind: :comment,
+      type: :text,
+      content: content
+    }
+  end
+
+  def message(%Comment.Image{
+        content: content,
+        image: image
+      }) do
+    %{
+      kind: :comment,
+      type: :image,
+      content: content,
+      image: image
+    }
+  end
+
+  def translate_message(item, language, scenario, comments_scenario) do
+    with translate_question <-
            &Translator.translate(
              &1,
              language: language,
-             scenario: current,
+             scenario: scenario,
              keys: [:content]
            ),
          translate_comment <-
@@ -80,54 +132,10 @@ defmodule Api.ChatHelpers do
              scenario: comments_scenario,
              keys: [:content, :image]
            ) do
-      messages |> Enum.map(&message(&1, {translate_question, translate_comment}))
+      case item |> Map.fetch(:kind) do
+        {:ok, :question} -> translate_question.(item)
+        {:ok, :comment} -> translate_comment.(item)
+      end
     end
-  end
-
-  def message(%Question.Single{id: id}, {a, _}) do
-    %{
-      type: :text,
-      content: id
-    }
-    |> a.()
-  end
-
-  def message(%Question.Multiple{id: id}, {a, _}) do
-    %{
-      type: :text,
-      content: id
-    }
-    |> a.()
-  end
-
-  def message(%Question.Prompt{id: id}, {a, _}) do
-    %{
-      type: :text,
-      content: id
-    }
-    |> a.()
-  end
-
-  def message(%Comment.Text{content: content}, {_, b}) do
-    %{
-      type: :text,
-      content: content
-    }
-    |> b.()
-  end
-
-  def message(
-        %Comment.Image{
-          content: content,
-          image: image
-        },
-        {_, b}
-      ) do
-    %{
-      type: :image,
-      content: content,
-      image: image
-    }
-    |> b.()
   end
 end
