@@ -1,6 +1,7 @@
 start: symptom
 
 questions:
+#symptom_check
   symptom:
     type: multiple
     answers:
@@ -8,127 +9,110 @@ questions:
     decisions:
       - case: [running_nose]
         leads_to: have_running_nose
-        loads_scenario: running_nose
-        comments:
-          - type: text
-            content: some_comment
+        #loads_scenario: running_nose - does that work here ??
       - case: default
-        leads_to: have_running_nose
-        loads_scenario: running_nose
+        jumps_to: initial
 
   have_running_nose:
     type: single
     answers:
       yes:
-        leads_to: medicine
+        leads_to: patient_q
+        loads_scenario: running_nose
       no_typing_error:
         jumps_to: initial
+
+#safety_questions
+    #_q = question
+    #_ag = answer to go on
+    #_ad = answer to drop out 
+    #_do = dropout 
+    #_di = dropin
+  #patient
+  patient_q:
+    type: single
+    answers:
+      patient_ag:
+        leads_to: time_q
+      patient_ad:
+        leads_to: patient_do
+
+  patient_do:
+    type: single
+    answers:
+      patient_di:
+        leads_to: time_q
+ 
+  #time
+  time_q:
+    type: single
+    answers:
+      time_ag:
+        leads_to: frequency_q
+      time_ad: 
         comments:
           - type: text
-            content: some_comment
-          - type: image
-            image: some_image
-            content: some_content_text
-
-  medicine:
+            content: standard_do
+        jumps_to: terminal
+  #frequency
+  frequency_q:
     type: single
     answers:
-      yes:
-        leads_to: allergy_or_cold
-      no:
-        leads_to: age_disclaimer
-
-  age_disclaimer:
-    type: single
-    answers:
-      undestood:
-        leads_to: allergy_or_cold
-
-  allergy_or_cold:
-    type: single
-    answers:
-      probably_cold:
-        leads_to: time
-      probably_allergy:
-        jumps_to: allergy
-
-  time:
-    type: single
-    answers:
-      less_than_a_week:
-        leads_to: frequency
-      more_than_a_week:
-        leads_to: frequency
-
-  frequency:
-    type: single
-    answers:
-      yes:
-        leads_to: age
-      no:
-        leads_to: age
-
-  age:
-    type: single
-    answers:
-      over_18:
-        leads_to: sex
-      under_18:
-        leads_to: sex
+      frequency_ag:
+        leads_to: age_q
+      frequency_ad:
         comments:
           - type: text
-            content: check_age_limits
-
-  sex:
+            content: standard_do
+        jumps_to: terminal
+  #age
+  age_q:
     type: single
     answers:
-      male:
-        leads_to: further_diseases
-      female:
-        leads_to: pregant
-
-  pregant:
-    type: single
-    answers:
-      yes:
+      age_ag:
+        leads_to: gender_q
+      patient_ad:
         comments:
           - type: text
-            content: pregnant_risk
-      no:
-        leads_to: breastfeeding
-
-  breastfeeding:
+            content: standard_do
+        jumps_to: terminal
+  #gender pregnancy breastfeeding 
+  gender_q:
     type: single
     answers:
-      yes:
-        comments:
-          - type: text
-            content: breastfeeding_risk
-      no:
-        leads_to: further_diseases
-
-  further_diseases:
+      gender_ag:
+        leads_to: further_medication_q
+      gender_ad:
+        leads_to: pregnancy_q
+  pregnancy_q:
     type: single
     answers:
-      yes:
+      pregnancy_ag:
+        leads_to: breastfeeding_q
+      pregnancy_do:
+          comments:
+            - type: text
+              content: standard_do
+          jumps_to: terminal
+      breastfeeding_q:
+        type: single
+        answers:
+          breastfeeding_ag:
+            leads_to: further_medication_q
+          breastfeeding_do:
+            comments:
+              - type: text
+                content: standard_do
+            jumps_to: terminal
+  #further_medication
+  further_medication_q:
+    type: single
+    answers:
+      further_medication_ag:
+        #end of szenario
+      further_medication_ad:
         leads_to: thanks_for_trying
-      no:
-        leads_to: further_medications
 
-  further_medications:
-    type: single
-    answers:
-      yes:
-        leads_to: thanks_for_trying
-      no:
-        leads_to: drug_allergies
-
-  drug_allergies:
-    type: single
-    answers:
-      yes:
-        leads_to: thanks_for_trying
-      no:
-
-  thanks_for_trying:
-    type: prompt
+    thanks_for_trying:
+      type: prompt
+      jumps_to: terminal
