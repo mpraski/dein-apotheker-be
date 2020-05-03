@@ -37,6 +37,10 @@ defmodule Api.ChatController do
   end
 
   def languages(conn, _params) do
-    conn |> render("languages.json", languages: Translator.languages())
+    conn
+    |> render("languages.json",
+      languages: Translator.languages(),
+      default: Translator.default_language()
+    )
   end
 end

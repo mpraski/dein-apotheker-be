@@ -2,11 +2,14 @@ defmodule Chat.Translator do
   alias Chat.Scenario
 
   @languages ~w[en de]
-  @defaults %{scenario: nil, keys: [], language: "en"}
+  @default_language "en"
+  @defaults %{scenario: nil, keys: [], language: @default_language}
 
   alias Chat.Util
 
   def languages, do: @languages
+
+  def default_language, do: @default_language
 
   def translate(item, opts \\ []) do
     opts =

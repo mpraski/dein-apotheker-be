@@ -15,8 +15,18 @@ defmodule Api.ChatView do
     |> in_envelope()
   end
 
-  def render("languages.json", %{languages: languages}) do
-    languages |> in_envelope()
+  def render(
+        "languages.json",
+        %{
+          languages: languages,
+          default: default
+        } = data
+      ) do
+    %{
+      languages: languages,
+      default: default
+    }
+    |> in_envelope()
   end
 
   defp in_context(item, {scenarios, question, data}) do
