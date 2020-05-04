@@ -64,7 +64,7 @@ defmodule Api.ChatHelpers do
     with language <- data |> Map.get("language", Translator.default_language()),
          question <- Chat.question(current, question),
          comments <- data |> Map.get(:comments, []),
-         comments_scenario <- data |> Map.get(:comments_scenario),
+         comments_scenario <- data |> Map.get(:comments_scenario, current),
          messages <- comments ++ [question] do
       messages
       |> Enum.map(&message/1)

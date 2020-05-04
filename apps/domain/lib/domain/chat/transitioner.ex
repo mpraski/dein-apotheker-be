@@ -30,6 +30,7 @@ defmodule Chat.Transitioner do
       data
       |> Map.put(:comments, comments)
       |> Map.put(:comments_scenario, current)
+      |> Map.put(:finish, scenarios == [])
 
     {scenarios, question, data}
   end
@@ -60,6 +61,7 @@ defmodule Chat.Transitioner do
       data
       |> Map.put(:comments, comments)
       |> Map.put(:comments_scenario, current)
+      |> Map.put(:finish, scenarios == [])
 
     {scenarios, question, data}
   end
@@ -88,13 +90,14 @@ defmodule Chat.Transitioner do
       |> Map.put(id, answer)
       |> Map.put(:comments, comments)
       |> Map.put(:comments_scenario, current)
+      |> Map.put(:finish, scenarios == [])
 
     {scenarios, question, data}
   end
 
   def transition do
     %Scenario{start: start} = Chat.scenario(@initial_scenario)
-    {[@initial_scenario], start, %{:comments_scenario => @initial_scenario}}
+    {[@initial_scenario], start, %{}}
   end
 
   defp next(next_question, next_scenario, new_scenario, scenarios) do
@@ -107,13 +110,20 @@ defmodule Chat.Transitioner do
           %Scenario{start: start} = Chat.scenario(next_scenario)
           [_ | rest] = scenarios
 
-          {[next_scenario | rest], start}
+          if next_scenario == @terminal_scenario do
+            {[next_scenario], start}
+          else
+            {[next_scenario | rest], start}
+          end
 
         true ->
           case scenarios do
             [_, previous | rest] ->
               %Scenario{start: start} = Chat.scenario(previous)
               {[previous | rest], start}
+
+            [@terminal_scenario] ->
+              {[], nil}
 
             [_] ->
               %Scenario{start: start} = Chat.scenario(@terminal_scenario)
