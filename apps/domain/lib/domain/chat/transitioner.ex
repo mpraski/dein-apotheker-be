@@ -32,6 +32,8 @@ defmodule Chat.Transitioner do
       |> Map.put(:comments_scenario, current)
       |> Map.put(:finish, scenarios == [])
 
+    IO.inspect({scenarios, question, data})
+
     {scenarios, question, data}
   end
 
@@ -63,6 +65,8 @@ defmodule Chat.Transitioner do
       |> Map.put(:comments_scenario, current)
       |> Map.put(:finish, scenarios == [])
 
+    IO.inspect({scenarios, question, data})
+
     {scenarios, question, data}
   end
 
@@ -92,6 +96,8 @@ defmodule Chat.Transitioner do
       |> Map.put(:comments_scenario, current)
       |> Map.put(:finish, scenarios == [])
 
+    IO.inspect({scenarios, question, data})
+
     {scenarios, question, data}
   end
 
@@ -110,6 +116,9 @@ defmodule Chat.Transitioner do
           %Scenario{start: start} = Chat.scenario(next_scenario)
           [_ | rest] = scenarios
 
+          # If we jump to terminal, then we
+          # discard all pending scenarios.
+          # Baby, it's the end of the line!
           if next_scenario == @terminal_scenario do
             {[next_scenario], start}
           else

@@ -73,7 +73,7 @@ questions:
     answers:
       age_ag:
         leads_to: gender_q
-      patient_ad:
+      age_ad:
         comments:
           - type: text
             content: standard_do
@@ -93,7 +93,7 @@ questions:
     answers:
       pregnancy_ag:
         leads_to: breastfeeding_q
-      pregnancy_do:
+      pregnancy_ad:
           comments:
             - type: text
               content: standard_do
@@ -104,7 +104,7 @@ questions:
     answers:
       breastfeeding_ag:
         leads_to: further_medication_q
-      breastfeeding_do:
+      breastfeeding_ad:
         comments:
           - type: text
             content: standard_do

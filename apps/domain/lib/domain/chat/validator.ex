@@ -1,14 +1,19 @@
 defmodule Chat.Validator do
-  alias Chat.{Scenario, Answer, Question, Comment, Util}
+  alias Chat.{Scenario, Answer, Question, Comment, Util, Translator}
 
   def validate(%Scenario{} = scenario) do
     scenario
     |> validate_all([
+      {&validate_entry_point/1, "a scenario needs to start with an existing question"},
       {&validate_exclusion/1, "answer cannot both lead to question and jump to scenario"},
       {&validate_consistency/1,
        "answers need to lead to existing questions withing the scenario"},
       {&validate_cases/1,
-       "multiple answer cases need to lead to existing questions withing the scenario"}
+       "multiple answer cases need to lead to existing questions withing the scenario"},
+      {&validate_default_translation/1,
+       "all questions, answers and comments need to be translated in default language (#{
+         Translator.default_language()
+       })"}
       # {&validate_translation/1, "all questions, answers and comments need to be translated"}
     ])
   end
@@ -21,6 +26,15 @@ defmodule Chat.Validator do
     else
       {:error, error}
     end
+  end
+
+  defp validate_entry_point(%Scenario{
+         start: start,
+         questions: questions
+       }) do
+    questions
+    |> Enum.map(&Util.pluck(&1, :id))
+    |> Enum.member?(start)
   end
 
   defp validate_exclusion(%Scenario{} = scenario) do
@@ -62,6 +76,13 @@ defmodule Chat.Validator do
     cases |> Enum.all?(&Map.has_key?(t, &1))
   end
 
+  defp validate_default_translation(%Scenario{translations: ts} = scenario) do
+    with l <- Translator.default_language(),
+         t <- ts |> Map.get(l) do
+      scenario |> Enum.all?(&validate_translation(&1, t))
+    end
+  end
+
   defp validate_translation(%Scenario{translations: ts} = scenario) do
     validated =
       for {_, t} <- ts do
@@ -76,6 +97,15 @@ defmodule Chat.Validator do
   defp validate_translation(%Question.Prompt{id: id}, t), do: t |> Map.has_key?(id)
 
   defp validate_translation(%Answer.Single{id: id}, t), do: t |> Map.has_key?(id)
+
+  defp validate_translation(%Answer.Multiple{case: :default}, _), do: true
+
+  defp validate_translation(%Answer.Multiple{case: cases}, t) do
+    cases
+    |> Enum.map(&Map.has_key?(t, &1))
+    |> Enum.all?()
+  end
+
   defp validate_translation(%Comment.Text{content: content}, t), do: t |> Map.has_key?(content)
 
   defp validate_translation(%Comment.Image{content: c, image: i}, t) do

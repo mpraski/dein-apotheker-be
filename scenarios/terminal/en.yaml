@@ -1,8 +1,8 @@
-feedback: "Could we ask for some feedback?"
+feedback: Could we ask for some feedback?
 next_symptom: Would you like to get a recommandation for a medication against another symptom?
-another_symptom: yes, please!
-not_another_symptom: no, that was all I need. Thanks!
-feedback_do: >
+another_symptom: Yes, please!
+not_another_symptom: No, that was all I need. Thanks!
+feedback_do: >-
   Thank you for using dein-apotheker.online.
   We hope you will be better soon!
   We would strongly appreciate a little feedback.
