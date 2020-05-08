@@ -25,6 +25,5 @@ app.env
 database.env
 
 .gitlab-ci.env
-.gitlab-ci.yml
 
 builds

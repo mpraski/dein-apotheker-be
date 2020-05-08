@@ -1,0 +1,20 @@
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  script:
+    - echo $CI_REGISTRY_PASSWORD | docker login --username $CI_REGISTRY_USER --password-stdin $CI_REGISTRY:5000
+    - docker build --tag $CI_REGISTRY:5000/$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA --tag $CI_REGISTRY:5000/$CI_REGISTRY_IMAGE:latest .
+    - docker push $CI_REGISTRY:5000/$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY:5000/$CI_REGISTRY_IMAGE:latest
+
+deploy:
+  stage: deploy
+  script:
+    - ssh-add $DO_KEY
+    - ssh -i $DO_KEY $DO_USER@$DO_HOST "
+      cd /var/www && sed docker-compose.yml -i -e 's/\($CI_REGISTRY_IMAGE:\)\(.*\)/\1$CI_COMMIT_SHA/' 
+      && docker-compose down -v --rmi all 
+      && docker-compose up -d"
