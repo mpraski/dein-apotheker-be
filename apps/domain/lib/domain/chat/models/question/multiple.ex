@@ -4,6 +4,7 @@ defmodule Chat.Question.Multiple do
   defstruct(
     id: nil,
     answers: [],
-    decisions: []
+    decisions: [],
+    load_scenarios: false
   )
 end

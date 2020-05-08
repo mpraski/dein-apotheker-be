@@ -28,15 +28,17 @@ defmodule Chat.Decoder do
             "type" => "multiple",
             "answers" => answers,
             "decisions" => decisions
-          }}
+          } = q}
        )
        when is_list(answers) and is_list(decisions) do
     decisions = decisions |> Enum.map(&decode_answer_multiple/1)
+    load_scenarios = q |> Map.get("load_scenarios", false)
 
     %Question.Multiple{
       id: id,
       answers: answers,
-      decisions: decisions
+      decisions: decisions,
+      load_scenarios: load_scenarios
     }
   end
 

@@ -41,7 +41,9 @@ defmodule Chat.Transitioner do
     [current | _] = scenarios
 
     %Question.Multiple{
-      decisions: decisions
+      answers: answers,
+      decisions: decisions,
+      load_scenarios: load_scenarios
     } = Chat.question(current, question)
 
     %Answer.Multiple{
@@ -64,6 +66,12 @@ defmodule Chat.Transitioner do
       |> Map.put(:comments, comments)
       |> Map.put(:comments_scenario, current)
       |> Map.put(:finish, scenarios == [])
+
+    scenarios = if load_scenarios do
+      answers |> Enum.reduce(scenarios, &load_scenario(&2, &1))
+    else
+      scenarios
+    end
 
     IO.inspect({scenarios, question, data})
 

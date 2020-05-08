@@ -4,22 +4,12 @@ questions:
   #symptom_check
   symptom:
     type: multiple
+    load_scenarios: true
     answers:
       - running_nose
     decisions:
-      - case: [running_nose]
-        leads_to: have_running_nose
       - case: default
-        jumps_to: initial
-
-  have_running_nose:
-    type: single
-    answers:
-      yes:
         leads_to: patient_q
-        loads_scenario: running_nose
-      no_typing_error:
-        jumps_to: initial
 
   #safety_questions
   #_q = question
