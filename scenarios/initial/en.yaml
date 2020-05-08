@@ -1,6 +1,7 @@
 #symptom_check
 symptom: For which symptom are you looking for a drug?
 running_nose: Running nose
+allergy: Allergy
 have_running_nose: Do you have a running nose?
 yes: Yes
 no_typing_error: No, it was a typing error

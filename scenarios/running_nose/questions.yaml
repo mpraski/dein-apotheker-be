@@ -57,21 +57,16 @@ questions:
 #            content: usage_di
 #        leads_to: explanation_q
   usage_do:
-    type: multiple
+    type: single
     answers:
-      - usage_di
-    decisions:
-      - case: [usage_di]
+      usage_di:
         leads_to: explanation_q
-      - case: default
-        leads_to: usage_q
   
   #explanation
   explanation_q:
     type: single
     answers:
       explanation_ag:
-        jumps_to: terminal
       explanation_ad:
         leads_to: explanation_do
 #        comments:
@@ -79,11 +74,6 @@ questions:
 #            content: explanation_di
 #        jumps_to: terminal
   explanation_do:
-    type: multiple
+    type: single
     answers:
-      - explanation_di
-    decisions:
-      - case: [explanation_di]
-        jumps_to: terminal
-      - case: default
-        leads_to: explanation_q
+      explanation_di:

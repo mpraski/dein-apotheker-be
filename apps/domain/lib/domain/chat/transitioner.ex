@@ -30,18 +30,14 @@ defmodule Chat.Transitioner do
       data
       |> Map.put(:comments, comments)
       |> Map.put(:comments_scenario, current)
-      |> Map.put(:finish, scenarios == [])
-
-    IO.inspect({scenarios, question, data})
 
     {scenarios, question, data}
   end
 
-  def transition({scenarios, question, data}, {:multiple, answer}) do
+  def transition({scenarios, question, data}, {:multiple, answers}) do
     [current | _] = scenarios
 
     %Question.Multiple{
-      answers: answers,
       decisions: decisions,
       load_scenarios: load_scenarios
     } = Chat.question(current, question)
@@ -51,7 +47,7 @@ defmodule Chat.Transitioner do
       jumps_to: next_scenario,
       loads_scenario: new_scenario,
       comments: comments
-    } = decisions |> find_decision(answer)
+    } = decisions |> find_decision(answers)
 
     {scenarios, question} =
       next(
@@ -65,15 +61,13 @@ defmodule Chat.Transitioner do
       data
       |> Map.put(:comments, comments)
       |> Map.put(:comments_scenario, current)
-      |> Map.put(:finish, scenarios == [])
 
-    scenarios = if load_scenarios do
-      answers |> Enum.reduce(scenarios, &load_scenario(&2, &1))
-    else
-      scenarios
-    end
-
-    IO.inspect({scenarios, question, data})
+    scenarios =
+      if load_scenarios do
+        answers |> Enum.reduce(scenarios, &load_scenario(&2, &1))
+      else
+        scenarios
+      end
 
     {scenarios, question, data}
   end
@@ -102,9 +96,6 @@ defmodule Chat.Transitioner do
       |> Map.put(id, answer)
       |> Map.put(:comments, comments)
       |> Map.put(:comments_scenario, current)
-      |> Map.put(:finish, scenarios == [])
-
-    IO.inspect({scenarios, question, data})
 
     {scenarios, question, data}
   end
@@ -122,7 +113,6 @@ defmodule Chat.Transitioner do
 
         next_scenario ->
           %Scenario{start: start} = Chat.scenario(next_scenario)
-          [_ | rest] = scenarios
 
           # If we jump to terminal, then we
           # discard all pending scenarios.
@@ -130,6 +120,7 @@ defmodule Chat.Transitioner do
           if next_scenario == @terminal_scenario do
             {[next_scenario], start}
           else
+            [_ | rest] = scenarios
             {[next_scenario | rest], start}
           end
 
