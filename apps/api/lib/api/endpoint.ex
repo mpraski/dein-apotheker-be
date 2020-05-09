@@ -10,11 +10,6 @@ defmodule Api.Endpoint do
     signing_salt: "Q+aBTFr8"
   ]
 
-  socket("/socket", Api.UserSocket,
-    websocket: true,
-    longpoll: false
-  )
-
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
