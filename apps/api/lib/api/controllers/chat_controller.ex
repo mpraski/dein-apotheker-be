@@ -1,7 +1,7 @@
 defmodule Api.ChatController do
   use Api, :controller
 
-  alias Chat.{Transitioner, Translator}
+  alias Chat.{Transitioner, Translator, Recorder}
   alias Api.Plugs.{FromContext, RequireToken}
   alias Api.FallbackController
 
@@ -18,9 +18,11 @@ defmodule Api.ChatController do
       })
       when type in @question_types do
     if conn.assigns.has_context? do
-      with context <- conn.assigns.context,
+      with token <- conn.assigns.token,
+           context <- conn.assigns.context,
            answer <- {String.to_atom(type), value},
-           new_context <- Transitioner.transition(context, answer) do
+           new_context <- Transitioner.transition(context, answer),
+           :ok <- Recorder.record(token, context, answer) do
         conn |> render("answer.json", context: new_context)
       end
     else
@@ -30,7 +32,11 @@ defmodule Api.ChatController do
 
   def answer(conn, _params) do
     if conn.assigns.has_context? do
-      conn |> render("answer.json", context: Transitioner.transition())
+      with token <- conn.assigns.token,
+           context <- Transitioner.transition(),
+           :ok <- Recorder.record(token, context, nil) do
+        conn |> render("answer.json", context: context)
+      end
     else
       {:error, 400, "Badly formed request"}
     end

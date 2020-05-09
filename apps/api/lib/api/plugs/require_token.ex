@@ -10,14 +10,16 @@ defmodule Api.Plugs.RequireToken do
 
   def call(%Conn{req_headers: headers} = conn, _params) do
     predicate = fn
-      {"token", _} -> true
+      {"token", token} -> byte_size(token) > 0
       _ -> false
     end
 
-    with found <- headers |> Enum.find(nil, predicate) do
+    with found <- headers |> Enum.find(predicate) do
       case found do
         {"token", token} ->
-          conn |> assign(:token, token)
+          conn
+          |> assign(:token, token)
+          |> assign(:has_token?, true)
 
         nil ->
           conn

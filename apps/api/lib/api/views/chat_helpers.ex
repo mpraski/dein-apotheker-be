@@ -106,9 +106,9 @@ defmodule Api.ChatHelpers do
   end
 
   defp message(%Comment.Image{
-        content: content,
-        image: image
-      }) do
+         content: content,
+         image: image
+       }) do
     %{
       kind: :comment,
       type: :image,
@@ -132,9 +132,9 @@ defmodule Api.ChatHelpers do
              scenario: comments_scenario,
              keys: [:content, :image]
            ) do
-      case item |> Map.fetch(:kind) do
-        {:ok, :question} -> translate_question.(item)
-        {:ok, :comment} -> translate_comment.(item)
+      case item |> Map.get(:kind) do
+        :question -> translate_question.(item)
+        :comment -> translate_comment.(item)
       end
     end
   end

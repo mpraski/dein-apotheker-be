@@ -26,10 +26,7 @@ defmodule Chat.Transitioner do
         scenarios
       )
 
-    data =
-      data
-      |> Map.put(:comments, comments)
-      |> Map.put(:comments_scenario, current)
+    data = data |> prepare_comments(comments, current)
 
     {scenarios, question, data}
   end
@@ -57,17 +54,14 @@ defmodule Chat.Transitioner do
         scenarios
       )
 
-    data =
-      data
-      |> Map.put(:comments, comments)
-      |> Map.put(:comments_scenario, current)
-
     scenarios =
       if load_scenarios do
         answers |> Enum.reduce(scenarios, &load_scenario(&2, &1))
       else
         scenarios
       end
+
+    data = data |> prepare_comments(comments, current)
 
     {scenarios, question, data}
   end
@@ -93,9 +87,8 @@ defmodule Chat.Transitioner do
 
     data =
       data
+      |> prepare_comments(comments, current)
       |> Map.put(id, answer)
-      |> Map.put(:comments, comments)
-      |> Map.put(:comments_scenario, current)
 
     {scenarios, question, data}
   end
@@ -145,6 +138,12 @@ defmodule Chat.Transitioner do
     scenarios = scenarios |> load_scenario(new_scenario)
 
     {scenarios, question}
+  end
+
+  defp prepare_comments(data, comments, scenario) do
+    data
+    |> Map.put(:comments, comments)
+    |> Map.put(:comments_scenario, scenario)
   end
 
   defp find_decision(decisions, answer) do

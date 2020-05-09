@@ -1,12 +1,10 @@
 defmodule Chat.Scenario do
   @enforce_keys [:id, :start, :questions, :translations]
 
-  defstruct(
-    id: nil,
-    start: nil,
-    questions: [],
-    translations: %{}
-  )
+  defstruct id: nil,
+            start: nil,
+            questions: [],
+            translations: %{}
 end
 
 defimpl Enumerable, for: Chat.Scenario do

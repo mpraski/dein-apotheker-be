@@ -1,10 +1,8 @@
 defmodule Chat.Question.Multiple do
   @enforce_keys [:id, :answers, :decisions]
 
-  defstruct(
-    id: nil,
-    answers: [],
-    decisions: [],
-    load_scenarios: false
-  )
+  defstruct id: nil,
+            answers: [],
+            decisions: [],
+            load_scenarios: false
 end
