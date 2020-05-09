@@ -2,6 +2,7 @@ defmodule Chat.Recorder do
   use GenServer
 
   @tick_interval 60_000
+  @live_interval 3_600
 
   defmodule State do
     defstruct exporters: [],
@@ -106,5 +107,12 @@ defmodule Chat.Recorder do
     end
   end
 
-  defp clean_history(history), do: history
+  defp clean_history(history) do
+    with now <- Time.utc_now() do
+      history
+      |> Enum.filter(fn {_, %{updated_at: updated_at}} ->
+        Time.diff(now, updated_at) < @live_interval
+      end)
+    end
+  end
 end
