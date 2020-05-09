@@ -113,6 +113,7 @@ defmodule Chat.Recorder do
       |> Enum.filter(fn {_, %{updated_at: updated_at}} ->
         Time.diff(now, updated_at) < @live_interval
       end)
+      |> Map.new()
     end
   end
 end

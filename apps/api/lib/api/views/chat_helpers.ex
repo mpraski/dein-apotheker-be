@@ -3,7 +3,11 @@ defmodule Api.ChatHelpers do
 
   def id({_, question, _}), do: question
 
-  def input({[], _, _}), do: nil
+  def input({[], _, _}) do
+    %{
+      type: :end
+    }
+  end
 
   def input({[current | _], question, data}) do
     language =
