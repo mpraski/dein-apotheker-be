@@ -1,0 +1,55 @@
+#_questions
+#_q = question
+#_ag = answer to go on
+#_ad = answer to drop out
+#_do = dropout
+#_di = dropin
+
+standard_do: >-
+  Soon we'll be able to help you also in a situation like that.
+  Right now we are sorry. We deal with one of your most important values - your health.
+  We know that and therefore it is important to know our limits.
+  Please ask your practitioner or pharmacist for help.
+
+#limit1
+limit1_q: Just to make sure it's a common cough and nothing more serious Is the coming out secretion bloody or purulent?
+limit1_ag: No
+limit1_ad: Yes
+
+#limit2
+limit2_q: Do you have high fever (> 38,5°C)? 
+limit2_ag: No
+limit2_ad: Yes
+
+#limit3
+limit3_q: Do you make any unusual noices while breathing?
+limit3_ag: No
+limit3_ad: Yes
+
+#result
+result: >-
+  Great!
+  So here is what I would recommend you:
+
+  **Bronchpret Saft TE**
+
+result_image: https://www.bronchipret.de/fileadmin/_processed_/7/3/csm_Bronchipret_Saft_TE_100_Packung_mit_Flasche_rechts_neues_Etikett-blaue_Kappe-2019_01_08_dead1f06b9.jpg 
+warning: For risks and side effects read the package leaflet and ask your practitioner or pharmacist.
+
+#buy? do you want to buy that product?
+#usage
+usage_q: Wanna know how to use it?
+usage_ag: No, don't bother me
+usage_ad: Yes, please
+usage_do: >-
+  *Take a measuring cup full of juice with some water **three times a day**. 
+  
+  *Take the **last dose around 5pm** so that the ejection-promoting effect does not prevent you from sleeping.
+usage_di: OK, I got it.
+
+#explanation
+explanation_q: Would you like to know more about how it works?
+explanation_ag: Don't worry! It's only to me that it helps me.
+explanation_ad: That sounds interesting!
+explanation_do: Expectorant, promotes expectoration
+explanation_di: That was interesting, thanks!

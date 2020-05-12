@@ -2,7 +2,9 @@
 symptom: For which symptom are you looking for a drug?
 running_nose: Running nose
 allergy: Allergy
-have_running_nose: Do you have a running nose?
+cough: Cough
+sore_throat: Sore throat
+headache: Headache
 yes: Yes
 no_typing_error: No, it was a typing error
 
@@ -63,7 +65,7 @@ further_medication_q: >-
   Are you suffering from a chronic illness?
   or do you take any medication on a regular basis?
   (except something like a regular pain killer against headaches) or
-  do you hae any drug allergies?
+  do you have any drug allergies?
 further_medication_ag: No
 further_medication_ad: Yes
 thanks_for_trying: >-

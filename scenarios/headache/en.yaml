@@ -1,0 +1,52 @@
+#_questions
+#_q = question
+#_ag = answer to go on
+#_ad = answer to drop out
+#_do = dropout
+#_di = dropin
+
+standard_do: >-
+  Soon we'll be able to help you also in a situation like that.
+  Right now we are sorry. We deal with one of your most important values - your health.
+  We know that and therefore it is important to know our limits.
+  Please ask your practitioner or pharmacist for help.
+
+#limit1
+limit1_q: Just to make sure it's an ordinary headache and nothing more serious - Are you experiencing persistent nausea and vomiting?
+limit1_ag: No
+limit1_ad: Yes
+
+#limit2
+limit2_q: Do you have problems with high eye pressure? Headaches caused by a glaucoma attack should definitely be treated by a doctor.
+limit2_ag: No
+limit2_ad: Yes
+
+#result
+result: >-
+  Great!
+  So here is what I would recommend you:
+
+  **Nurofen Schmelztabletten Minze**
+
+result_image: https://media-services.digital-rb.com/s3/live-productcatalogue/sys-master/images/haa/h4a/8868121444382/Meltlet-Mint_ankle_normal_1280x1280.png?width=320&height=320
+warning: For risks and side effects read the package leaflet and ask your practitioner or pharmacist.
+
+#buy? do you want to buy that product?
+#usage
+usage_q: Wanna know how to use it?
+usage_ag: No, don't bother me
+usage_ad: Yes, please
+usage_do: >-
+  *Let a tablet melt on your tongue and swallow the dissolved mass. 
+  
+  *Please do not take more than 2 tablets (400mg) at once. 
+  
+  *Leave 6 hours before the next intake and do not take more than 6 tablets (1200mg) a day.
+usage_di: OK, I got it.
+
+#explanation
+explanation_q: Would you like to know more about how it works?
+explanation_ag: Don't worry! It's only to me that it helps me.
+explanation_ad: That sounds interesting!
+explanation_do: Analgesic, anti-inflammatory, slightly antipyretic
+explanation_di: That was interesting, thanks!
