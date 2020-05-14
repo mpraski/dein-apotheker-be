@@ -22,13 +22,12 @@ limit2_ag: No
 limit2_ad: Yes
 
 #result
-result: >-
+great: >-
   Great!
   So here is what I would recommend you:
-
-  **Nurofen Schmelztabletten Minze**
-
+result: Nurofen Schmelztabletten Minze
 result_image: https://media-services.digital-rb.com/s3/live-productcatalogue/sys-master/images/haa/h4a/8868121444382/Meltlet-Mint_ankle_normal_1280x1280.png?width=320&height=320
+result_price: €10.00
 warning: For risks and side effects read the package leaflet and ask your practitioner or pharmacist.
 
 #buy? do you want to buy that product?
@@ -38,9 +37,9 @@ usage_ag: No, don't bother me
 usage_ad: Yes, please
 usage_do: >-
   * Let a tablet melt on your tongue and swallow the dissolved mass
-  
+
   * Please do not take more than 2 tablets (400mg) at once
-  
+
   * Leave 6 hours before the next intake and do not take more than 6 tablets (1200mg) a day
 usage_di: OK, I got it.
 

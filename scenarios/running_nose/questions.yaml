@@ -31,9 +31,12 @@ questions:
 #        result
         leads_to: usage_q
         comments:
-          - type: image
+          - type: text
+            content: great
+          - type: buy
             image: result_image
-            content: result 
+            price: result_price
+            name: result 
           - type: text
             content: warning
 #       how to buy??

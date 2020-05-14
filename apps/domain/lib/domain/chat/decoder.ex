@@ -145,4 +145,17 @@ defmodule Chat.Decoder do
       image: image
     }
   end
+
+  defp decode_comment(%{
+         "type" => "buy",
+         "name" => name,
+         "image" => image,
+         "price" => price
+       }) do
+    %Comment.Buy{
+      name: name,
+      image: image,
+      price: price
+    }
+  end
 end

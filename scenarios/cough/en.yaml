@@ -17,7 +17,7 @@ limit1_ag: No
 limit1_ad: Yes
 
 #limit2
-limit2_q: Do you have high fever (> 38,5°C)? 
+limit2_q: Do you have high fever (> 38,5°C)?
 limit2_ag: No
 limit2_ad: Yes
 
@@ -27,13 +27,12 @@ limit3_ag: No
 limit3_ad: Yes
 
 #result
-result: >-
+great: >-
   Great!
   So here is what I would recommend you:
-
-  **Bronchpret Saft TE**
-
-result_image: https://www.bronchipret.de/fileadmin/_processed_/7/3/csm_Bronchipret_Saft_TE_100_Packung_mit_Flasche_rechts_neues_Etikett-blaue_Kappe-2019_01_08_dead1f06b9.jpg 
+result: Bronchpret Saft TE
+result_image: https://www.bronchipret.de/fileadmin/_processed_/7/3/csm_Bronchipret_Saft_TE_100_Packung_mit_Flasche_rechts_neues_Etikett-blaue_Kappe-2019_01_08_dead1f06b9.jpg
+result_price: €10.00
 warning: For risks and side effects read the package leaflet and ask your practitioner or pharmacist.
 
 #buy? do you want to buy that product?
@@ -43,7 +42,7 @@ usage_ag: No, don't bother me
 usage_ad: Yes, please
 usage_do: >-
   * Take a measuring cup full of juice with some water **three times a day**
-  
+
   * Take the **last dose around 5pm** so that the ejection-promoting effect does not prevent you from sleeping
 usage_di: OK, I got it.
 

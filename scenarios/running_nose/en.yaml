@@ -30,12 +30,12 @@ limit2_ad: Yes
 #(...)
 
 #result
-result: >-
+great: >-
   Great!
   So here is what I would recommend you:
-
-  **Ratiopharm Duo**
+result: Ratiopharm Duo
 result_image: https://www.ratiopharm.de/assets/_processed_/b/1/csm_NasenDuo_Nasenspray_10ML_3D_Web_hoch_rechts_full_12521543_7c7d704a5b.png
+result_price: €10.00
 warning: For risks and side effects read the package leaflet and ask your practitioner or pharmacist.
 
 #buy? do you want to buy that product?
@@ -45,7 +45,7 @@ usage_ag: No, don't bother me
 usage_ad: Yes, please
 usage_do: >-
   * 1 spray per nostril **2-3** times per day (every **6-8h**)
-  
+
   * Keep your head back while you spray and then lean your head forward afterwards
 usage_di: OK, I got it.
 

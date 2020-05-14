@@ -12,12 +12,12 @@ standard_do: >-
   Please ask your practitioner or pharmacist for help.
 
 #limit1
-limit1_q: Just to make sure it's a common sore throat and nothing more serious - Is the exuding secretion bloody or purulent? Or are your tonsils purulent or swollen? 
+limit1_q: Just to make sure it's a common sore throat and nothing more serious - Is the exuding secretion bloody or purulent? Or are your tonsils purulent or swollen?
 limit1_ag: No
 limit1_ad: Yes
 
 #limit2
-limit2_q: Do you have high fever (> 39°C)? 
+limit2_q: Do you have high fever (> 39°C)?
 limit2_ag: No
 limit2_ad: Yes
 
@@ -27,13 +27,12 @@ limit3_ag: No
 limit3_ad: Yes
 
 #result
-result: >-
+great: >-
   Great!
   So here is what I would recommend you:
-
-  **Tantum Verde Spray**
-
+result: Tantum Verde Spray
 result_image: https://www.tantum-verde.de/files/tantum_verde/layout/png/spray_wide.png
+result_price: €10.00
 warning: For risks and side effects read the package leaflet and ask your practitioner or pharmacist.
 
 #buy? do you want to buy that product?
@@ -43,9 +42,9 @@ usage_ag: No, don't bother me
 usage_ad: Yes, please
 usage_do: >-
   * Before the first application, you must press the spray head a few times until an even spray burst emerges
-  
+
   * Then insert the spray nozzle into the mouth opening, point it at the affected area and use your index finger to operate the spray head
-  
+
   * You can spray **6 sprays** into the throat up to **5 times a day**
 usage_di: OK, I got it.
 

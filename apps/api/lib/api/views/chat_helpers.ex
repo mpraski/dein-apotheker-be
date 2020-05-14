@@ -121,6 +121,20 @@ defmodule Api.ChatHelpers do
     }
   end
 
+  defp message(%Comment.Buy{
+         name: name,
+         image: image,
+         price: price
+       }) do
+    %{
+      kind: :comment,
+      type: :buy,
+      name: name,
+      image: image,
+      price: price
+    }
+  end
+
   defp translate_message(item, language, scenario, comments_scenario) do
     with translate_question <-
            &Translator.translate(
@@ -134,7 +148,7 @@ defmodule Api.ChatHelpers do
              &1,
              language: language,
              scenario: comments_scenario,
-             keys: [:content, :image]
+             keys: [:content, :name, :price, :image]
            ) do
       case item |> Map.get(:kind) do
         :question -> translate_question.(item)
