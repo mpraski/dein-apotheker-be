@@ -56,10 +56,8 @@ questions:
         comments:
           - type: text
             content: great
-          - type: buy
-            image: result_image
-            price: result_price
-            name: result 
+          - type: product
+            product: bronchpret_saft_te
           - type: text
             content: warning
 #       how to buy??
