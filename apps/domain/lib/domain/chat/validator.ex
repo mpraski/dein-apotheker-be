@@ -1,5 +1,5 @@
 defmodule Chat.Validator do
-  alias Chat.{Scenario, Answer, Question, Comment, Util, Translator}
+  alias Chat.{Scenario, Answer, Question, Comment, Product, Util, Translator}
 
   def validate(%Scenario{} = scenario) do
     scenario
@@ -13,7 +13,8 @@ defmodule Chat.Validator do
       {&validate_default_translation/1,
        "all questions, answers and comments need to be translated in default language (#{
          Translator.default_language()
-       })"}
+       })"},
+      {&validate_products/1, "all product comments must refer to existing products"}
       # {&validate_translation/1, "all questions, answers and comments need to be translated"}
     ])
   end
@@ -57,6 +58,7 @@ defmodule Chat.Validator do
   defp validate_consistency(%Answer.Single{leads_to: id}, m), do: m |> Util.has_key?(id)
   defp validate_consistency(%Answer.Multiple{leads_to: id}, m), do: m |> Util.has_key?(id)
   defp validate_consistency(%Question.Prompt{leads_to: id}, m), do: m |> Util.has_key?(id)
+  defp validate_consistency(%Question.Message{leads_to: id}, m), do: m |> Util.has_key?(id)
   defp validate_consistency(_, _), do: true
 
   defp validate_cases(%Scenario{questions: questions}) do
@@ -95,6 +97,7 @@ defmodule Chat.Validator do
   defp validate_translation(%Question.Single{id: id}, t), do: t |> Map.has_key?(id)
   defp validate_translation(%Question.Multiple{id: id}, t), do: t |> Map.has_key?(id)
   defp validate_translation(%Question.Prompt{id: id}, t), do: t |> Map.has_key?(id)
+  defp validate_translation(%Question.Message{}, _), do: true
 
   defp validate_translation(%Answer.Single{id: id}, t), do: t |> Map.has_key?(id)
 
@@ -116,5 +119,35 @@ defmodule Chat.Validator do
     [n, i] |> Enum.all?(&Map.has_key?(t, &1))
   end
 
+  defp validate_translation(%Comment.Product{}, _), do: true
+
+  defp validate_translation(
+         %Product{
+           name: n,
+           directions: d,
+           explanation: e,
+           image: i
+         },
+         t
+       ) do
+    [n, d, e, i] |> Enum.all?(&Map.has_key?(t, &1))
+  end
+
   defp validate_translation(a, t) when is_binary(a), do: t |> Map.has_key?(a)
+
+  defp validate_products(
+         %Scenario{
+           products: products
+         } = scenario
+       ) do
+    product_ids =
+      products
+      |> Enum.map(&Util.pluck(&1, :id))
+      |> Util.index()
+
+    scenario |> Enum.all?(&validate_product(&1, product_ids))
+  end
+
+  defp validate_product(%Comment.Product{product: p}, ps), do: ps |> Map.has_key?(p)
+  defp validate_product(_, _), do: true
 end

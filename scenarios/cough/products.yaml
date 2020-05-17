@@ -1,0 +1,6 @@
+products:
+  bronchpret_saft_te:
+    name: bronchpret_saft_te_name
+    directions: bronchpret_saft_te_directions
+    explanation: bronchpret_saft_te_explanation
+    image: bronchpret_saft_te_image

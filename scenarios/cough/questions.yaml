@@ -1,6 +1,26 @@
-start: limit1_q
+start: opportunities
 
 questions:
+  #show the products as messages
+  opportunities:
+    type: message
+    leads_to: what_next
+    comments:
+      - type: text
+        content: present_opportunities
+      - type: product
+        product: bronchpret_saft_te
+  #suggest the user answers questions
+  what_next:
+    type: single
+    answers:
+      what_next_ag:
+        leads_to: limit1_q
+      what_next_ad:
+        comments:
+          - type: text
+            content: what_next_do
+        jumps_to: terminal
   #symptom_specific
   #limit1
   limit1_q:

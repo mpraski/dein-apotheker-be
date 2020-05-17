@@ -15,4 +15,12 @@ defmodule Chat do
   def question(scenario, question) do
     question(scenario(scenario), question)
   end
+
+  def product(%Scenario{products: products}, p) do
+    products |> Map.get(p)
+  end
+  
+  def product(scenario, product) do
+    product(scenario(scenario), product)
+  end
 end

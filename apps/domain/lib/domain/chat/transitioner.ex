@@ -28,7 +28,7 @@ defmodule Chat.Transitioner do
 
     data = data |> prepare_comments(comments, current)
 
-    {scenarios, question, data}
+    {scenarios, question, data} |> load_messages()
   end
 
   def transition({scenarios, question, data}, {:multiple, answers}) do
@@ -63,7 +63,7 @@ defmodule Chat.Transitioner do
 
     data = data |> prepare_comments(comments, current)
 
-    {scenarios, question, data}
+    {scenarios, question, data} |> load_messages()
   end
 
   def transition({scenarios, question, data}, {:prompt, answer}) do
@@ -90,12 +90,30 @@ defmodule Chat.Transitioner do
       |> prepare_comments(comments, current)
       |> Map.put(id, answer)
 
-    {scenarios, question, data}
+    {scenarios, question, data} |> load_messages()
   end
 
   def transition do
     %Scenario{start: start} = Chat.scenario(@initial_scenario)
     {[@initial_scenario], start, %{}}
+  end
+
+  def load_messages({scenarios, question, data} = context) do
+    [current | _] = scenarios
+
+    case Chat.question(current, question) do
+      %Question.Message{
+        leads_to: leads_to,
+        comments: comments
+      } ->
+        with comments <- comments |> Enum.map(&{&1, current}),
+             data <- data |> Map.update(:comments, [], &(comments ++ &1)) do
+          {scenarios, leads_to, data} |> load_messages()
+        end
+
+      _ ->
+        context
+    end
   end
 
   defp next(next_question, next_scenario, new_scenario, scenarios) do
@@ -141,9 +159,9 @@ defmodule Chat.Transitioner do
   end
 
   defp prepare_comments(data, comments, scenario) do
-    data
-    |> Map.put(:comments, comments)
-    |> Map.put(:comments_scenario, scenario)
+    with comments <- comments |> Enum.map(&{&1, scenario}) do
+      data |> Map.put(:comments, comments)
+    end
   end
 
   defp find_decision(decisions, answer) do

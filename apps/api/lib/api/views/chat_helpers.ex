@@ -1,5 +1,7 @@
 defmodule Api.ChatHelpers do
-  alias Chat.{Translator, Util, Question, Question, Answer, Comment}
+  alias Chat.{Translator, Question, Question, Answer, Comment, Product}
+
+  @translation_keys ~w[content name directions explanation price image]a
 
   def id({_, question, _}), do: question
 
@@ -66,68 +68,66 @@ defmodule Api.ChatHelpers do
 
   def messages({[current | _], question, data}) do
     with language <- data |> Map.get("language", Translator.default_language()),
-         question <- Chat.question(current, question),
          comments <- data |> Map.get(:comments, []),
-         comments_scenario <- data |> Map.get(:comments_scenario, current),
-         messages <- comments ++ [question] do
+         question <- Chat.question(current, question),
+         messages <- comments ++ [{question, current}],
+         scenarios = messages |> Enum.map(fn {_, s} -> s end) do
       messages
       |> Enum.map(&message/1)
-      |> Enum.map(&translate_message(&1, language, current, comments_scenario))
-      |> Enum.map(&Util.pop(&1, :kind))
+      |> Enum.zip(scenarios)
+      |> Enum.map(&translate_message(&1, language))
     end
   end
 
-  defp message(%Question.Single{id: id}) do
+  defp message({%Question.Single{id: id}, _}) do
     %{
-      kind: :question,
       type: :text,
       content: id
     }
   end
 
-  defp message(%Question.Multiple{id: id}) do
+  defp message({%Question.Multiple{id: id}, _}) do
     %{
-      kind: :question,
       type: :text,
       content: id
     }
   end
 
-  defp message(%Question.Prompt{id: id}) do
+  defp message({%Question.Prompt{id: id}, _}) do
     %{
-      kind: :question,
       type: :text,
       content: id
     }
   end
 
-  defp message(%Comment.Text{content: content}) do
+  defp message({%Comment.Text{content: content}, _}) do
     %{
-      kind: :comment,
       type: :text,
       content: content
     }
   end
 
-  defp message(%Comment.Image{
-         content: content,
-         image: image
-       }) do
+  defp message(
+         {%Comment.Image{
+            content: content,
+            image: image
+          }, _}
+       ) do
     %{
-      kind: :comment,
       type: :image,
       content: content,
       image: image
     }
   end
 
-  defp message(%Comment.Buy{
-         name: name,
-         image: image,
-         price: price
-       }) do
+  defp message(
+         {%Comment.Buy{
+            name: name,
+            image: image,
+            price: price
+          }, _}
+       ) do
     %{
-      kind: :comment,
       type: :buy,
       name: name,
       image: image,
@@ -135,25 +135,29 @@ defmodule Api.ChatHelpers do
     }
   end
 
-  defp translate_message(item, language, scenario, comments_scenario) do
-    with translate_question <-
-           &Translator.translate(
-             &1,
-             language: language,
-             scenario: scenario,
-             keys: [:content]
-           ),
-         translate_comment <-
-           &Translator.translate(
-             &1,
-             language: language,
-             scenario: comments_scenario,
-             keys: [:content, :name, :price, :image]
-           ) do
-      case item |> Map.get(:kind) do
-        :question -> translate_question.(item)
-        :comment -> translate_comment.(item)
-      end
-    end
+  defp message({%Comment.Product{product: p}, scenario}) do
+    %Product{
+      name: name,
+      directions: directions,
+      explanation: explanation,
+      image: image
+    } = Chat.product(scenario, p)
+
+    %{
+      type: :product,
+      name: name,
+      directions: directions,
+      explanation: explanation,
+      image: image
+    }
+  end
+
+  defp translate_message({item, scenario}, language) do
+    item
+    |> Translator.translate(
+      language: language,
+      scenario: scenario,
+      keys: @translation_keys
+    )
   end
 end

@@ -1,11 +1,19 @@
 defmodule Chat.Decoder do
-  alias Chat.{Question, Answer, Comment, Util}
+  alias Chat.{Question, Answer, Product, Comment, Util}
 
   def decode_start(%{"start" => start}), do: start
 
   def decode_questions(%{"questions" => questions}) do
     questions |> Enum.map(&decode_question/1)
   end
+
+  def decode_products(%{"products" => nil}), do: []
+
+  def decode_products(%{"products" => products}) do
+    (products || []) |> Enum.map(&decode_product/1)
+  end
+
+  def decode_products(_), do: []
 
   defp decode_question(
          {id,
@@ -51,6 +59,23 @@ defmodule Chat.Decoder do
     {_, question} = question |> Map.pop("type")
 
     %Question.Prompt{id: id} |> decode_question_prompt(Util.to_keywords(question))
+  end
+
+  defp decode_question({
+         id,
+         %{
+           "type" => "message",
+           "leads_to" => leads_to,
+           "comments" => comments
+         }
+       }) do
+    comments = comments |> Enum.map(&decode_comment/1)
+
+    %Question.Message{
+      id: id,
+      leads_to: leads_to,
+      comments: comments
+    }
   end
 
   defp decode_question_prompt(%Question.Prompt{} = q, [{:leads_to, leads_to} | rest]) do
@@ -156,6 +181,33 @@ defmodule Chat.Decoder do
       name: name,
       image: image,
       price: price
+    }
+  end
+
+  defp decode_comment(%{
+         "type" => "product",
+         "product" => product
+       }) do
+    %Comment.Product{
+      product: product
+    }
+  end
+
+  defp decode_product(
+         {id,
+          %{
+            "name" => name,
+            "directions" => directions,
+            "explanation" => explanation,
+            "image" => image
+          }}
+       ) do
+    %Product{
+      id: id,
+      name: name,
+      directions: directions,
+      explanation: explanation,
+      image: image
     }
   end
 end

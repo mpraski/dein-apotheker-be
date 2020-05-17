@@ -4,11 +4,12 @@ defmodule Chat.Scenario do
   defstruct id: nil,
             start: nil,
             questions: [],
+            products: [],
             translations: %{}
 end
 
 defimpl Enumerable, for: Chat.Scenario do
-  alias Chat.{Scenario, Question, Answer, Comment}
+  alias Chat.{Scenario, Question, Answer, Comment, Product}
 
   def count(_), do: {:error, __MODULE__}
 
@@ -16,8 +17,8 @@ defimpl Enumerable, for: Chat.Scenario do
 
   def slice(_), do: {:error, __MODULE__}
 
-  def reduce(%Scenario{questions: q}, acc, fun) do
-    reduce_scenario(q, acc, fun)
+  def reduce(%Scenario{questions: q, products: p}, acc, fun) do
+    reduce_scenario(q ++ p, acc, fun)
   end
 
   defp reduce_scenario(_, {:halt, acc}, _fun), do: {:halted, acc}
@@ -47,6 +48,19 @@ defimpl Enumerable, for: Chat.Scenario do
 
   defp reduce_scenario([%Question.Prompt{} = q | t], {:cont, acc}, fun) do
     reduce_scenario(t, fun.(q, acc), fun)
+  end
+
+  defp reduce_scenario(
+         [
+           %Question.Message{
+             comments: comments
+           } = q
+           | t
+         ],
+         {:cont, acc},
+         fun
+       ) do
+    reduce_scenario(comments ++ t, fun.(q, acc), fun)
   end
 
   defp reduce_scenario([%Answer.Single{comments: comments} = a | t], {:cont, acc}, fun) do
@@ -79,6 +93,14 @@ defimpl Enumerable, for: Chat.Scenario do
 
   defp reduce_scenario([%Comment.Buy{} = c | t], {:cont, acc}, fun) do
     reduce_scenario(t, fun.(c, acc), fun)
+  end
+
+  defp reduce_scenario([%Comment.Product{} = c | t], {:cont, acc}, fun) do
+    reduce_scenario(t, fun.(c, acc), fun)
+  end
+
+  defp reduce_scenario([%Product{} = p | t], {:cont, acc}, fun) do
+    reduce_scenario(t, fun.(p, acc), fun)
   end
 
   defp reduce_scenario([a | t], {:cont, acc}, fun) when is_binary(a) do
