@@ -19,11 +19,7 @@ defmodule Api.ChatHelpers do
     current
     |> Chat.question(question)
     |> input()
-    |> Translator.translate(
-      language: language,
-      scenario: current,
-      keys: [:content]
-    )
+    |> translate_input(current, language)
   end
 
   def input(%Question.Single{answers: answers}) do
@@ -153,6 +149,15 @@ defmodule Api.ChatHelpers do
   end
 
   defp translate_message({item, scenario}, language) do
+    item
+    |> Translator.translate(
+      language: language,
+      scenario: scenario,
+      keys: @translation_keys
+    )
+  end
+
+  defp translate_input(item, scenario, language) do
     item
     |> Translator.translate(
       language: language,
