@@ -30,7 +30,7 @@ defmodule Chat.Transitioner do
       new_scenario: new_scenario
     )
     |> put_comments(comments, current)
-    |> load_messages()
+    |> put_messages()
   end
 
   def transition({[current | _], question, _} = context, {:multiple, answers}) do
@@ -55,7 +55,7 @@ defmodule Chat.Transitioner do
       load_scenarios: load_scenarios
     )
     |> put_comments(comments, current)
-    |> load_messages()
+    |> put_messages()
   end
 
   def transition({[current | _], question, _} = context, {:prompt, answer}) do
@@ -74,17 +74,17 @@ defmodule Chat.Transitioner do
     )
     |> put_comments(comments, current)
     |> put_free_text(answer)
-    |> load_messages()
+    |> put_messages()
   end
 
   def transition do
     %Scenario{start: start} = Chat.scenario(@initial_scenario)
-    {[@initial_scenario], start, %{}} |> load_messages()
+    {[@initial_scenario], start, %{}} |> put_messages()
   end
 
-  def load_messages({[], _, _} = context), do: context
+  def put_messages({[], _, _} = context), do: context
 
-  def load_messages({scenarios, question, data} = context) do
+  def put_messages({scenarios, question, data} = context) do
     [current | _] = scenarios
 
     case Chat.question(current, question) do
@@ -94,7 +94,7 @@ defmodule Chat.Transitioner do
       } ->
         with comments <- comments |> Enum.map(&{&1, current}),
              data <- data |> Map.update(:comments, [], &(comments ++ &1)) do
-          {scenarios, leads_to, data} |> load_messages()
+          {scenarios, leads_to, data} |> put_messages()
         end
 
       _ ->
