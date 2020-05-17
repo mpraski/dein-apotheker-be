@@ -36,10 +36,8 @@ questions:
         comments:
           - type: text
             content: great
-          - type: buy
-            image: result_image
-            price: result_price
-            name: result 
+          - type: product
+            product: tantum_verde_spray
           - type: text
             content: warning
 #       how to buy??

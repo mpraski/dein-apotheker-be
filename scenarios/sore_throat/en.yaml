@@ -54,3 +54,14 @@ explanation_ag: Don't worry! It's only to me that it helps me.
 explanation_ad: That sounds interesting!
 explanation_do: Analgesic, anti-inflammatory and antiseptic
 explanation_di: That was interesting, thanks!
+
+#tantum_verde_spray
+tantum_verde_spray_name: Tantum Verde Spray
+tantum_verde_spray_directions: >-
+  * Before the first application, you must press the spray head a few times until an even spray burst emerges
+
+  * Then insert the spray nozzle into the mouth opening, point it at the affected area and use your index finger to operate the spray head
+
+  * You can spray **6 sprays** into the throat up to **5 times a day**
+tantum_verde_spray_explanation: Analgesic, anti-inflammatory and antiseptic
+tantum_verde_spray_image: https://www.tantum-verde.de/files/tantum_verde/layout/png/spray_wide.png

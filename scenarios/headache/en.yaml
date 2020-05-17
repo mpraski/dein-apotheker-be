@@ -49,3 +49,14 @@ explanation_ag: Don't worry! It's only to me that it helps me.
 explanation_ad: That sounds interesting!
 explanation_do: Analgesic, anti-inflammatory, slightly antipyretic
 explanation_di: That was interesting, thanks!
+
+#nurofen
+nurofen_schmelztabletten_minze_name: Nurofen Schmelztabletten Minze
+nurofen_schmelztabletten_minze_directions: >-
+  * Let a tablet melt on your tongue and swallow the dissolved mass
+
+  * Please do not take more than 2 tablets (400mg) at once
+
+  * Leave 6 hours before the next intake and do not take more than 6 tablets (1200mg) a day
+nurofen_schmelztabletten_minze_explanation: Analgesic, anti-inflammatory, slightly antipyretic
+nurofen_schmelztabletten_minze_image: https://media-services.digital-rb.com/s3/live-productcatalogue/sys-master/images/haa/h4a/8868121444382/Meltlet-Mint_ankle_normal_1280x1280.png?width=320&height=320

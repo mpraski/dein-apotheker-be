@@ -71,7 +71,7 @@ defmodule Api.ChatHelpers do
          comments <- data |> Map.get(:comments, []),
          question <- Chat.question(current, question),
          messages <- comments ++ [{question, current}],
-         scenarios = messages |> Enum.map(fn {_, s} -> s end) do
+         scenarios <- messages |> Enum.map(fn {_, s} -> s end) do
       messages
       |> Enum.map(&message/1)
       |> Enum.zip(scenarios)

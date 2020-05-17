@@ -24,10 +24,8 @@ questions:
         comments:
           - type: text
             content: great
-          - type: buy
-            image: result_image
-            price: result_price
-            name: result 
+          - type: product
+            product: nurofen_schmelztabletten_minze
           - type: text
             content: warning
 #       how to buy??
