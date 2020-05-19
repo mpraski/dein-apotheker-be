@@ -21,10 +21,10 @@ defmodule Chat.Transitioner do
       jumps_to: next_scenario,
       loads_scenario: new_scenario,
       comments: comments
-    } = answers |> Enum.find(nil, &(&1.id == answer))
+    } = answers |> Enum.find(&(&1.id == answer))
 
     context
-    |> core(
+    |> put_transition(
       next_question: next_question,
       next_scenario: next_scenario,
       new_scenario: new_scenario
@@ -47,7 +47,7 @@ defmodule Chat.Transitioner do
     } = decisions |> find_decision(answers)
 
     context
-    |> core(
+    |> put_transition(
       next_question: next_question,
       next_scenario: next_scenario,
       new_scenario: new_scenario,
@@ -67,7 +67,7 @@ defmodule Chat.Transitioner do
     } = Chat.question(current, question)
 
     context
-    |> core(
+    |> put_transition(
       next_question: next_question,
       next_scenario: next_scenario,
       new_scenario: new_scenario
@@ -102,7 +102,7 @@ defmodule Chat.Transitioner do
     end
   end
 
-  defp core({scenarios, _, data}, opts \\ []) do
+  defp put_transition({scenarios, _, data}, opts \\ []) do
     opts = opts |> Enum.into(@defaults)
 
     {scenarios, question} =
@@ -142,18 +142,9 @@ defmodule Chat.Transitioner do
       end
 
     scenarios =
-      if opts.new_scenario do
-        scenarios ++ [opts.new_scenario]
-      else
-        scenarios
-      end
-
-    scenarios =
-      if opts.load_scenarios do
-        opts.new_scenarios |> Enum.reduce(scenarios, &(&2 ++ [&1]))
-      else
-        scenarios
-      end
+      scenarios
+      |> load_scenario(opts.new_scenario)
+      |> load_scenarios(opts.load_scenarios, opts.new_scenarios)
 
     {scenarios, question, data}
   end
@@ -172,8 +163,14 @@ defmodule Chat.Transitioner do
   end
 
   defp find_decision(decisions, answer) do
-    with default <- decisions |> Enum.find(nil, &(&1.case == :default)) do
+    with default <- decisions |> Enum.find(&(&1.case == :default)) do
       decisions |> Enum.find(default, &Util.equal(&1.case, answer))
     end
   end
+
+  defp load_scenario(scenarios, nil), do: scenarios
+  defp load_scenario(scenarios, scenario), do: scenarios ++ [scenario]
+
+  defp load_scenarios(scenarios, nil, _), do: scenarios
+  defp load_scenarios(scenarios, _, new), do: new |> Enum.reduce(scenarios, &(&2 ++ [&1]))
 end
