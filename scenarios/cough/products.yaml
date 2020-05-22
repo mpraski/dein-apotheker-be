@@ -1,6 +1,26 @@
 products:
-  bronchpret_saft_te:
-    name: bronchpret_saft_te_name
-    directions: bronchpret_saft_te_directions
-    explanation: bronchpret_saft_te_explanation
-    image: bronchpret_saft_te_image
+  #name: _n
+  #directions: _d
+  #explanation: _e
+  #image: _image
+
+  sirup:
+    name: sirup_n
+    directions: sirup_d
+    explanation: sirup_e
+    image: sirup_image
+  tablet:
+    name: tablet_n
+    directions: tablet_d
+    explanation: tablet_e
+    image: tablet_image
+  cream:
+    name: cream_n
+    directions: cream_d
+    explanation: cream_e
+    image: cream_image
+  calmer:
+    name: calmer_n
+    directions: calmer_d
+    explanation: calmer_e
+    image: calmer_image
