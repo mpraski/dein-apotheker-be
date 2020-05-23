@@ -1,6 +1,13 @@
-start: limit1_q
+start: about_running_nose
 
 questions:
+  about_running_nose:
+    type: message
+    comments:
+      - type: text
+        content: about_running_nose
+    leads_to: limit1_q
+
   #symptom_specific
   #allergy
   allergy_q:
