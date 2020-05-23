@@ -105,6 +105,11 @@ defmodule Chat.Transitioner do
   defp put_transition({scenarios, _, data}, opts) do
     opts = opts |> Enum.into(@defaults)
 
+    scenarios =
+      scenarios
+      |> load_scenario(opts.new_scenario)
+      |> load_scenarios(opts.load_scenarios, opts.new_scenarios)
+      
     {scenarios, question} =
       cond do
         opts.next_question ->
@@ -140,11 +145,6 @@ defmodule Chat.Transitioner do
               raise "Should not reach here"
           end
       end
-
-    scenarios =
-      scenarios
-      |> load_scenario(opts.new_scenario)
-      |> load_scenarios(opts.load_scenarios, opts.new_scenarios)
 
     {scenarios, question, data}
   end

@@ -1,4 +1,4 @@
-start: symptom
+start: patient_q
 
 questions:
   #patient

@@ -32,7 +32,7 @@ questions:
 #mobility - individualize question1
   mobility:
     type: single
-    answer:
+    answers:
       mobility_true: 
         comments:
           - type: product
@@ -48,17 +48,18 @@ questions:
   #gototablet
   choice_tablet:
     type: single
-    answer:
+    answers:
       choice_tablet_ok:
         leads_to: tablet_usage_q
       choice_tablet_change_to_sirup: 
         comments:
           - type: product
             product: sirup
-        leads_to: sirup_usage
+        leads_to: sirup_usage_q
   
   tablet_usage_q:
     type: single
+    answers:
       usage_ag:
         leads_to: tablet_explanation_q
       usage_ad:
@@ -87,7 +88,7 @@ questions:
   #gotosirup
   choice_sirup:
     type: single
-    answer:
+    answers:
       choice_sirup_ok:
         leads_to: sirup_usage_q
       choice_sirup_change_to_tablet:
@@ -98,6 +99,7 @@ questions:
 
   sirup_usage_q:
     type: single
+    answers:
       usage_ag:
         leads_to: sirup_explanation_q
       usage_ad:
@@ -126,7 +128,7 @@ questions:
   #calmer - individualize question2
   calmer_q:
     type: single
-    answer:
+    answers:
       calmer_yes: 
         comments:
           - type: product
@@ -137,7 +139,7 @@ questions:
   
   choice_calmer:
     type: single
-    answer:
+    answers:
       choice_calmer_ok:
         leads_to: calmer_usage_q
       only_one_product:
@@ -162,11 +164,12 @@ questions:
             product: sirup  
           - type: product
             product: sirup  
-    leads_to: one_last_thing
+        leads_to: one_last_thing
 
 
   calmer_usage_q:
     type: single
+    answers:
       usage_ag:
         leads_to: calmer_explanation_q
       usage_ad:
@@ -194,6 +197,9 @@ questions:
   
   one_last_thing:
     type: message
+    comments:
+      - type: text
+        content: one_last_thing_e
     leads_to: limit1_q 
   
 #symptom_specific
@@ -226,7 +232,7 @@ questions:
     type: single
     answers:
       limit3_ag:
-        loads_scnarios: safety_questions_general
+        loads_scenario: safety_questions_general
         #not jumps to - so it only starts after all the symptoms - how do we make sure it only stats once? and how can we finish symptom1 when in symptom2 it Jumps_to terminal through dropout?!
       limit3_ad:
         comments:

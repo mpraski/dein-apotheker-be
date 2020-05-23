@@ -19,7 +19,7 @@ limit1_ag: No
 limit1_ad: Yes
 
 #limit2
-limit2_q: Do you have high fever (> 38,5°C)?
+limit2_q: Do you have high fever **(> 38,5°C)**?
 limit2_ag: No
 limit2_ad: Yes
 
@@ -42,12 +42,12 @@ sirup_image: https://www.bionorica.de/fileadmin/de/Produkte/Atemwege/Bronchipret
 tablet_n: Bronchipret TP Filmtabletten
 tablet_d: none
 tablet_e: TP stands for thyme (Thymus vulgaris) and primrose (Primula veris). A strong combination, but still rather the number 2. 
-tablet_image:
+tablet_image: https://cdn.shop-apotheke.com/images/bronchipret-tp-filmtabletten-D00168484-p1.jpg
 #cream
 cream_n: Pinimenthol Erkältungssalbe
 cream_d: none
 cream_e: A good support for dissolving mucus when you are at home all day anyway.
-cream_image: https://www.docmorris.de/images/produkte/03745309/PinimentholErkltungssalbe.jpg
+cream_image: https://cdn.shop-apotheke.com/images/pinimenthol-erkaeltungssalbe-creme-D03745284-p1.jpg
 #calmer
 calmer_n: WICK Hustenstiller Sirup
 calmer_d: none
@@ -101,12 +101,12 @@ cough_e: >-
   Sometimes more solid, sometimes less so - but for the cough to stop permanently, the mucus has to come out. 
   This is important because otherwise the mucus in your lungs can become inflamed. 
   That's why I recommend using cough expectorants and only if necessary a cough suppressant. 
-4product: I want to show you the best/good medications against cough 
+4products: "I want to show you the best medications against cough:"
 warning: For risks and side effects read the package leaflet and ask your practitioner or pharmacist.
 
 individual: What do you think?
 individual_ag: What is the right one for me?
-individual_do: I want to buy it.
+individual_ad: I want to buy it.
 
 mobility: Do you want "mobile" medication so that you can continue to go about your everyday life in the best possible way? or are you at home right now anyway?
 mobility_true: Medications for the road, please! 
@@ -136,6 +136,6 @@ only_calmer: I just want to buy the cough suppressant!
 
 calmer_vs_expect: Since a cough suppressant only inhibits the cough reflex I don't think you should use it consistently. I consider it merely as an aid to ensure the important and restful sleep. The rest of the day it is important to clear your airways of mucus, so if you only want to buy one product, I advise you to use an expectorant. 
 still_calmer: I still only want to buy the cough suppressant.
-understood_expect: Okay, thanks for the tip, then I'll pass the expectorant. 
- 
-one_last_thing: Try to drink plenty of fluids: 3-4 liters per day. A well hydrated body has it easy to cough up mucus.
+understood_expect: Okay, thanks for the tip, then I'll pass the expectorant.
+
+one_last_thing_e: "Try to drink plenty of fluids: 3-4 liters per day. A well hydrated body has it easy to cough up mucus."

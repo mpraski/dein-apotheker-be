@@ -13,6 +13,3 @@ questions:
       - headache
     decisions:
       - case: default
-        leads_to: symptom 
-
- 
