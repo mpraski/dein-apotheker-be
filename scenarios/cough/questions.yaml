@@ -1,27 +1,202 @@
-start: opportunities
+start: cough
 
 questions:
   #show the products as messages
-  opportunities:
+  cough:
     type: message
-    leads_to: what_next
+    leads_to: individual
     comments:
       - type: text
-        content: present_opportunities
+        content: cough_e
+      - type: text
+        content: 4products
       - type: product
-        product: bronchpret_saft_te
+        product: sirup
+      - type: product
+        product: tablet
+      - type: product
+        product: calmer
+      - type: product
+        product: cream
+      - type: text
+        content: warning
   #suggest the user answers questions
-  what_next:
+  individual:
     type: single
     answers:
-      what_next_ag:
+      individual_ag:
+        leads_to: mobility
+      individual_ad:
         leads_to: limit1_q
-      what_next_ad:
+
+#mobility - individualize question1
+  mobility:
+    type: single
+    answer:
+      mobility_true: 
         comments:
-          - type: text
-            content: what_next_do
-        jumps_to: terminal
-  #symptom_specific
+          - type: product
+            product: tablet
+        leads_to: choice_tablet
+      mobility_false: 
+        comments:
+          - type: product
+            product: sirup
+        leads_to: choice_sirup 
+          #cream: after sirup_explanation, only if mobility leads directly to choice_sirup - something like load but for questions!?
+
+  #gototablet
+  choice_tablet:
+    type: single
+    answer:
+      choice_tablet_ok:
+        leads_to: tablet_usage_q
+      choice_tablet_change_to_sirup: 
+        comments:
+          - type: product
+            product: sirup
+        leads_to: sirup_usage
+  
+  tablet_usage_q:
+    type: single
+      usage_ag:
+        leads_to: tablet_explanation_q
+      usage_ad:
+        leads_to: tablet_usage_a
+
+  tablet_usage_a:
+    type: single
+    answers:
+      usage_di:
+        leads_to: tablet_explanation_q
+
+  tablet_explanation_q:
+    type: single
+    answers:
+      explanation_ag:
+        leads_to: calmer_q
+      explanation_ad:
+        leads_to: tablet_explanation_a
+
+  tablet_explanation_a:
+    type: single
+    answers:
+      explanation_di:
+        leads_to: calmer_q
+
+  #gotosirup
+  choice_sirup:
+    type: single
+    answer:
+      choice_sirup_ok:
+        leads_to: sirup_usage_q
+      choice_sirup_change_to_tablet:
+        comments:
+          - type: product
+            product: tablet
+        leads_to: tablet_usage_q
+
+  sirup_usage_q:
+    type: single
+      usage_ag:
+        leads_to: sirup_explanation_q
+      usage_ad:
+        leads_to: sirup_usage_a
+
+  sirup_usage_a:
+    type: single
+    answers:
+      usage_di:
+        leads_to: tablet_explanation_q
+
+  sirup_explanation_q:
+    type: single
+    answers:
+      explanation_ag:
+        leads_to: calmer_q
+      explanation_ad:
+        leads_to: sirup_explanation_a
+
+  sirup_explanation_a:
+    type: single
+    answers:
+      explanation_di:
+        leads_to: calmer_q
+
+  #calmer - individualize question2
+  calmer_q:
+    type: single
+    answer:
+      calmer_yes: 
+        comments:
+          - type: product
+            product: calmer
+        leads_to: choice_calmer
+      calmer_no: 
+        leads_to: one_last_thing
+  
+  choice_calmer:
+    type: single
+    answer:
+      choice_calmer_ok:
+        leads_to: calmer_usage_q
+      only_one_product:
+        comments:
+          - type: product
+            product: sirup
+        leads_to: calmer_vs_expect    
+      only_calmer:
+        comments:
+          - type: product
+            product: sirup    
+        leads_to: calmer_vs_expect   
+
+  calmer_vs_expect:
+    type: single
+    answers:
+      still_calmer:
+        leads_to: calmer_usage_q
+      understood_expect:
+        comments:
+          - type: product
+            product: sirup  
+          - type: product
+            product: sirup  
+    leads_to: one_last_thing
+
+
+  calmer_usage_q:
+    type: single
+      usage_ag:
+        leads_to: calmer_explanation_q
+      usage_ad:
+        leads_to: calmer_usage_a
+
+  calmer_usage_a:
+    type: single
+    answers:
+      usage_di:
+        leads_to: calmer_explanation_q
+
+  calmer_explanation_q:
+    type: single
+    answers:
+      explanation_ag:
+        leads_to: one_last_thing
+      explanation_ad:
+        leads_to: calmer_explanation_a
+
+  calmer_explanation_a:
+    type: single
+    answers:
+      explanation_di:
+        leads_to: one_last_thing
+  
+  one_last_thing:
+    type: message
+    leads_to: limit1_q 
+  
+#symptom_specific
   #limit1
   limit1_q:
     type: single
@@ -51,53 +226,10 @@ questions:
     type: single
     answers:
       limit3_ag:
-#        result
-        leads_to: usage_q
-        comments:
-          - type: text
-            content: great
-          - type: product
-            product: bronchpret_saft_te
-          - type: text
-            content: warning
-#       how to buy??
+        loads_scnarios: safety_questions_general
+        #not jumps to - so it only starts after all the symptoms - how do we make sure it only stats once? and how can we finish symptom1 when in symptom2 it Jumps_to terminal through dropout?!
       limit3_ad:
         comments:
           - type: text
             content: standard_do
         jumps_to: terminal
-
-  #general questions - symptom specific answers
-  #usage
-  usage_q:
-    type: single
-    answers:
-      usage_ag:
-        leads_to: explanation_q
-      usage_ad:
-        leads_to: usage_do
-#        comments:
-#          - type: text
-#            content: usage_di
-#        leads_to: explanation_q
-  usage_do:
-    type: single
-    answers:
-      usage_di:
-        leads_to: explanation_q
-  
-  #explanation
-  explanation_q:
-    type: single
-    answers:
-      explanation_ag:
-      explanation_ad:
-        leads_to: explanation_do
-#        comments:
-#          - type: text
-#            content: explanation_di
-#        jumps_to: terminal
-  explanation_do:
-    type: single
-    answers:
-      explanation_di:
