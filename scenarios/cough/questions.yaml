@@ -159,11 +159,6 @@ questions:
       still_calmer:
         leads_to: calmer_usage_q
       understood_expect:
-        comments:
-          - type: product
-            product: sirup  
-          - type: product
-            product: sirup  
         leads_to: one_last_thing
 
 

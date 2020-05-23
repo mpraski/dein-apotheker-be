@@ -136,6 +136,6 @@ only_calmer: I just want to buy the cough suppressant!
 
 calmer_vs_expect: Since a cough suppressant only inhibits the cough reflex I don't think you should use it consistently. I consider it merely as an aid to ensure the important and restful sleep. The rest of the day it is important to clear your airways of mucus, so if you only want to buy one product, I advise you to use an expectorant. 
 still_calmer: I still only want to buy the cough suppressant.
-understood_expect: Okay, thanks for the tip, then I'll pass the expectorant.
+understood_expect: Okay, thanks for the tip, then I'll buy only the expectorant.
 
 one_last_thing_e: "Try to drink plenty of fluids: 3-4 liters per day. A well hydrated body has it easy to cough up mucus."
