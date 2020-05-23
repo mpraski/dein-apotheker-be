@@ -116,21 +116,6 @@ defmodule Api.ChatHelpers do
     }
   end
 
-  defp message(
-         {%Comment.Buy{
-            name: name,
-            image: image,
-            price: price
-          }, _}
-       ) do
-    %{
-      type: :buy,
-      name: name,
-      image: image,
-      price: price
-    }
-  end
-
   defp message({%Comment.Product{product: p}, scenario}) do
     %Product{
       name: name,

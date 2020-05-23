@@ -102,7 +102,7 @@ defmodule Chat.Transitioner do
     end
   end
 
-  defp put_transition({scenarios, _, data}, opts \\ []) do
+  defp put_transition({scenarios, _, data}, opts) do
     opts = opts |> Enum.into(@defaults)
 
     {scenarios, question} =

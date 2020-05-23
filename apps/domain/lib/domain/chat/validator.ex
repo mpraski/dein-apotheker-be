@@ -115,10 +115,6 @@ defmodule Chat.Validator do
     [c, i] |> Enum.all?(&Map.has_key?(t, &1))
   end
 
-  defp validate_translation(%Comment.Buy{name: n, image: i}, t) do
-    [n, i] |> Enum.all?(&Map.has_key?(t, &1))
-  end
-
   defp validate_translation(%Comment.Product{}, _), do: true
 
   defp validate_translation(

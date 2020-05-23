@@ -91,10 +91,6 @@ defimpl Enumerable, for: Chat.Scenario do
     reduce_scenario(t, fun.(c, acc), fun)
   end
 
-  defp reduce_scenario([%Comment.Buy{} = c | t], {:cont, acc}, fun) do
-    reduce_scenario(t, fun.(c, acc), fun)
-  end
-
   defp reduce_scenario([%Comment.Product{} = c | t], {:cont, acc}, fun) do
     reduce_scenario(t, fun.(c, acc), fun)
   end
