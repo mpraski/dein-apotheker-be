@@ -108,7 +108,7 @@ warning: For risks and side effects read the package leaflet and ask your practi
 #individual_ag: What is the right one for me?
 #individual_ad: I want to buy it.
 
-mobility: Do you want "mobile" medication so that you can continue to go about your everyday life in the best possible way? or are you at home right now anyway?
+mobility: Do you want "mobile" medication so that you can continue to go about your everyday life in the best possible way? Or are you at home right now anyway?
 mobility_true: Medications for the road, please! 
 mobility_false: I'm just taking the time to take special care of myself. 
 
@@ -138,7 +138,7 @@ calmer_vs_expect: Since a cough suppressant only inhibits the cough reflex I don
 still_calmer: I still only want to buy the cough suppressant.
 understood_expect: Okay, thanks for the tip, then I'll buy only the expectorant.
 
-one_last_thing_e: >- 
+one_last_thing: >- 
   Two last tipps before we talk about your safety: 
   * Try to drink plenty of fluids: 3-4 liters per day. A well hydrated body has it easy to cough up mucus. 
   * To support your body even further your could use a cream like that.

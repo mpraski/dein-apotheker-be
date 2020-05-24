@@ -185,8 +185,6 @@ questions:
     answers:
       explanation_di:
         comments:
-        - type: text
-          content: one_last_thing_e
         - type: product
           product: cream
         leads_to: limit1_q 
