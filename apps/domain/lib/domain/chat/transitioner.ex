@@ -92,10 +92,9 @@ defmodule Chat.Transitioner do
         leads_to: leads_to,
         comments: comments
       } ->
-        with comments <- comments |> Enum.map(&{&1, current}),
-             data <- data |> Map.update(:comments, [], &(comments ++ &1)) do
-          {scenarios, leads_to, data} |> put_messages()
-        end
+        comments = comments |> Enum.map(&{&1, current})
+        data = data |> Map.update(:comments, [], &(comments ++ &1))
+        {scenarios, leads_to, data} |> put_messages()
 
       _ ->
         context
@@ -109,7 +108,7 @@ defmodule Chat.Transitioner do
       scenarios
       |> load_scenario(opts.new_scenario)
       |> load_scenarios(opts.load_scenarios, opts.new_scenarios)
-      
+
     {scenarios, question} =
       cond do
         opts.next_question ->

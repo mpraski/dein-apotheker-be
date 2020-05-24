@@ -19,7 +19,10 @@ defmodule Domain.Application do
     opts = [strategy: :one_for_one, name: Domain.Supervisor]
     {:ok, pid} = Supervisor.start_link(children, opts)
 
-    Recorder.add_exporter(fn _ -> :ok end)
+    Recorder.add_exporter(fn data ->
+      IO.inspect(data)
+      :ok
+    end)
 
     {:ok, pid}
   end

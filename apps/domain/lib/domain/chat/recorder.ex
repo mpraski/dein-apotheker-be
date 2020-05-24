@@ -1,8 +1,10 @@
 defmodule Chat.Recorder do
   use GenServer
 
+  # 1 minutes in milliseconds
   @tick_interval 60_000
-  @live_interval 3_600
+  # 30 minutes in seconds
+  @live_interval 1_800
 
   defmodule State do
     defstruct exporters: [],
@@ -83,18 +85,24 @@ defmodule Chat.Recorder do
   defp tick, do: Process.send_after(self(), :tick, @tick_interval)
 
   defp default(context, answer) do
-    %{
-      updated_at: Time.utc_now(),
-      answers: [{context, answer}]
-    }
+    with now <- Time.utc_now() do
+      %{
+        created_at: now,
+        updated_at: now,
+        answers: [{context, answer, now}]
+      }
+    end
   end
 
   defp update(context, answer) do
-    fn %{answers: answers} ->
-      %{
-        updated_at: Time.utc_now(),
-        answers: answers ++ [{context, answer}]
-      }
+    fn %{created_at: c, answers: a} ->
+      with now <- Time.utc_now() do
+        %{
+          created_at: c,
+          updated_at: now,
+          answers: a ++ [{context, answer, now}]
+        }
+      end
     end
   end
 

@@ -85,8 +85,7 @@ defmodule Chat.Validator do
   end
 
   defp validate_cases(%Question.Multiple{decisions: decisions, answers: answers}) do
-    answers = answers |> Util.index()
-    decisions |> Enum.all?(&validate_cases(&1, answers))
+    decisions |> Enum.all?(&validate_cases(&1, answers |> Util.index()))
   end
 
   defp validate_cases(_), do: true
@@ -103,8 +102,7 @@ defmodule Chat.Validator do
          validated <- apply_validation(scenario, &validate_translation(&1, t)) do
       case Util.all?(validated) do
         {i, false} ->
-          {:error,
-           "#{i} is not translated in default language (#{l})"}
+          {:error, "#{i} is not translated in default language (#{l})"}
 
         _ ->
           :ok
@@ -174,8 +172,6 @@ defmodule Chat.Validator do
         _ -> :ok
       end
     end
-
-    # scenario |> Enum.all?(&validate_product(&1, product_ids))
   end
 
   defp validate_product(%Comment.Product{product: p}, ps), do: ps |> Map.has_key?(p)
