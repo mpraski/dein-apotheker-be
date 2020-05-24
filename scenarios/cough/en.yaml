@@ -55,13 +55,13 @@ calmer_e: The active ingredient dextrometorphan stops coughing briefly but relia
 calmer_image: https://res.cloudinary.com/mtree/image/upload/f_auto,q_auto/Vicks_DE/de-de/-/media/Vicks_DE/Images/Products/Secondary%20Images/Hustensirup/wickgallery1210x1210hustensiruppackoutofpack.jpg?w=1210&v=1-201806271331
 
 ######usage+explanation######
-usage_ag: No, don't bother me
-usage_ad: Yes, please
+usage_ag: No, don't bother me!
+usage_ad: Yes, please.
 usage_di: OK, I got it.
 
-explanation_ag: Don't worry! It's only to me that it helps me.
-explanation_ad: That sounds interesting!
-explanation_di: That was interesting, thanks!
+explanation_ag: Don't worry! It's only important to me that it helps me.
+explanation_ad: That sounds interesting.
+explanation_di: That is interesting, thanks.
 
 #tablet
 tablet_usage_q: Wanna know how to use it?
@@ -97,16 +97,16 @@ calmer_explanation_a: Dextromethorphan suppresses the cough reflex by attenuatin
 ######individual product choice######
 
 cough_e: >-
-  If you have a cough, the problem is typically that there is mucus in the bronchi. 
-  Sometimes more solid, sometimes less so - but for the cough to stop permanently, the mucus has to come out. 
-  This is important because otherwise the mucus in your lungs can become inflamed. 
-  That's why I recommend using cough expectorants and only if necessary a cough suppressant. 
-4products: "I want to show you the best medications against cough:"
+  If you have a cough, the problem is typically that mucus **stucks in your Lungs**. For the cough to stop permanently, the mucus **has to come out.** 
+  And it comes out through coughing - otherwise it can become inflamed. 
+#That's why I recommend using cough expectorants and only if necessary a cough suppressant. 
+
+#4products: "I want to show you the best medications against cough:"
 warning: For risks and side effects read the package leaflet and ask your practitioner or pharmacist.
 
-individual: What do you think?
-individual_ag: What is the right one for me?
-individual_ad: I want to buy it.
+#individual: What do you think?
+#individual_ag: What is the right one for me?
+#individual_ad: I want to buy it.
 
 mobility: Do you want "mobile" medication so that you can continue to go about your everyday life in the best possible way? or are you at home right now anyway?
 mobility_true: Medications for the road, please! 
@@ -125,7 +125,7 @@ choice_sirup_change_to_tablet: I don't like syrups, I'd rather take pills. Even 
 #what_next_ad: Just wanna buy
 #what_next_do: Ok, just click *Add to Basket* on any medication above to add them to the cart
 
-calmer_q: Do you cough especially at naight and does the cough keep you from sleeping ? Or is it more like coughing in the morning? 
+calmer_q: Do you cough especially at night and does the cough keep you from sleeping ? Or is it more like coughing in the morning? 
 calmer_yes: The cough keeps me from sleeping.
 calmer_no: My sleep is not disturbed by my cough.
 
@@ -136,6 +136,9 @@ only_calmer: I just want to buy the cough suppressant!
 
 calmer_vs_expect: Since a cough suppressant only inhibits the cough reflex I don't think you should use it consistently. I consider it merely as an aid to ensure the important and restful sleep. The rest of the day it is important to clear your airways of mucus, so if you only want to buy one product, I advise you to use an expectorant. 
 still_calmer: I still only want to buy the cough suppressant.
-understood_expect: Okay, thanks for the tip, then I'll pass the expectorant.
+understood_expect: Okay, thanks for the tip, then I'll buy only the expectorant.
 
-one_last_thing_e: "Try to drink plenty of fluids: 3-4 liters per day. A well hydrated body has it easy to cough up mucus."
+one_last_thing_e: >- 
+  Two last tipps before we talk about your safety: 
+  * Try to drink plenty of fluids: 3-4 liters per day. A well hydrated body has it easy to cough up mucus. 
+  * To support your body even further your could use a cream like that.
