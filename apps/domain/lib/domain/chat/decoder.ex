@@ -15,6 +15,14 @@ defmodule Chat.Decoder do
 
   def decode_products(_), do: []
 
+  def decode_translations(translations) do
+    translations |> Util.map_contents(&decode_translation/1)
+  end
+
+  def decode_translation(translations) do
+    translations |> Util.map_contents(&Util.format(&1, translations))
+  end
+
   defp decode_question(
          {id,
           %{

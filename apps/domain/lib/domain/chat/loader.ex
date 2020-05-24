@@ -37,6 +37,7 @@ defmodule Chat.Loader do
       |> Enum.filter(fn {_, p} -> File.exists?(p) end)
       |> Enum.map(fn {l, p} -> {l, @yaml.read_from_file!(p)} end)
       |> Map.new()
+      |> Decoder.decode_translations()
 
     scenario = %Scenario{
       id: id,

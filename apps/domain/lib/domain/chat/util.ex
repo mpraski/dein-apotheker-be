@@ -48,4 +48,14 @@ defmodule Chat.Util do
       _ -> nil
     end
   end
+
+  def map_contents(map, f) do
+    map |> Enum.map(fn {k, v} -> {k, f.(v)} end) |> Map.new()
+  end
+
+  def format(string, bindings) do
+    with replace <- fn _, var -> bindings |> Map.get(var, "") end do
+      Regex.replace(~r/\{(\w+?)\}/, string, replace)
+    end
+  end
 end
