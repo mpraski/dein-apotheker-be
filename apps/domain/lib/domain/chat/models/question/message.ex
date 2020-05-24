@@ -5,3 +5,9 @@ defmodule Chat.Question.Message do
             leads_to: nil,
             comments: []
 end
+
+defimpl String.Chars, for: Chat.Question.Message do
+  def to_string(%Chat.Question.Message{id: id}) do
+    "%Question.Message{id: #{id}}"
+  end
+end

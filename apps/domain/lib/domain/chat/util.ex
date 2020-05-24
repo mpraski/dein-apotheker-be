@@ -34,4 +34,18 @@ defmodule Chat.Util do
   end
 
   def equal(_, _), do: false
+
+  def any?(items) do
+    case items |> Enum.find(fn {_, p} -> p end) do
+      {i, p} -> {i, p}
+      _ -> nil
+    end
+  end
+
+  def all?(items) do
+    case items |> Enum.find(fn {_, p} -> !p end) do
+      {i, p} -> {i, p}
+      _ -> nil
+    end
+  end
 end

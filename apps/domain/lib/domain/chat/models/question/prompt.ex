@@ -7,3 +7,9 @@ defmodule Chat.Question.Prompt do
             loads_scenario: nil,
             comments: []
 end
+
+defimpl String.Chars, for: Chat.Question.Prompt do
+  def to_string(%Chat.Question.Prompt{id: id}) do
+    "%Question.Prompt{id: #{id}}"
+  end
+end
