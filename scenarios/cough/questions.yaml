@@ -4,30 +4,10 @@ questions:
   #show the products as messages
   cough:
     type: message
-    leads_to: individual
+    leads_to: mobility
     comments:
       - type: text
         content: cough_e
-      - type: text
-        content: 4products
-      - type: product
-        product: sirup
-      - type: product
-        product: tablet
-      - type: product
-        product: calmer
-      - type: product
-        product: cream
-      - type: text
-        content: warning
-  #suggest the user answers questions
-  individual:
-    type: single
-    answers:
-      individual_ag:
-        leads_to: mobility
-      individual_ad:
-        leads_to: limit1_q
 
 #mobility - individualize question1
   mobility:
@@ -55,6 +35,8 @@ questions:
         comments:
           - type: product
             product: sirup
+          - type: text
+            content: warning
         leads_to: sirup_usage_q
   
   tablet_usage_q:
@@ -95,6 +77,8 @@ questions:
         comments:
           - type: product
             product: tablet
+          - type: text
+            content: warning
         leads_to: tablet_usage_q
 
   sirup_usage_q:
@@ -133,6 +117,8 @@ questions:
         comments:
           - type: product
             product: calmer
+          - type: text
+            content: warning
         leads_to: choice_calmer
       calmer_no: 
         leads_to: one_last_thing
@@ -146,11 +132,15 @@ questions:
         comments:
           - type: product
             product: sirup
+          - type: text
+            content: warning
         leads_to: calmer_vs_expect    
       only_calmer:
         comments:
           - type: product
             product: sirup    
+          - type: text
+            content: warning
         leads_to: calmer_vs_expect   
 
   calmer_vs_expect:
@@ -191,11 +181,16 @@ questions:
         leads_to: one_last_thing
   
   one_last_thing:
-    type: message
-    comments:
-      - type: text
-        content: one_last_thing_e
-    leads_to: limit1_q 
+    type: single
+    answers:
+      explanation_di:
+        comments:
+        - type: text
+          content: one_last_thing_e
+        - type: product
+          product: cream
+        leads_to: limit1_q 
+    #is that the right order? I want to display the tipps + cream, then the customer should be able to click "ok" (=explanation_di), then go on to Limit
   
 #symptom_specific
   #limit1
