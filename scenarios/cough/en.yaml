@@ -138,7 +138,10 @@ calmer_vs_expect: Since a cough suppressant only inhibits the cough reflex I don
 still_calmer: I still only want to buy the cough suppressant.
 understood_expect: Okay, thanks for the tip, then I'll buy only the expectorant.
 
-one_last_thing: >- 
-  Two last tipps before we talk about your safety: 
-  * Try to drink plenty of fluids: 3-4 liters per day. A well hydrated body has it easy to cough up mucus. 
+one_last_thing: "Two last tips before we talk about your safety:"
+one_last_thing_tips: >- 
+  * Try to drink plenty of fluids: 3-4 liters per day. A well hydrated body has it easy to cough up mucus.
+
   * To support your body even further your could use a cream like that.
+
+all_right: All right?

@@ -181,12 +181,20 @@ questions:
         leads_to: one_last_thing
   
   one_last_thing:
+    type: message
+    comments:
+    - type: text
+      content: one_last_thing
+    - type: text
+      content: one_last_thing_tips
+    - type: product
+      product: cream
+    leads_to: all_right 
+
+  all_right:
     type: single
     answers:
       explanation_di:
-        comments:
-        - type: product
-          product: cream
         leads_to: limit1_q 
     #is that the right order? I want to display the tipps + cream, then the customer should be able to click "ok" (=explanation_di), then go on to Limit
   
