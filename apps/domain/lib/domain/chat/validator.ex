@@ -8,9 +8,8 @@ defmodule Chat.Validator do
       &validate_exclusion/1,
       &validate_consistency/1,
       &validate_cases/1,
-      &validate_default_translation/1,
-      &validate_products/1
-      # {&validate_translation/1, "all questions, answers and comments need to be translated"}
+      &validate_products/1,
+      &validate_default_translation/1
     ])
   end
 
@@ -20,6 +19,13 @@ defmodule Chat.Validator do
     case f.(scenario) do
       :ok -> scenario |> validate_all(checks)
       {:error, error} -> {:error, error}
+    end
+  end
+
+  defp apply_validation(items, validator) when is_function(validator, 1) do
+    with named <- items |> Enum.map(&Kernel.to_string/1),
+         validated <- items |> Enum.map(validator) do
+      Enum.zip(named, validated)
     end
   end
 
@@ -37,10 +43,8 @@ defmodule Chat.Validator do
   end
 
   defp validate_exclusion(%Scenario{} = scenario) do
-    with named <- scenario |> Enum.map(&Kernel.to_string/1),
-         validated <- scenario |> Enum.map(&validate_exclusion/1),
-         zipped <- Enum.zip(named, validated) do
-      case Util.any?(zipped) do
+    with validated <- apply_validation(scenario, &validate_exclusion/1) do
+      case Util.any?(validated) do
         {i, true} -> {:error, "#{i} both leads to question and jumps to scenario"}
         _ -> :ok
       end
@@ -57,10 +61,8 @@ defmodule Chat.Validator do
       |> Enum.map(&Util.pluck(&1, :id))
       |> Util.index()
 
-    with named <- scenario |> Enum.map(&Kernel.to_string/1),
-         validated <- scenario |> Enum.map(&validate_consistency(&1, question_ids)),
-         zipped <- Enum.zip(named, validated) do
-      case Util.all?(zipped) do
+    with validated <- apply_validation(scenario, &validate_consistency(&1, question_ids)) do
+      case Util.all?(validated) do
         {i, false} -> {:error, "#{i} doesn't lead to existing question"}
         _ -> :ok
       end
@@ -74,10 +76,8 @@ defmodule Chat.Validator do
   defp validate_consistency(_, _), do: true
 
   defp validate_cases(%Scenario{questions: questions}) do
-    with named <- questions |> Enum.map(&Kernel.to_string/1),
-         validated <- questions |> Enum.map(&validate_cases/1),
-         zipped <- Enum.zip(named, validated) do
-      case Util.all?(zipped) do
+    with validated <- apply_validation(questions, &validate_cases/1) do
+      case Util.all?(validated) do
         {i, false} -> {:error, "#{i} doesn't lead to existing question"}
         _ -> :ok
       end
@@ -100,13 +100,11 @@ defmodule Chat.Validator do
   defp validate_default_translation(%Scenario{translations: ts} = scenario) do
     with l <- Translator.default_language(),
          t <- ts |> Map.get(l),
-         named <- scenario |> Enum.map(&Kernel.to_string/1),
-         validated <- scenario |> Enum.map(&validate_translation(&1, t)),
-         zipped <- Enum.zip(named, validated) do
-      case Util.all?(zipped) do
+         validated <- apply_validation(scenario, &validate_translation(&1, t)) do
+      case Util.all?(validated) do
         {i, false} ->
           {:error,
-           "#{i} is not translated in default language (#{Translator.default_language()})"}
+           "#{i} is not translated in default language (#{l})"}
 
         _ ->
           :ok
@@ -170,10 +168,8 @@ defmodule Chat.Validator do
       |> Enum.map(&Util.pluck(&1, :id))
       |> Util.index()
 
-    with named <- scenario |> Enum.map(&Kernel.to_string/1),
-         validated <- scenario |> Enum.map(&validate_product(&1, product_ids)),
-         zipped <- Enum.zip(named, validated) do
-      case Util.all?(zipped) do
+    with validated <- apply_validation(scenario, &validate_product(&1, product_ids)) do
+      case Util.all?(validated) do
         {i, false} -> {:error, "#{i} does not point to existing product"}
         _ -> :ok
       end
