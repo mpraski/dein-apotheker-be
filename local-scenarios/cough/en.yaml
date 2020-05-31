@@ -1,0 +1,147 @@
+#_questions
+#_q = question
+#_ag = answer to go on
+#_ad = answer to drop out
+#_do = dropout
+#_di = dropin
+
+
+######limits######
+standard_do: >-
+  Soon we'll be able to help you also in a situation like that.
+  Right now we are sorry. We deal with one of your most important values - your health.
+  We know that and therefore it is important to know our limits.
+  Please ask your practitioner or pharmacist for help.
+
+#limit1
+limit1_q: Just to make sure it's a common cough and nothing more serious Is the coming out secretion bloody or purulent?
+limit1_ag: No
+limit1_ad: Yes
+
+#limit2
+limit2_q: Do you have high fever **(> 38,5°C)**?
+limit2_ag: No
+limit2_ad: Yes
+
+#limit3
+limit3_q: Do you make any unusual noices while breathing?
+limit3_ag: No
+limit3_ad: Yes
+
+######products######   product-explanation = genral; explanation next to usage = describes effect mechanism
+  #name: _n
+  #directions: _d
+  #explanation: _e
+  #image: _image
+#sirup
+sirup_n: Bronchipret Saft TE (Sirup)
+sirup_d: none
+sirup_e: TE stands for thyme (Thymus vulgaris) and ivy extract (Hedera helix) - the strongest combination to dissolve mucus. 
+sirup_image: https://www.bionorica.de/fileadmin/de/Produkte/Atemwege/Bronchipret/Packshots_Einzeln_578x385_Bronchipret-Saft-TE-100-links.png 
+#tablet
+tablet_n: Bronchipret TP Filmtabletten
+tablet_d: none
+tablet_e: TP stands for thyme (Thymus vulgaris) and primrose (Primula veris). A strong combination, but still rather the number 2. 
+tablet_image: https://cdn.shop-apotheke.com/images/bronchipret-tp-filmtabletten-D00168484-p1.jpg
+#cream
+cream_n: Pinimenthol Erkältungssalbe
+cream_d: none
+cream_e: A good support for dissolving mucus when you are at home all day anyway.
+cream_image: https://cdn.shop-apotheke.com/images/pinimenthol-erkaeltungssalbe-creme-D03745284-p1.jpg
+#calmer
+calmer_n: WICK Hustenstiller Sirup
+calmer_d: none
+calmer_e: The active ingredient dextrometorphan stops coughing briefly but reliably.
+calmer_image: https://res.cloudinary.com/mtree/image/upload/f_auto,q_auto/Vicks_DE/de-de/-/media/Vicks_DE/Images/Products/Secondary%20Images/Hustensirup/wickgallery1210x1210hustensiruppackoutofpack.jpg?w=1210&v=1-201806271331
+
+######usage+explanation######
+usage_ag: No, don't bother me!
+usage_ad: Yes, please.
+usage_di: OK, I got it.
+
+explanation_ag: Don't worry! It's only important to me that it helps me.
+explanation_ad: That sounds interesting.
+explanation_di: That is interesting, thanks.
+
+#tablet
+tablet_usage_q: Wanna know how to use it?
+tablet_usage_a: Take one tablet three times a day with plenty of water. Take the last dose around 5 p.m. so that the cough does not prevent you from sleeping.
+
+tablet_explanation_q: Would you like to know more about how it works?
+tablet_explanation_a: Essential oils dissolve tough and stuck mucus, so the body can better expectorate it.
+
+#sirup
+sirup_usage_q: Wanna know how to use it?
+sirup_usage_a: Take a measuring cup full of juice with some water three times a day. Take the last dose around 5 p.m. so that the cough does not prevent you from sleeping.
+
+sirup_explanation_q: Would you like to know more about how it works?
+sirup_explanation_a: Essential oils dissolve tough and stuck mucus, so the body can better expectorate it.
+
+#calmer:
+calmer_usage_q: Wanna know how to use it?
+calmer_usage_a: Take a measuring cup of syrup with a little water before going to sleep. 
+
+calmer_explanation_q: Would you like to know more about how it works?
+calmer_explanation_a: Dextromethorphan suppresses the cough reflex by attenuating the cough centre in the central nervous system.
+
+#copy for layout
+#bronchpret_saft_te_directions: >-
+ # * Take a measuring cup full of juice with some water **three times a day**
+ #
+ #* Take the **last dose around 5pm** so that the ejection-promoting effect does not prevent you from sleeping
+#usage_do: >-
+ # * Take a measuring cup full of juice with some water **three times a day**
+ #
+ # * Take the **last dose around 5pm** so that the ejection-promoting effect does not prevent you from sleeping
+
+######individual product choice######
+
+cough_e: >-
+  If you have a cough, the problem is typically that mucus **stucks in your Lungs**. For the cough to stop permanently, the mucus **has to come out.** 
+  And it comes out through coughing - otherwise it can become inflamed. 
+#That's why I recommend using cough expectorants and only if necessary a cough suppressant. 
+
+#4products: "I want to show you the best medications against cough:"
+warning: For risks and side effects read the package leaflet and ask your practitioner or pharmacist.
+
+#individual: What do you think?
+#individual_ag: What is the right one for me?
+#individual_ad: I want to buy it.
+
+mobility: Do you want "mobile" medication so that you can continue to go about your everyday life in the best possible way? Or are you at home right now anyway?
+mobility_true: Medications for the road, please! 
+mobility_false: I'm just taking the time to take special care of myself. 
+
+choice_tablet: The tablets work almost as well as the syrup, but are much easier to take on the road.
+choice_tablet_ok: Sounds good.
+choice_tablet_change_to_sirup: Even on the road I prefer to have a syrup. As long as it has the strongest effect!
+
+choice_sirup: When you're home anyway, I recommend you to take cough syrup, because it has the strongest effect.
+choice_sirup_ok: Sounds good.
+choice_sirup_change_to_tablet: I don't like syrups, I'd rather take pills. Even if they're not as strong as the syrup.
+
+#what_next: Now, you can just buy them. You can answer the questions below so that I can select one for you. What say you?
+#what_next_ag: Sure, let's go!
+#what_next_ad: Just wanna buy
+#what_next_do: Ok, just click *Add to Basket* on any medication above to add them to the cart
+
+calmer_q: Do you cough especially at night and does the cough keep you from sleeping ? Or is it more like coughing in the morning? 
+calmer_yes: The cough keeps me from sleeping.
+calmer_no: My sleep is not disturbed by my cough.
+
+choice_calmer: Your sleep is important so that your body can recover and you get healthy again! I also recommend to take a cough suppressant before sleeping, so that you can sleep more calmly.
+choice_calmer_ok: Sounds good.
+only_one_product: I only want to buy one product. Then which one is the right one? 
+only_calmer: I just want to buy the cough suppressant!
+
+calmer_vs_expect: Since a cough suppressant only inhibits the cough reflex I don't think you should use it consistently. I consider it merely as an aid to ensure the important and restful sleep. The rest of the day it is important to clear your airways of mucus, so if you only want to buy one product, I advise you to use an expectorant. 
+still_calmer: I still only want to buy the cough suppressant.
+understood_expect: Okay, thanks for the tip, then I'll buy only the expectorant.
+
+one_last_thing: "Two last tips before we talk about your safety:"
+one_last_thing_tips: >- 
+  * Try to drink plenty of fluids: 3-4 liters per day. A well hydrated body has it easy to cough up mucus.
+
+  * To support your body even further your could use a cream like that.
+
+all_right: All right?

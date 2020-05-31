@@ -1,0 +1,97 @@
+start: patient_q
+
+questions:
+  #patient
+  patient_q:
+    type: single
+    answers:
+      patient_ag:
+        leads_to: time_q
+      patient_ad:
+        leads_to: patient_do
+
+  patient_do:
+    type: single
+    answers:
+      patient_di:
+        leads_to: time_q
+ 
+  #time
+  time_q:
+    type: single
+    answers:
+      time_ag:
+        leads_to: frequency_q
+      time_ad: 
+        comments:
+          - type: text
+            content: standard_do
+        jumps_to: terminal
+
+  #frequency
+  frequency_q:
+    type: single
+    answers:
+      frequency_ag:
+        leads_to: age_q
+      frequency_ad:
+        comments:
+          - type: text
+            content: standard_do
+        jumps_to: terminal
+
+  #age
+  age_q:
+    type: single
+    answers:
+      age_ag:
+        leads_to: gender_q
+      age_ad:
+        comments:
+          - type: text
+            content: standard_do
+        jumps_to: terminal
+
+  #gender pregnancy breastfeeding 
+  gender_q:
+    type: single
+    answers:
+      gender_ag:
+        leads_to: further_medication_q
+      gender_ad:
+        leads_to: pregnancy_q
+
+  pregnancy_q:
+    type: single
+    answers:
+      pregnancy_ag:
+        leads_to: breastfeeding_q
+      pregnancy_ad:
+          comments:
+            - type: text
+              content: standard_do
+          jumps_to: terminal
+
+  breastfeeding_q:
+    type: single
+    answers:
+      breastfeeding_ag:
+        leads_to: further_medication_q
+      breastfeeding_ad:
+        comments:
+          - type: text
+            content: standard_do
+        jumps_to: terminal
+
+  #further_medication
+  further_medication_q:
+    type: single
+    answers:
+      further_medication_ag:
+        #end of szenario
+      further_medication_ad:
+        leads_to: thanks_for_trying
+
+  thanks_for_trying:
+    type: prompt
+    jumps_to: terminal

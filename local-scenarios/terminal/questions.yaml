@@ -1,0 +1,12 @@
+start: next_symptom
+
+questions:
+  next_symptom:
+    type: single
+    answers:
+      another_symptom:
+        jumps_to: initial
+      not_another_symptom: 
+        leads_to: feedback
+  feedback:
+    type: prompt

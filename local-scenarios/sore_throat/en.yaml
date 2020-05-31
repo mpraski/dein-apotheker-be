@@ -1,0 +1,69 @@
+#_questions
+#_q = question
+#_ag = answer to go on
+#_ad = answer to drop out
+#_do = dropout
+#_di = dropin
+
+standard_do: >-
+  Soon we'll be able to help you also in a situation like that.
+  Right now we are sorry. We deal with one of your most important values - your health.
+  We know that and therefore it is important to know our limits.
+  Please ask your practitioner or pharmacist for help.
+
+about_sore_throat: Now, about your sore throat
+
+#limit1
+limit1_q: Just to make sure it's a common sore throat and nothing more serious - Is the exuding secretion bloody or purulent? Or are your tonsils purulent or swollen?
+limit1_ag: No
+limit1_ad: Yes
+
+#limit2
+limit2_q: Do you have high fever (> 39°C)?
+limit2_ag: No
+limit2_ad: Yes
+
+#limit3
+limit3_q: Do you have a serious injury in your neck? Like a burn?
+limit3_ag: No
+limit3_ad: Yes
+
+#result
+great: >-
+  Great!
+  So here is what I would recommend you:
+result: Tantum Verde Spray
+result_image: https://www.tantum-verde.de/files/tantum_verde/layout/png/spray_wide.png
+result_price: €10.00
+warning: For risks and side effects read the package leaflet and ask your practitioner or pharmacist.
+
+#buy? do you want to buy that product?
+#usage
+usage_q: Wanna know how to use it?
+usage_ag: No, don't bother me
+usage_ad: Yes, please
+usage_do: >-
+  * Before the first application, you must press the spray head a few times until an even spray burst emerges
+
+  * Then insert the spray nozzle into the mouth opening, point it at the affected area and use your index finger to operate the spray head
+
+  * You can spray **6 sprays** into the throat up to **5 times a day**
+usage_di: OK, I got it.
+
+#explanation
+explanation_q: Would you like to know more about how it works?
+explanation_ag: Don't worry! It's only to me that it helps me.
+explanation_ad: That sounds interesting!
+explanation_do: Analgesic, anti-inflammatory and antiseptic
+explanation_di: That was interesting, thanks!
+
+#tantum_verde_spray
+tantum_verde_spray_name: Tantum Verde Spray
+tantum_verde_spray_directions: >-
+  * Before the first application, you must press the spray head a few times until an even spray burst emerges
+
+  * Then insert the spray nozzle into the mouth opening, point it at the affected area and use your index finger to operate the spray head
+
+  * You can spray **6 sprays** into the throat up to **5 times a day**
+tantum_verde_spray_explanation: Analgesic, anti-inflammatory and antiseptic
+tantum_verde_spray_image: https://www.tantum-verde.de/files/tantum_verde/layout/png/spray_wide.png

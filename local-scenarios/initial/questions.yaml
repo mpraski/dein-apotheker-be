@@ -1,0 +1,15 @@
+start: symptom
+
+questions:
+  #symptom_check
+  symptom:
+    type: multiple
+    load_scenarios: true
+    answers:
+      - running_nose
+      #- allergy
+      - cough
+      - sore_throat
+      - headache
+    decisions:
+      - case: default

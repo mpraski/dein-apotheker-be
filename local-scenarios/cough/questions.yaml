@@ -1,0 +1,237 @@
+start: cough
+
+questions:
+  #show the products as messages
+  cough:
+    type: message
+    leads_to: mobility
+    comments:
+      - type: text
+        content: cough_e
+
+#mobility - individualize question1
+  mobility:
+    type: single
+    answers:
+      mobility_true: 
+        comments:
+          - type: product
+            product: tablet
+        leads_to: choice_tablet
+      mobility_false: 
+        comments:
+          - type: product
+            product: sirup
+        leads_to: choice_sirup 
+          #cream: after sirup_explanation, only if mobility leads directly to choice_sirup - something like load but for questions!?
+
+  #gototablet
+  choice_tablet:
+    type: single
+    answers:
+      choice_tablet_ok:
+        leads_to: tablet_usage_q
+      choice_tablet_change_to_sirup: 
+        comments:
+          - type: product
+            product: sirup
+          - type: text
+            content: warning
+        leads_to: sirup_usage_q
+  
+  tablet_usage_q:
+    type: single
+    answers:
+      usage_ag:
+        leads_to: tablet_explanation_q
+      usage_ad:
+        leads_to: tablet_usage_a
+
+  tablet_usage_a:
+    type: single
+    answers:
+      usage_di:
+        leads_to: tablet_explanation_q
+
+  tablet_explanation_q:
+    type: single
+    answers:
+      explanation_ag:
+        leads_to: calmer_q
+      explanation_ad:
+        leads_to: tablet_explanation_a
+
+  tablet_explanation_a:
+    type: single
+    answers:
+      explanation_di:
+        leads_to: calmer_q
+
+  #gotosirup
+  choice_sirup:
+    type: single
+    answers:
+      choice_sirup_ok:
+        leads_to: sirup_usage_q
+      choice_sirup_change_to_tablet:
+        comments:
+          - type: product
+            product: tablet
+          - type: text
+            content: warning
+        leads_to: tablet_usage_q
+
+  sirup_usage_q:
+    type: single
+    answers:
+      usage_ag:
+        leads_to: sirup_explanation_q
+      usage_ad:
+        leads_to: sirup_usage_a
+
+  sirup_usage_a:
+    type: single
+    answers:
+      usage_di:
+        leads_to: tablet_explanation_q
+
+  sirup_explanation_q:
+    type: single
+    answers:
+      explanation_ag:
+        leads_to: calmer_q
+      explanation_ad:
+        leads_to: sirup_explanation_a
+
+  sirup_explanation_a:
+    type: single
+    answers:
+      explanation_di:
+        leads_to: calmer_q
+
+  #calmer - individualize question2
+  calmer_q:
+    type: single
+    answers:
+      calmer_yes: 
+        comments:
+          - type: product
+            product: calmer
+          - type: text
+            content: warning
+        leads_to: choice_calmer
+      calmer_no: 
+        leads_to: one_last_thing
+  
+  choice_calmer:
+    type: single
+    answers:
+      choice_calmer_ok:
+        leads_to: calmer_usage_q
+      only_one_product:
+        comments:
+          - type: product
+            product: sirup
+          - type: text
+            content: warning
+        leads_to: calmer_vs_expect    
+      only_calmer:
+        comments:
+          - type: product
+            product: sirup    
+          - type: text
+            content: warning
+        leads_to: calmer_vs_expect   
+
+  calmer_vs_expect:
+    type: single
+    answers:
+      still_calmer:
+        leads_to: calmer_usage_q
+      understood_expect:
+        leads_to: one_last_thing
+
+
+  calmer_usage_q:
+    type: single
+    answers:
+      usage_ag:
+        leads_to: calmer_explanation_q
+      usage_ad:
+        leads_to: calmer_usage_a
+
+  calmer_usage_a:
+    type: single
+    answers:
+      usage_di:
+        leads_to: calmer_explanation_q
+
+  calmer_explanation_q:
+    type: single
+    answers:
+      explanation_ag:
+        leads_to: one_last_thing
+      explanation_ad:
+        leads_to: calmer_explanation_a
+
+  calmer_explanation_a:
+    type: single
+    answers:
+      explanation_di:
+        leads_to: one_last_thing
+  
+  one_last_thing:
+    type: message
+    comments:
+    - type: text
+      content: one_last_thing
+    - type: text
+      content: one_last_thing_tips
+    - type: product
+      product: cream
+    leads_to: all_right 
+
+  all_right:
+    type: single
+    answers:
+      explanation_di:
+        leads_to: limit1_q 
+    #is that the right order? I want to display the tipps + cream, then the customer should be able to click "ok" (=explanation_di), then go on to Limit
+  
+#symptom_specific
+  #limit1
+  limit1_q:
+    type: single
+    answers:
+      limit1_ag:
+        leads_to: limit2_q
+      limit1_ad:
+        comments:
+          - type: text
+            content: standard_do
+        jumps_to: terminal
+  
+  #limit2
+  limit2_q:
+    type: single
+    answers:
+      limit2_ag:
+        leads_to: limit3_q
+      limit2_ad:
+        comments:
+          - type: text
+            content: standard_do
+        jumps_to: terminal
+
+  #limit3
+  limit3_q:
+    type: single
+    answers:
+      limit3_ag:
+        loads_scenario: safety_questions_general
+        #not jumps to - so it only starts after all the symptoms - how do we make sure it only stats once? and how can we finish symptom1 when in symptom2 it Jumps_to terminal through dropout?!
+      limit3_ad:
+        comments:
+          - type: text
+            content: standard_do
+        jumps_to: terminal

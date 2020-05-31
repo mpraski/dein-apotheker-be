@@ -1,0 +1,6 @@
+products:
+  nurofen_schmelztabletten_minze:
+    name: nurofen_schmelztabletten_minze_name
+    directions: nurofen_schmelztabletten_minze_directions
+    explanation: nurofen_schmelztabletten_minze_explanation
+    image: nurofen_schmelztabletten_minze_image
