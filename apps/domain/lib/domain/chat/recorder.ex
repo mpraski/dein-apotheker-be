@@ -3,12 +3,9 @@ defmodule Chat.Recorder do
 
   # 1 minutes in milliseconds
   @tick_interval 60_000
-  # 30 minutes in seconds
-  @live_interval 1_800
 
   defmodule State do
-    defstruct exporters: [],
-              history: %{}
+    defstruct exporters: [], history: %{}
   end
 
   def start_link(_) do
@@ -70,14 +67,11 @@ defmodule Chat.Recorder do
           history: history
         } = state
       ) do
-    history =
-      history
-      |> export_history(exporters)
-      |> clean_history()
+    history |> export_history(exporters)
 
     tick()
 
-    {:noreply, %State{state | history: history}}
+    {:noreply, %State{state | history: %{}}}
   end
 
   # Private
@@ -86,22 +80,14 @@ defmodule Chat.Recorder do
 
   defp default(context, answer) do
     with now <- Time.utc_now() do
-      %{
-        created_at: now,
-        updated_at: now,
-        answers: [{context, answer, now}]
-      }
+      [{context, answer, now}]
     end
   end
 
-  defp update(context, answer) do
-    fn %{created_at: c, answers: a} ->
+  defp update(context, answers) do
+    fn answers ->
       with now <- Time.utc_now() do
-        %{
-          created_at: c,
-          updated_at: now,
-          answers: a ++ [{context, answer, now}]
-        }
+        [{context, answer, now} | answers]
       end
     end
   end
@@ -112,16 +98,6 @@ defmodule Chat.Recorder do
     case e.(history) do
       :ok -> history |> export_history(rest)
       {:error, error} -> raise "Failed to export history: #{error}"
-    end
-  end
-
-  defp clean_history(history) do
-    with now <- Time.utc_now() do
-      history
-      |> Enum.filter(fn {_, %{updated_at: updated_at}} ->
-        Time.diff(now, updated_at) < @live_interval
-      end)
-      |> Map.new()
     end
   end
 end
