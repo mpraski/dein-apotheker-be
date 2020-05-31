@@ -1,7 +1,7 @@
 defmodule Chat do
   alias Chat.{Loader, Scenario}
 
-  @scenarios_path Path.join(File.cwd!(), "../../scenarios")
+  @scenarios_path Path.join(File.cwd!(), "../../dein-apotheker-scenarios")
   @scenarios Loader.load_scenarios(@scenarios_path)
 
   def scenario(scenario), do: @scenarios |> Map.get(scenario)

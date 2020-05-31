@@ -1,0 +1,3 @@
+[submodule "dein-apotheker-scenarios"]
+	path = dein-apotheker-scenarios
+	url = git@github.com:mpraski/dein-apotheker-scenarios.git
