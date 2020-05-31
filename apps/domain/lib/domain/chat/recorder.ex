@@ -67,7 +67,7 @@ defmodule Chat.Recorder do
           history: history
         } = state
       ) do
-    history |> export_history(exporters)
+    history |> export(exporters)
 
     tick()
 
@@ -79,22 +79,26 @@ defmodule Chat.Recorder do
   defp tick, do: Process.send_after(self(), :tick, @tick_interval)
 
   defp default(context, answer) do
-    with now <- Time.utc_now() do
+    with now <- DateTime.utc_now() do
       [{context, answer, now}]
     end
   end
 
   defp update(context, answer) do
     fn answers ->
-      with now <- Time.utc_now() do
+      with now <- DateTime.utc_now() do
         [{context, answer, now} | answers]
       end
     end
   end
 
-  defp export_history(history, []), do: history
+  defp export_history(history, exporters) do
+    history |> Enum.reverse() |> export(exporters)
+  end
 
-  defp export_history(history, [e | rest]) do
+  defp export(history, []), do: history
+
+  defp export(history, [e | rest]) do
     case e.(history) do
       :ok -> history |> export_history(rest)
       {:error, error} -> raise "Failed to export history: #{error}"

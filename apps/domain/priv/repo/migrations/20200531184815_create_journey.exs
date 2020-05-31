@@ -9,7 +9,7 @@ defmodule Domain.Repo.Migrations.CreateJourney do
       add(:question, :string)
       add(:scenario, :string)
       add(:data, :map)
-      add(:when, :time)
+      add(:when, :utc_datetime_usec)
     end
   end
 end
