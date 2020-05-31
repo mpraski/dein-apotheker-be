@@ -13,10 +13,10 @@ config :domain, ecto_repos: [Domain.Repo]
 
 # Configure your database
 config :domain, Domain.Repo,
-  username: "psa_user",
+  username: "eat_user",
   password: "qwerty123",
-  database: "psa_db",
-  hostname: "database",
+  database: "eat_db",
+  hostname: "localhost",
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 

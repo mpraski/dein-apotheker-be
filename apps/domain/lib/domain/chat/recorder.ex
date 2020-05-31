@@ -84,7 +84,7 @@ defmodule Chat.Recorder do
     end
   end
 
-  defp update(context, answers) do
+  defp update(context, answer) do
     fn answers ->
       with now <- Time.utc_now() do
         [{context, answer, now} | answers]
