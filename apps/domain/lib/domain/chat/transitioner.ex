@@ -171,5 +171,7 @@ defmodule Chat.Transitioner do
   defp load_scenario(scenarios, scenario), do: scenarios ++ [scenario]
 
   defp load_scenarios(scenarios, nil, _), do: scenarios
-  defp load_scenarios(scenarios, _, new), do: new |> Enum.reduce(scenarios, &(&2 ++ [&1]))
+
+  defp load_scenarios(scenarios, _, new),
+    do: new |> Enum.reduce(scenarios, &[&1 | &2]) |> Enum.reverse()
 end

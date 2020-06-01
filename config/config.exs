@@ -11,6 +11,8 @@ import Config
 
 # Configures Elixir's Logger
 config :logger, :console,
+  level: :warn,
+  compile_time_purge_level: :info,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
@@ -22,7 +24,8 @@ config :logger, :console,
 # child application in their own app, but all other
 # dependencies, regardless if they belong to one or multiple
 # apps, should be configured in the umbrella to avoid confusion.
-for config <- "../apps/*/config/{config,#{Mix.env()}}.exs" |> Path.expand(__DIR__) |> Path.wildcard() do
+for config <-
+      "../apps/*/config/{config,#{Mix.env()}}.exs" |> Path.expand(__DIR__) |> Path.wildcard() do
   import_config config
 end
 

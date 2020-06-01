@@ -12,6 +12,8 @@ defmodule Api.ChatController do
 
   action_fallback(FallbackController)
 
+  @question_types |> Enum.each(&String.to_existing_atom/1)
+
   def answer(conn, %{
         "type" => type,
         "value" => value
@@ -20,7 +22,7 @@ defmodule Api.ChatController do
     if conn.assigns.has_context? do
       with token <- conn.assigns.token,
            context <- conn.assigns.context,
-           answer <- {String.to_atom(type), value},
+           answer <- {String.to_existing_atom(type), value},
            new_context <- Transitioner.transition(context, answer),
            :ok <- Recorder.record(token, context, answer) do
         conn |> render("answer.json", context: new_context)
