@@ -67,7 +67,7 @@ defmodule Chat.Recorder do
           history: history
         } = state
       ) do
-    history |> export(exporters)
+    history |> export_history(exporters)
 
     tick()
 

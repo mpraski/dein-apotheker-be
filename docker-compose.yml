@@ -2,13 +2,13 @@
 version: "3.3"
 services:
   database:
-    image: mysql:8.0
+    image: postgres:13
     env_file:
       - database.env
     volumes:
-      - database-data:/var/lib/mysql
+      - database-data:/var/lib/postgresql
     ports:
-      - 3306:3306
+      - 5432:5432
   #migration:
   #  build: .
   #  command: eval Domain.Migration.migrate

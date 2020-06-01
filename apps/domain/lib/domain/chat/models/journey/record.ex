@@ -1,7 +1,7 @@
 defmodule Chat.Journey.Record do
   use Ecto.Schema
 
-  @fields ~w[token answer answer_type question scenario data when]a
+  @fields ~w[token answer answer_type question scenario data answered_at]a
 
   schema "journey" do
     field(:token, :string)
@@ -10,7 +10,7 @@ defmodule Chat.Journey.Record do
     field(:question, :string)
     field(:scenario, :string)
     field(:data, :map)
-    field(:when, :utc_datetime_usec)
+    field(:answered_at, :utc_datetime_usec)
   end
 
   def changeset(record, params \\ %{}) do

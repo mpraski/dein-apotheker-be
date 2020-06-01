@@ -1,6 +1,8 @@
 defmodule Chat.Journey.Exporter do
   alias Chat.Journey.Record
 
+  @start {"none", "<start>"}
+
   def export(history) do
     results =
       history
@@ -22,14 +24,15 @@ defmodule Chat.Journey.Exporter do
          {
            {scenarios, question, data},
            answer,
-           timestamp
+           answered_at
          }
          | answers
        ]) do
-    {answer_type, answer_value} = case answer do
-        nil -> {"none", "<start>"}
+    {answer_type, answer_value} =
+      case answer do
+        nil -> @start
         {type, value} -> {Atom.to_string(type), format_answer(value)}
-    end
+      end
 
     case %Record{
            token: token,
@@ -38,7 +41,7 @@ defmodule Chat.Journey.Exporter do
            question: question,
            scenario: List.first(scenarios),
            data: data,
-           when: timestamp
+           answered_at: answered_at
          }
          |> Record.changeset(%{})
          |> Domain.Repo.insert() do

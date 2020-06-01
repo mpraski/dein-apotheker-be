@@ -30,7 +30,7 @@ defmodule Domain.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
       # {:sibling_app_in_umbrella, in_umbrella: true}
       {:ecto_sql, "~> 3.0"},
-      {:myxql, "~> 0.3.0"},
+      {:postgrex, ">= 0.0.0"},
       {:yaml_elixir, "~> 2.4"},
     ]
   end
