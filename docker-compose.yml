@@ -16,14 +16,5 @@ services:
       - app.env
     depends_on:
       - database
-  #app:
-  #  build: .
-  #  command: start
-  #  env_file:
-  #    - app.env
-  #  ports:
-  #    - 8080:8080
-  #  depends_on:
-  #    - migration
 volumes:
   database-data:
