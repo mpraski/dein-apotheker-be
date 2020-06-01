@@ -4,10 +4,33 @@ defmodule Domain.Migration do
   """
 
   @app :domain
+  @steps 100
+  @interval 500
+
+  defmacrop repeat(fun, steps \\ @steps, interval \\ @interval) do
+    quote do
+      Enum.reduce_while(1..unquote(steps), false, fn _, _ ->
+        case unquote(fun) do
+          {:ok, _} ->
+            {:halt, true}
+
+          _ ->
+            :timer.sleep(unquote(interval))
+            {:cont, false}
+        end
+      end)
+    end
+  end
 
   def migrate do
     with rs <- repos() do
-      true = rs |> Enum.all?(&wait/1)
+      unless rs
+             |> Enum.map(&fn -> repeat(trySelect(&1)) end)
+             |> Enum.map(&Task.async/1)
+             |> Enum.map(&Task.await(&1, @interval * @steps))
+             |> Enum.all?() do
+        raise "Database connectivity problem"
+      end
 
       for repo <- rs do
         {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
@@ -19,17 +42,11 @@ defmodule Domain.Migration do
     {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :down, to: version))
   end
 
-  defp wait(repo) do
-    result =
-      try do
-        Ecto.Adapters.SQL.query(repo, "SELECT 1")
-      rescue
-        e in DBConnection.ConnectionError -> e
-      end
-
-    case result do
-      {:ok, _} -> true
-      _ -> wait(repo)
+  defp trySelect(repo) do
+    try do
+      Ecto.Adapters.SQL.query(repo, "SELECT 1")
+    rescue
+      e in DBConnection.ConnectionError -> e
     end
   end
 
