@@ -3,8 +3,10 @@ defmodule Chat.Initializer do
   alias Chat.Loader
 
   defmacro __using__(_) do
-    scenarios_path = Path.join(File.cwd!(), Application.get_env(:domain, :scenario_path))
-    scenarios = Loader.load_scenarios(scenarios_path)
+    scenarios =
+      File.cwd!()
+      |> Path.join(Application.get_env(:domain, :scenario_path))
+      |> Loader.load_scenarios()
 
     for {k, v} <- scenarios do
       quote do
