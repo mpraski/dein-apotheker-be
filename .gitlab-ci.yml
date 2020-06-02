@@ -19,6 +19,6 @@ deploy:
   script:
     - ssh-add $DO_KEY
     - ssh -i $DO_KEY $DO_USER@$DO_HOST "
-      cd /var/www && sed docker-compose.yml -i -e 's/\($CI_REGISTRY_IMAGE:\)\(.*\)/\1$CI_COMMIT_SHA/' 
-      && docker-compose down --rmi all 
+      docker-compose down
+      && cd /var/www && sed docker-compose.yml -i -e 's/\($CI_REGISTRY_IMAGE:\)\(.*\)/\1$CI_COMMIT_SHA/' 
       && docker-compose up -d"
