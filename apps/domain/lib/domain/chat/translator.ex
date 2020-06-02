@@ -1,9 +1,7 @@
 defmodule Chat.Translator do
-  alias Chat.Scenario
-
   @languages ~w[en de]
   @default_language "en"
-  @defaults %{scenario: nil, keys: [], language: @default_language}
+  @defaults %{scenario: nil, keys: [], translations: %{}, language: @default_language}
 
   alias Chat.Util
 
@@ -13,9 +11,14 @@ defmodule Chat.Translator do
 
   def translate(item, opts \\ []) do
     opts =
-      opts
-      |> Enum.into(@defaults)
-      |> Map.update!(:keys, &Util.index/1)
+      with opts <- opts |> Enum.into(@defaults),
+           scenario <- opts |> Map.get(:scenario),
+           language <- opts |> Map.get(:language),
+           translations <- Chat.translation(scenario, language) do
+        opts
+        |> Map.put(:translations, translations)
+        |> Map.update!(:keys, &Util.index/1)
+      end
 
     do_translate(item, opts)
   end
@@ -41,26 +44,23 @@ defmodule Chat.Translator do
   end
 
   defp do_translate({key, value}, %{
-         scenario: scenario,
-         language: language
+         translations: translations
        })
        when is_binary(value) do
-    {key, fetch(value, scenario, language)}
+    {key, fetch(value, translations)}
   end
 
   defp do_translate({key, value}, %{
-         scenario: scenario,
-         language: language
+         translations: translations
        })
        when is_list(value) do
-    {key, value |> Enum.map(&fetch(&1, scenario, language))}
+    {key, value |> Enum.map(&fetch(&1, translations))}
   end
 
   defp do_translate(item, _), do: item
 
-  defp fetch(item, scenario, language) do
-    %Scenario{translations: translations} = Chat.scenario(scenario)
-    %{^item => value} = translations |> Map.get(language)
+  defp fetch(item, translations) do
+    %{^item => value} = translations
     value
   end
 

@@ -55,7 +55,7 @@ defmodule Api.HealthCheck do
 
   # Common checks
 
-  def ping_repo(repo) do
+  def repo?(repo) do
     fn ->
       result =
         try do
@@ -71,7 +71,7 @@ defmodule Api.HealthCheck do
     end
   end
 
-  def process_alive(pid) do
+  def alive?(pid) do
     fn ->
       Process.alive?(pid)
     end

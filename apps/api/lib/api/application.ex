@@ -25,11 +25,11 @@ defmodule Api.Application do
 
     # Configure health checks
     with repo <- Domain.Repo do
-      HealthCheck.add_readiness(HealthCheck.ping_repo(repo))
+      HealthCheck.add_readiness(HealthCheck.repo?(repo))
     end
 
     with pid <- Chat.Recorder.pid() do
-      HealthCheck.add_liveness(HealthCheck.process_alive(pid))
+      HealthCheck.add_liveness(HealthCheck.alive?(pid))
     end
 
     {:ok, pid}

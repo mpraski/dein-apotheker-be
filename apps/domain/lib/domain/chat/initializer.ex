@@ -27,6 +27,14 @@ defmodule Chat.Initializer do
             end
           end
         end
+
+        unquote do
+          for {t, c} <- v.translations do
+            quote do
+              def translation(unquote(k), unquote(t)), do: unquote(Macro.escape(c))
+            end
+          end
+        end
       end
     end
   end
