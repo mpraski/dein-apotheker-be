@@ -43,17 +43,11 @@ defmodule Chat.Translator do
     item |> Enum.map(&do_translate(&1, opts))
   end
 
-  defp do_translate({key, value}, %{
-         translations: translations
-       })
-       when is_binary(value) do
+  defp do_translate({key, value}, %{translations: translations}) when is_binary(value) do
     {key, fetch(value, translations)}
   end
 
-  defp do_translate({key, value}, %{
-         translations: translations
-       })
-       when is_list(value) do
+  defp do_translate({key, value}, %{translations: translations}) when is_list(value) do
     {key, value |> Enum.map(&fetch(&1, translations))}
   end
 
