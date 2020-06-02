@@ -10,8 +10,14 @@ defmodule Api.Plugs.RequireToken do
 
   def call(%Conn{req_headers: headers} = conn, _params) do
     predicate = fn
-      {"token", token} -> byte_size(token) > 0
-      _ -> false
+      {"token", token} ->
+        case UUID.info(token) do
+          {:ok, _} -> true
+          {:error, _} -> false
+        end
+
+      _ ->
+        false
     end
 
     with found <- headers |> Enum.find(predicate) do

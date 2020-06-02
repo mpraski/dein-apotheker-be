@@ -24,8 +24,7 @@ defmodule Api.ChatView do
       ) do
     %{
       languages: languages,
-      default: default,
-      lel: "lol"
+      default: default
     }
     |> in_envelope()
   end
