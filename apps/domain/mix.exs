@@ -32,6 +32,7 @@ defmodule Domain.MixProject do
       {:ecto_sql, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
       {:yaml_elixir, "~> 2.4"},
+      {:benchee, "~> 1.0", only: :dev}
     ]
   end
 end

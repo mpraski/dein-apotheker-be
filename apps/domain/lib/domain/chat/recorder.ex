@@ -24,6 +24,10 @@ defmodule Chat.Recorder do
     GenServer.cast(__MODULE__, :sync)
   end
 
+  def pid do
+    GenServer.call(__MODULE__, :pid)
+  end
+
   # Server
 
   @impl true
@@ -31,6 +35,9 @@ defmodule Chat.Recorder do
     tick()
     {:ok, %State{}}
   end
+
+  @impl true
+  def handle_call(:pid, _from, state), do: {:reply, self(), state}
 
   @impl true
   def handle_cast(
