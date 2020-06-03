@@ -14,25 +14,18 @@ defmodule Api.Application do
 
     # List all child processes to be supervised
     children = [
-      HealthCheck,
+      {HealthCheck,
+       {
+         [HealthCheck.repo?(Domain.Repo)],
+         [HealthCheck.alive?(&Chat.Recorder.pid/0)]
+       }},
       Endpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Api.Supervisor]
-    {:ok, pid} = Supervisor.start_link(children, opts)
-
-    # Configure health checks
-    with repo <- Domain.Repo do
-      HealthCheck.add_readiness(HealthCheck.repo?(repo))
-    end
-
-    with pid <- Chat.Recorder.pid() do
-      HealthCheck.add_liveness(HealthCheck.alive?(pid))
-    end
-
-    {:ok, pid}
+    Supervisor.start_link(children, opts)
   end
 
   # Tell Phoenix to update the endpoint configuration

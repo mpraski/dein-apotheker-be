@@ -1,5 +1,6 @@
 defmodule Chat.Journey.Exporter do
   alias Chat.Journey.Record
+  require Logger
 
   @start {"none", "<start>"}
 
@@ -16,6 +17,16 @@ defmodule Chat.Journey.Exporter do
       [] -> :ok
       [e | _] -> e
     end
+  end
+
+  def export_log(history) do
+    history
+    |> Enum.each(fn {token, answers} ->
+      Logger.debug("New steps for token #{token}:")
+      answers |> Enum.each(&Logger.debug(inspect(&1)))
+    end)
+
+    :ok
   end
 
   defp export_answers(_, []), do: :ok

@@ -12,16 +12,16 @@ defmodule Domain.Application do
     children = [
       # Starts a worker by calling: Domain.Worker.start_link(arg)
       {Domain.Repo, []},
-      Recorder
+      {Recorder,
+       [
+         &Exporter.export/1,
+         &Exporter.export_log/1
+       ]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Domain.Supervisor]
-    {:ok, pid} = Supervisor.start_link(children, opts)
-
-    Recorder.add_exporter(&Exporter.export/1)
-
-    {:ok, pid}
+    Supervisor.start_link(children, opts)
   end
 end

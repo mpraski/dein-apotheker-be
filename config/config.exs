@@ -9,13 +9,6 @@
 # move said applications out of the umbrella.
 import Config
 
-# Configures Elixir's Logger
-config :logger, :console,
-  level: :warn,
-  compile_time_purge_level: :info,
-  format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
-
 # By default, the umbrella project as well as each child
 # application will require this configuration file, as
 # configuration and dependencies are shared in an umbrella

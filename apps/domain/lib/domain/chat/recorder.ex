@@ -8,8 +8,8 @@ defmodule Chat.Recorder do
     defstruct exporters: [], history: %{}
   end
 
-  def start_link(_) do
-    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+  def start_link(exporters) do
+    GenServer.start_link(__MODULE__, exporters, name: __MODULE__)
   end
 
   def record(token, context, answer) do
@@ -31,9 +31,9 @@ defmodule Chat.Recorder do
   # Server
 
   @impl true
-  def init(_) do
+  def init(exporters) do
     tick()
-    {:ok, %State{}}
+    {:ok, %State{exporters: exporters}}
   end
 
   @impl true
@@ -103,12 +103,20 @@ defmodule Chat.Recorder do
     history |> Enum.reverse() |> export(exporters)
   end
 
-  defp export(history, []), do: history
+  defp export(history, exporters) do
+    results =
+      exporters
+      |> Enum.map(&fn -> &1.(history) end)
+      |> Enum.map(&Task.async/1)
+      |> Enum.map(&Task.await/1)
+      |> Enum.filter(fn
+        :ok -> false
+        _ -> true
+      end)
 
-  defp export(history, [e | rest]) do
-    case e.(history) do
-      :ok -> history |> export_history(rest)
-      {:error, error} -> raise "Failed to export history: #{error}"
+    case results do
+      [] -> :ok
+      [{:error, e} | _] -> raise "Failed to export history: #{e}"
     end
   end
 end

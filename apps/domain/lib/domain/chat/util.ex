@@ -30,7 +30,7 @@ defmodule Chat.Util do
   end
 
   def equal(one, two) when is_list(one) and is_list(two) do
-    one -- two == two -- one
+    Enum.sort(one) == Enum.sort(two)
   end
 
   def equal(_, _), do: false

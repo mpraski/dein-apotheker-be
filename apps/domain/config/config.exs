@@ -21,3 +21,9 @@ config :domain, Domain.Repo,
   pool_size: 10
 
 config :domain, scenario_path: "../../local-scenarios"
+
+# Configures Elixir's Logger
+config :logger, :console,
+  level: :debug,
+  format: "$time $metadata[$level] $message\n",
+  metadata: [:request_id]

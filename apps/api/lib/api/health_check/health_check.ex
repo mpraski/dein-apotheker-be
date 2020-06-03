@@ -6,8 +6,8 @@ defmodule Api.HealthCheck do
 
   use GenServer
 
-  def start_link(_) do
-    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+  def start_link({_ready, _live} = state) do
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
   end
 
   def add_readiness(check) when is_function(check, 0) do
@@ -29,8 +29,8 @@ defmodule Api.HealthCheck do
   # Server
 
   @impl true
-  def init(_) do
-    {:ok, {[], []}}
+  def init({_ready, _live} = state) do
+    {:ok, state}
   end
 
   @impl true
@@ -71,9 +71,9 @@ defmodule Api.HealthCheck do
     end
   end
 
-  def alive?(pid) do
+  def alive?(pid_fun) do
     fn ->
-      Process.alive?(pid)
+      Process.alive?(pid_fun.())
     end
   end
 
