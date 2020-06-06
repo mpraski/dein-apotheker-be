@@ -1,1 +1,1 @@
-# dein-apotheker-be
+# Dein Apotheker Chat Service
