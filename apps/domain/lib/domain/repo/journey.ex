@@ -1,5 +1,5 @@
-defmodule Chat.Journey.Exporter do
-  alias Chat.Journey.Record
+defmodule Repo.Journey do
+  alias Repo.Journey.Item
   require Logger
 
   @start {"none", "<start>"}
@@ -45,7 +45,7 @@ defmodule Chat.Journey.Exporter do
         {type, value} -> {Atom.to_string(type), format_answer(value)}
       end
 
-    case %Record{
+    case %Item{
            token: token,
            answer: answer_value,
            answer_type: answer_type,
@@ -54,7 +54,7 @@ defmodule Chat.Journey.Exporter do
            data: data,
            answered_at: answered_at
          }
-         |> Record.changeset(%{})
+         |> Item.changeset(%{})
          |> Domain.Repo.insert() do
       {:ok, _} -> export_answers(token, answers)
       {:error, error} -> {:error, error}

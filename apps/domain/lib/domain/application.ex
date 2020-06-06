@@ -6,7 +6,7 @@ defmodule Domain.Application do
   use Application
 
   alias Chat.Recorder
-  alias Chat.Journey.Exporter
+  alias Repo.Journey
 
   def start(_type, _args) do
     children = [
@@ -14,8 +14,8 @@ defmodule Domain.Application do
       {Domain.Repo, []},
       {Recorder,
        [
-         &Exporter.export/1,
-         &Exporter.export_log/1
+         &Journey.export/1,
+         &Journey.export_log/1
        ]}
     ]
 

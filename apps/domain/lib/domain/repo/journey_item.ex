@@ -1,4 +1,4 @@
-defmodule Chat.Journey.Record do
+defmodule Repo.Journey.Item do
   use Ecto.Schema
 
   @fields ~w[token answer answer_type question scenario data answered_at]a
@@ -13,8 +13,8 @@ defmodule Chat.Journey.Record do
     field(:answered_at, :utc_datetime_usec)
   end
 
-  def changeset(record, params \\ %{}) do
-    record
+  def changeset(item, params \\ %{}) do
+    item
     |> Ecto.Changeset.cast(params, @fields)
     |> Ecto.Changeset.validate_required(@fields)
   end
