@@ -49,7 +49,7 @@ USER nobody
 
 WORKDIR /$APP
 
-COPY --from=builder --chown=nobody: /$APP/_build/$MIX_ENV/rel/$PROJECT .
+COPY --from=builder --chown=nobody:nobody /$APP/_build/$MIX_ENV/rel/$PROJECT .
 
 EXPOSE $PORT
 
