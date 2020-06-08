@@ -16,6 +16,11 @@ ARG PROJECT
 
 ENV LANG C.UTF-8
 
+# Install hex and rebar
+RUN mix do \
+    local.hex --force, \
+    local.rebar --force
+
 RUN mkdir /$APP
 WORKDIR /$APP
 
@@ -26,12 +31,6 @@ COPY apps ./apps
 COPY mix.exs .
 COPY mix.lock .
 COPY Makefile .
-
-# Install hex and rebar
-RUN mix do \
-    local.hex --force, \
-    local.rebar --force, \
-    deps.get --only $MIX_ENV
 
 # Fetch the application dependencies and build the application
 RUN apk add --update make && make build MIX_ENV=$MIX_ENV
@@ -49,8 +48,7 @@ RUN apk add --update ncurses-libs
 RUN adduser -D -u $UID -h /$APP $APP
 WORKDIR /$APP
 
-COPY --from=builder /$APP/_build/$MIX_ENV/rel/$PROJECT .
-RUN chown -R $APP: /$APP
+COPY --from=builder --chown=$APP: /$APP/_build/$MIX_ENV/rel/$PROJECT .
 USER $APP
 
 EXPOSE $PORT
