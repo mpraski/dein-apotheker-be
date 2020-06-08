@@ -16,12 +16,6 @@ ARG PROJECT
 
 ENV LANG C.UTF-8
 
-# Install hex and rebar
-RUN mix do \
-    local.hex --force, \
-    local.rebar --force, \
-    deps.get --only $MIX_ENV
-
 RUN mkdir /$APP
 WORKDIR /$APP
 
@@ -32,6 +26,12 @@ COPY apps ./apps
 COPY mix.exs .
 COPY mix.lock .
 COPY Makefile .
+
+# Install hex and rebar
+RUN mix do \
+    local.hex --force, \
+    local.rebar --force, \
+    deps.get --only $MIX_ENV
 
 # Fetch the application dependencies and build the application
 RUN apk add --update make && make build MIX_ENV=$MIX_ENV
