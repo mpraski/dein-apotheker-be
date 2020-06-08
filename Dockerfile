@@ -45,11 +45,11 @@ ARG UID
 
 RUN apk add --update ncurses-libs
 
-RUN adduser -D -u $UID -h /$APP $APP
+USER nobody
+
 WORKDIR /$APP
 
-COPY --from=builder --chown=$APP: /$APP/_build/$MIX_ENV/rel/$PROJECT .
-USER $APP
+COPY --from=builder --chown=nobody: /$APP/_build/$MIX_ENV/rel/$PROJECT .
 
 EXPOSE $PORT
 
