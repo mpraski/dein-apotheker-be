@@ -17,9 +17,7 @@ ARG PROJECT
 ENV LANG C.UTF-8
 
 # Install hex and rebar
-RUN --mount=type=cache,target=~/.hex/packages/hexpm,sharing=locked \
-    --mount=type=cache,target=~/.cache/rebar3,sharing=locked \
-    mix do \
+RUN mix do \
     local.hex --force, \
     local.rebar --force, \
     deps.get --only $MIX_ENV
@@ -46,8 +44,7 @@ ARG APP
 ARG PORT
 ARG UID
 
-RUN --mount=type=cache,target=/var/cache/apk,sharing=locked \
-    apk add --update ncurses-libs
+RUN apk add --update ncurses-libs
 
 RUN adduser -D -u $UID -h /$APP $APP
 WORKDIR /$APP
