@@ -17,11 +17,14 @@ ENV LANG C.UTF-8
 
 WORKDIR /$APP
 
+# Copy over configuration that is
+# is unlikely to change oftern
 COPY mix.* ./
 COPY config ./config
 COPY apps/api/mix.exs ./apps/api/
 COPY apps/domain/mix.exs ./apps/domain/
 
+# Install hex, rebar and dependencies
 RUN mix do \
     local.hex --force, \
     local.rebar --force, \
