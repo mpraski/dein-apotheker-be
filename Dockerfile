@@ -1,7 +1,6 @@
-# Set the required arguments
+# ---- REQUIREMENTS ----
 ARG APP=app
 ARG PORT=8080
-ARG UID=1000
 ARG MIX_ENV=prod
 ARG PROJECT=dein_apotheker
 
@@ -16,24 +15,25 @@ ARG PROJECT
 
 ENV LANG C.UTF-8
 
-# Install hex and rebar
-RUN mix do \
-    local.hex --force, \
-    local.rebar --force
-
-RUN mkdir /$APP
 WORKDIR /$APP
 
-# Copy over all the necessary application files and directories
-COPY dein-apotheker-scenarios ./dein-apotheker-scenarios
+COPY mix.* ./
 COPY config ./config
-COPY apps ./apps
-COPY mix.exs .
-COPY mix.lock .
-COPY Makefile .
+COPY apps/api/mix.exs ./apps/api/
+COPY apps/domain/mix.exs ./apps/domain/
 
-# Fetch the application dependencies and build the application
-RUN apk add --update make && make build MIX_ENV=$MIX_ENV
+RUN mix do \
+    local.hex --force, \
+    local.rebar --force, \
+    deps.get --only $MIX_ENV, \
+    deps.compile
+
+# Copy over the code and scenario
+COPY dein-apotheker-scenarios ./dein-apotheker-scenarios
+COPY apps ./apps
+
+# Build the application
+RUN MIX_ENV=$MIX_ENV mix do compile, release
 
 # ---- PACKAGE ----
 FROM alpine:3.11
@@ -41,7 +41,6 @@ FROM alpine:3.11
 ARG MIX_ENV
 ARG APP
 ARG PORT
-ARG UID
 
 RUN apk add --update ncurses-libs
 
