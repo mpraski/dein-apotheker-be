@@ -1,5 +1,7 @@
+%% data.yrl
+
 Nonterminals
-database column variable column_list select_list select_stmt where_stmt stmt.
+logical_op database column variable column_list select_list select_stmt where_stmt stmt.
 
 Terminals
 comma all select from where equals not_equals ident var.
@@ -17,8 +19,10 @@ select_list -> column_list : '$1'.
 column_list -> column                   : ['$1'].
 column_list -> column comma column_list : ['$1'|'$3'].
 
-where_stmt -> column equals variable     : {action('$2'), '$1', '$3'}.
-where_stmt -> column not_equals variable : {action('$2'), '$1', '$3'}.
+where_stmt -> column logical_op variable     : {'$2', '$1', '$3'}.
+
+logical_op -> equals     : action('$1').
+logical_op -> not_equals : action('$1').
 
 column -> ident : unwrap('$1').
 

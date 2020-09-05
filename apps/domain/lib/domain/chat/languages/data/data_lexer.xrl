@@ -1,11 +1,11 @@
-%% query.xrl
+%% data.xrl
 
 Definitions.
 
 Whitespace = [\s\t]
 Terminator = \n|\r\n|\r
-LeftParen = \[
-RightParent = \]
+LeftBracket = \[
+RightBracket = \]
 Comma = ,
 All = \*
 Select = SELECT
@@ -15,12 +15,13 @@ Equals = \=\=
 NotEquals = \!\=
 
 Identifier = [A-Za-z0-9]+
-Variable = {LeftParen}{Identifier}{RightParent}
+Variable = {LeftBracket}{Identifier}{RightBracket}
 
 Rules.
 
 {Whitespace} : skip_token.
 {Terminator} : skip_token.
+
 {Comma}      : {token, {comma, TokenLine}}.
 {All}        : {token, {all, TokenLine}}.
 {Select}     : {token, {select, TokenLine}}.
@@ -28,6 +29,7 @@ Rules.
 {Where}      : {token, {where, TokenLine}}.
 {Equals}     : {token, {equals, TokenLine}}.
 {NotEquals}  : {token, {not_equals, TokenLine}}.
+
 {Identifier} : {token, {ident, TokenLine, list_to_atom(TokenChars)}}.
 {Variable}   : {token, {var, TokenLine, trim_var(TokenChars)}}.
 
