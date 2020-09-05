@@ -11,7 +11,11 @@ defmodule Domain.MixProject do
       lockfile: "../../mix.lock",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      erlc_paths: [
+        "lib/domain/chat/languages/data",
+        "lib/domain/chat/languages/process"
+      ]
     ]
   end
 
