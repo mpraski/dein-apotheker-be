@@ -13,8 +13,8 @@ defmodule Domain.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       erlc_paths: [
-        "lib/domain/chat/languages/data",
-        "lib/domain/chat/languages/process"
+        "lib/domain/chat/languages/data/compiler",
+        "lib/domain/chat/languages/process/compiler"
       ]
     ]
   end
@@ -22,7 +22,7 @@ defmodule Domain.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:logger, :xlsxir],
       mod: {Domain.Application, []}
     ]
   end
@@ -36,6 +36,7 @@ defmodule Domain.MixProject do
       {:ecto_sql, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
       {:yaml_elixir, "~> 2.4"},
+      {:xlsxir, "~> 1.6.4"},
       {:benchee, "~> 1.0", only: :dev}
     ]
   end

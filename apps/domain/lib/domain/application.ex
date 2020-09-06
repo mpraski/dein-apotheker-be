@@ -11,7 +11,7 @@ defmodule Domain.Application do
   def start(_type, _args) do
     children = [
       # Starts a worker by calling: Domain.Worker.start_link(arg)
-      {Domain.Repo, []},
+      # {Domain.Repo, []},
       {Recorder,
        [
          &Journey.export/1,

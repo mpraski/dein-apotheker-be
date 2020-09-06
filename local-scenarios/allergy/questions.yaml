@@ -1,5 +1,0 @@
-start: dummy
-
-questions:
-  dummy:
-    type: prompt
