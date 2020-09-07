@@ -30,7 +30,7 @@ Rules.
 {Equals}     : {token, {equals, TokenLine}}.
 {NotEquals}  : {token, {not_equals, TokenLine}}.
 
-{Identifier} : {token, {ident, TokenLine, list_to_atom(TokenChars)}}.
+{Identifier} : {token, {ident, TokenLine, TokenChars}}.
 {Variable}   : {token, {var, TokenLine, trim_var(TokenChars)}}.
 
 Erlang code.

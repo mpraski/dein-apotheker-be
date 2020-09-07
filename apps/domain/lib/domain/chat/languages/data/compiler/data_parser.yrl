@@ -27,7 +27,7 @@ where_stmt -> column logical_op argument     : {'$2', '$1', {lit, '$3'}}.
 logical_op -> equals     : action('$1').
 logical_op -> not_equals : action('$1').
 
-argument -> ident : unwrap('$1').
+argument -> ident : unwrap_text('$1').
 
 column -> ident : unwrap('$1').
 
@@ -39,4 +39,6 @@ Erlang code.
 
 action({A,_}) -> A.
 
-unwrap({_,_,V}) -> V.
+unwrap_text({_,_,V}) -> list_to_binary(V).
+
+unwrap({_,_,V}) -> list_to_atom(V).

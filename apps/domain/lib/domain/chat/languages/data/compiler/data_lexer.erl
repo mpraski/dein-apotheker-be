@@ -651,7 +651,7 @@ yyaction_8(TokenLine) ->
 -compile({inline,yyaction_9/2}).
 -file("lib/domain/chat/languages/data/compiler/data_lexer.xrl", 31).
 yyaction_9(TokenChars, TokenLine) ->
-     { token, { ident, TokenLine, list_to_atom (TokenChars) } } .
+     { token, { ident, TokenLine, TokenChars } } .
 
 -compile({inline,yyaction_10/2}).
 -file("lib/domain/chat/languages/data/compiler/data_lexer.xrl", 32).
