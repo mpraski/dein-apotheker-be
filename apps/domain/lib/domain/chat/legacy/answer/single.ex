@@ -1,4 +1,4 @@
-defmodule Chat.Answer.Single do
+defmodule Chat.Legacy.Answer.Single do
   @enforce_keys [:id]
 
   defstruct id: nil,
@@ -8,8 +8,8 @@ defmodule Chat.Answer.Single do
             comments: []
 end
 
-defimpl String.Chars, for: Chat.Answer.Single do
-  def to_string(%Chat.Answer.Single{id: id}) do
+defimpl String.Chars, for: Chat.Legacy.Answer.Single do
+  def to_string(%Chat.Legacy.Answer.Single{id: id}) do
     "%Answer.Single{id: #{id}}"
   end
 end

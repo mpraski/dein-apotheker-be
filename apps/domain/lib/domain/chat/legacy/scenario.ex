@@ -1,4 +1,4 @@
-defmodule Chat.Scenario do
+defmodule Chat.Legacy.Scenario do
   @enforce_keys [:id, :start, :questions, :translations]
 
   defstruct id: nil,
@@ -9,7 +9,7 @@ defmodule Chat.Scenario do
 end
 
 defimpl Enumerable, for: Chat.Scenario do
-  alias Chat.{Scenario, Question, Answer, Comment, Product}
+  alias Chat.Legacy.{Scenario, Question, Answer, Comment, Product}
 
   def count(_), do: {:error, __MODULE__}
 

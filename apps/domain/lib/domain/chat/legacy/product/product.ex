@@ -1,4 +1,4 @@
-defmodule Chat.Product do
+defmodule Chat.Legacy.Product do
   @enforce_keys [:id, :name, :directions, :explanation, :image]
 
   defstruct id: nil,
@@ -8,8 +8,8 @@ defmodule Chat.Product do
             image: nil
 end
 
-defimpl String.Chars, for: Chat.Product do
-  def to_string(%Chat.Product{id: id}) do
+defimpl String.Chars, for: Chat.Legacy.Product do
+  def to_string(%Chat.Legacy.Product{id: id}) do
     "%Product{id: #{id}}"
   end
 end

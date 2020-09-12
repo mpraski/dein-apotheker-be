@@ -1,4 +1,4 @@
-defmodule Chat.Data.Answer do
+defmodule Chat.Scenario.Answer do
   @enforce_keys ~w[id text action]a
 
   defstruct id: nil,

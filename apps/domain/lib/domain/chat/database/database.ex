@@ -1,4 +1,4 @@
-defmodule Chat.Data.Database do
+defmodule Chat.Database do
   @enforce_keys ~w[id headers rows]a
 
   defstruct id: nil,

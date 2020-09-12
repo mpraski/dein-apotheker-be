@@ -1,7 +1,5 @@
 defmodule Api.ChatHelpers do
-  alias Chat.{Translator, Question, Question, Answer, Comment, Product}
-
-  @translation_keys ~w[content name directions explanation price image]a
+  alias Chat.Legacy.{Question, Answer, Comment, Product}
 
   def id({_, question, _}), do: question
 
@@ -12,14 +10,7 @@ defmodule Api.ChatHelpers do
   end
 
   def input({[current | _], question, data}) do
-    language =
-      data
-      |> Map.get("language", Translator.default_language())
-
-    current
-    |> Chat.question(question)
-    |> input()
-    |> translate_input(current, language)
+    nil
   end
 
   def input(%Question.Single{answers: answers}) do
@@ -63,16 +54,7 @@ defmodule Api.ChatHelpers do
   def messages({[], _, _}), do: []
 
   def messages({[current | _], question, data}) do
-    with language <- data |> Map.get("language", Translator.default_language()),
-         comments <- data |> Map.get(:comments, []),
-         question <- Chat.question(current, question),
-         messages <- comments ++ [{question, current}],
-         scenarios <- messages |> Enum.map(fn {_, s} -> s end) do
-      messages
-      |> Enum.map(&message/1)
-      |> Enum.zip(scenarios)
-      |> Enum.map(&translate_message(&1, language))
-    end
+    nil
   end
 
   defp message({%Question.Single{id: id}, _}) do
@@ -131,23 +113,5 @@ defmodule Api.ChatHelpers do
       explanation: explanation,
       image: image
     }
-  end
-
-  defp translate_message({item, scenario}, language) do
-    item
-    |> Translator.translate(
-      language: language,
-      scenario: scenario,
-      keys: @translation_keys
-    )
-  end
-
-  defp translate_input(item, scenario, language) do
-    item
-    |> Translator.translate(
-      language: language,
-      scenario: scenario,
-      keys: @translation_keys
-    )
   end
 end

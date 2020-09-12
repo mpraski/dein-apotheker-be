@@ -1,6 +1,6 @@
 defmodule Chat.Languages.Data.Interpreter do
   alias Chat.State
-  alias Chat.Data.Database
+  alias Chat.Database
 
   defmodule Context do
     defstruct databases: nil, state: nil
@@ -11,24 +11,28 @@ defmodule Chat.Languages.Data.Interpreter do
   end
 
   def interpret(program) do
-    &interpret_stmt(program, &1)
-  end
-
-  defp interpret_stmt({:select, select, d}, %Context{databases: ds}) do
-    with d <- get_database(d, ds) |> Database.index() do
-      d |> interpret_select(select).()
-    end
+    &interpret_stmt(program, %Context{} = &1)
   end
 
   defp interpret_stmt(
-         {:select, select, d, where},
+         {:select, select, database},
+         %Context{databases: ds}
+       ) do
+    database
+    |> get_database(ds)
+    |> index_if_needed(select)
+    |> interpret_select(select).()
+  end
+
+  defp interpret_stmt(
+         {:select, select, database, where},
          %Context{databases: ds, state: s}
        ) do
-    with d <- get_database(d, ds) do
-      d
-      |> interpret_where(where, s).()
-      |> interpret_select(select).()
-    end
+    database
+    |> get_database(ds)
+    |> interpret_where(where, s).()
+    |> index_if_needed(select)
+    |> interpret_select(select).()
   end
 
   defp interpret_select(:all) do
@@ -49,18 +53,19 @@ defmodule Chat.Languages.Data.Interpreter do
         |> Stream.map(&Tuple.to_list/1)
         |> Enum.to_list()
 
-      Database.new(id, [headers, rows])
+      Database.new(id, [headers | rows])
     end
   end
 
-  defp interpret_where({op, col, val}, %State{variables: vs}) do
+  defp interpret_where({op, col, val}, state) do
     with op <- logical_op(op),
-         val <- data_value(val, vs) do
+         vars <- State.all_vars(state),
+         val <- data_value(val, vars) do
       fn %Database{id: id, headers: headers, rows: rows} ->
         idx = Enum.find_index(headers, &(&1 == col))
         rows = Enum.filter(rows, &op.(Enum.at(&1, idx), val))
 
-        Database.new(id, [headers | rows]) |> Database.index()
+        Database.new(id, [headers | rows])
       end
     end
   end
@@ -70,7 +75,7 @@ defmodule Chat.Languages.Data.Interpreter do
   defp data_value({:var, n}, variables) do
     case Map.fetch(variables, n) do
       {:ok, v} -> v
-      nil -> raise Failure, message: "failed to get #{n} variable, not defined"
+      _ -> raise Failure, message: "failed to get #{n} variable, not defined"
     end
   end
 
@@ -84,4 +89,8 @@ defmodule Chat.Languages.Data.Interpreter do
       _ -> raise Failure, message: "failed to get database #{database}"
     end
   end
+
+  defp index_if_needed(db, :all), do: db
+
+  defp index_if_needed(db, _), do: Database.index(db)
 end

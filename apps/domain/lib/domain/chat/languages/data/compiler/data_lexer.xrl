@@ -14,7 +14,7 @@ Where = WHERE
 Equals = \=\=
 NotEquals = \!\=
 
-Identifier = [A-Za-z0-9]+
+Identifier = [A-Za-z0-9_]+
 Variable = {LeftBracket}{Identifier}{RightBracket}
 
 Rules.

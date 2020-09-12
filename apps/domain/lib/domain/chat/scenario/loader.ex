@@ -1,38 +1,32 @@
 defmodule Chat.Scenario.Loader do
-  @excel Xlsxir
+  alias Chat.Excel
 
-  @excel_ext ".xlsx"
   @scenario_file "Scenario.xlsx"
   @process_directory "processes"
 
-  def load_tables(path) do
-    {
-      {
-        scenario_name,
-        scenario_ref
-      },
-      process_refs
-    } = load_refs(path)
+  def load(path) do
+    path
+    |> File.ls!()
+    |> Stream.map(&Path.join([path, &1]))
+    |> Stream.filter(&File.dir?/1)
+    |> Stream.map(fn p ->
+      n = Path.basename(p)
 
-    tables = {
-      {
-        scenario_name,
-        read_table(scenario_ref)
-      },
-      process_refs |> Enum.map(fn {n, r} -> {n, read_table(r)} end)
-    }
+      scenario =
+        p
+        |> load_refs()
+        |> load_tables()
 
-    close_table(scenario_ref)
-    process_refs |> Enum.each(fn {_, r} -> close_table(r) end)
-
-    tables
+      {String.to_atom(n), scenario}
+    end)
+    |> Enum.into(Map.new())
   end
 
   defp load_refs(path) do
     {:ok, ref} =
       path
       |> Path.join(@scenario_file)
-      |> open_table()
+      |> Excel.open_table()
 
     scenario_name = Path.basename(path)
 
@@ -43,8 +37,8 @@ defmodule Chat.Scenario.Loader do
       |> Stream.map(&Path.join([path, @process_directory, &1]))
       |> Stream.filter(&File.regular?/1)
       |> Stream.map(fn f ->
-        n = Path.basename(f, @excel_ext)
-        {:ok, ref} = open_table(f)
+        n = Path.basename(f, Excel.ext())
+        {:ok, ref} = Excel.open_table(f)
         {n, ref}
       end)
       |> Enum.to_list()
@@ -52,15 +46,24 @@ defmodule Chat.Scenario.Loader do
     {{scenario_name, ref}, refs}
   end
 
-  defp open_table(path) do
-    @excel.multi_extract(path, 0)
-  end
+  defp load_tables({
+         {
+           scenario_name,
+           scenario_ref
+         },
+         process_refs
+       }) do
+    tables = {
+      {
+        scenario_name,
+        Excel.read_table(scenario_ref)
+      },
+      process_refs |> Enum.map(fn {n, r} -> {n, Excel.read_table(r)} end)
+    }
 
-  defp read_table(ref) do
-    @excel.get_list(ref)
-  end
+    Excel.close_table(scenario_ref)
+    process_refs |> Enum.each(fn {_, r} -> Excel.close_table(r) end)
 
-  defp close_table(ref) do
-    @excel.close(ref)
+    tables
   end
 end

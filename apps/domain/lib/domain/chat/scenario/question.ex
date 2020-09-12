@@ -1,5 +1,5 @@
-defmodule Chat.Data.Question do
-  alias Chat.Data.Answer
+defmodule Chat.Scenario.Question do
+  alias Chat.Scenario.Answer
 
   @types ~w[Q N P C F]a
 

@@ -31,13 +31,15 @@ argument -> ident : unwrap_text('$1').
 
 column -> ident : unwrap('$1').
 
-variable -> var : unwrap('$1').
+variable -> var : unwrap_none('$1').
 
 database -> ident : unwrap('$1').
 
 Erlang code.
 
 action({A,_}) -> A.
+
+unwrap_none({_,_,V}) -> V.
 
 unwrap_text({_,_,V}) -> list_to_binary(V).
 

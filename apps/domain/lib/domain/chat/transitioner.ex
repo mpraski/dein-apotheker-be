@@ -1,5 +1,5 @@
 defmodule Chat.Transitioner do
-  alias Chat.{Scenario, Question, Answer, Util}
+  alias Chat.Legacy.{Scenario, Question, Answer, Util}
 
   @initial_scenario "initial"
   @terminal_scenario "terminal"

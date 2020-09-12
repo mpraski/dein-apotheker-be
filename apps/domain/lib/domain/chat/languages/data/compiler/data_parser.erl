@@ -4,6 +4,8 @@
 
 action({A,_}) -> A.
 
+unwrap_none({_,_,V}) -> V.
+
 unwrap_text({_,_,V}) -> list_to_binary(V).
 
 unwrap({_,_,V}) -> list_to_atom(V).
@@ -180,7 +182,7 @@ yecctoken2string(Other) ->
 
 
 
--file("lib/domain/chat/languages/data/compiler/data_parser.erl", 183).
+-file("lib/domain/chat/languages/data/compiler/data_parser.erl", 185).
 
 -dialyzer({nowarn_function, yeccpars2/7}).
 yeccpars2(0=S, Cat, Ss, Stack, T, Ts, Tzr) ->
@@ -513,8 +515,8 @@ yeccpars2_23_(__Stack0) ->
 yeccpars2_24_(__Stack0) ->
  [__1 | __Stack] = __Stack0,
  [begin
-   unwrap ( __1 )
+   unwrap_none ( __1 )
   end | __Stack].
 
 
--file("lib/domain/chat/languages/data/compiler/data_parser.yrl", 45).
+-file("lib/domain/chat/languages/data/compiler/data_parser.yrl", 47).

@@ -1,4 +1,4 @@
-defmodule Chat.Data.Scenario do
+defmodule Chat.Scenario do
   @keys ~w[id actions processes]a
 
   @enforce_keys @keys

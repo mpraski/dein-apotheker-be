@@ -1,3 +1,7 @@
 defmodule Chat do
-  use Chat.Initializer
+  def question(_, _), do: nil
+
+  def scenario(_), do: nil
+
+  def product(_, _), do: nil
 end

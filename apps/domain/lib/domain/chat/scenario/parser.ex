@@ -1,6 +1,11 @@
 defmodule Chat.Scenario.Parser do
-  alias Chat.Data.{Scenario, Process, Question, Answer}
-  alias Chat.Languages.Process.Parser
+  alias Chat.Scenario
+  alias Chat.Scenario.{Process, Question, Answer}
+
+  alias Chat.Languages.Process.Parser, as: ProcessParser
+  alias Chat.Languages.Process.Interpreter, as: ProcessInterpreter
+  alias Chat.Languages.Data.Parser, as: DataParser
+  alias Chat.Languages.Data.Interpreter, as: DataInterpreter
 
   @scenario_header ~w[Process Action]
   @process_header ~w[ID Type Query Text Action Output]
@@ -10,13 +15,19 @@ defmodule Chat.Scenario.Parser do
     defexception message: "XLSX parsing failure"
   end
 
-  def parse_scenario({
-        {
-          scenario_name,
-          scenario_table
-        },
-        process_tables
-      }) do
+  def parse(scenarios) do
+    scenarios
+    |> Enum.map(fn {k, v} -> {k, parse_scenario(v)} end)
+    |> Enum.into(Map.new())
+  end
+
+  defp parse_scenario({
+         {
+           scenario_name,
+           scenario_table
+         },
+         process_tables
+       }) do
     actions =
       scenario_table
       |> validate_table(@scenario_header)
@@ -34,9 +45,7 @@ defmodule Chat.Scenario.Parser do
   end
 
   defp parse_actions([p, a]) do
-    with {:ok, program} <- parse_program(a) do
-      {String.to_atom(p), program}
-    end
+    {String.to_atom(p), parse_process_program(a)}
   end
 
   defp parse_process({p, rows}) do
@@ -59,7 +68,7 @@ defmodule Chat.Scenario.Parser do
 
     questions =
       rows
-      |> Enum.map(&extend(&1, @process_columns))
+      |> Enum.map(&fit(&1, @process_columns))
       |> Enum.reduce({[], []}, reducer)
       |> elem(0)
       |> Enum.map(fn %Question{id: id} = q -> {id, q} end)
@@ -69,7 +78,8 @@ defmodule Chat.Scenario.Parser do
   end
 
   defp parse_question([id, type, query, text, action, output]) do
-    with {:ok, program} <- parse_program(action),
+    with action <- parse_process_program(action),
+         query <- parse_data_program(query),
          id <- String.to_atom(id),
          type <- String.to_atom(type),
          output <- parse_question_output(output) do
@@ -78,28 +88,36 @@ defmodule Chat.Scenario.Parser do
         type,
         query,
         text,
-        program,
+        action,
         output
       )
     end
   end
 
   defp parse_answer([_, _, _, text, action, output]) do
-    with {:ok, program} <- parse_program(action),
+    with action <- parse_process_program(action),
          output <- parse_answer_output(output) do
       Answer.new(
         :unknown,
         text,
-        program,
+        action,
         output
       )
     end
   end
 
-  defp parse_program(nil), do: {:ok, nil}
+  defp parse_process_program(nil), do: nil
 
-  defp parse_program(source) do
-    Parser.parse(source)
+  defp parse_process_program(source) do
+    {:ok, program} = ProcessParser.parse(source)
+    ProcessInterpreter.interpret(program)
+  end
+
+  defp parse_data_program(nil), do: nil
+
+  defp parse_data_program(source) do
+    {:ok, program} = DataParser.parse(source)
+    DataInterpreter.interpret(program)
   end
 
   defp parse_question_output(nil), do: nil
@@ -113,7 +131,7 @@ defmodule Chat.Scenario.Parser do
   defp parse_answer_output(nil), do: nil
 
   defp parse_answer_output(output) do
-    output |> String.to_atom()
+    String.to_atom(output)
   end
 
   defp validate_table([h | r], header) do
@@ -124,18 +142,28 @@ defmodule Chat.Scenario.Parser do
     end
   end
 
-  defp extend(list, length, base \\ nil) do
-    rem = abs(Enum.count(list) - length)
+  defp fit(list, length, base \\ nil) do
+    delta = length - length(list)
 
-    if rem == 0 do
-      list
-    else
+    extend = fn d, l ->
       with app <-
-             0..(rem - 1)
+             0..(d - 1)
              |> Enum.to_list()
              |> Enum.map(fn _ -> base end) do
-        list |> Enum.concat(app)
+        l |> Enum.concat(app)
       end
     end
+
+    trim = fn d, l ->
+      Enum.take(l, length(l) + d)
+    end
+
+    fitter = fn
+      d when d == 0 -> list
+      d when d > 0 -> extend.(delta, list)
+      d when d < 0 -> trim.(delta, list)
+    end
+
+    fitter.(delta)
   end
 end
