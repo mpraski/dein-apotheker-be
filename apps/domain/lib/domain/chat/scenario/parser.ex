@@ -41,7 +41,7 @@ defmodule Chat.Scenario.Parser do
       |> Stream.map(fn %Process{id: id} = p -> {id, p} end)
       |> Enum.into(Map.new())
 
-    Scenario.new(scenario_name, actions, processes)
+    Scenario.new(String.to_atom(scenario_name), actions, processes)
   end
 
   defp parse_actions([p, a]) do

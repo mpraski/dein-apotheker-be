@@ -11,7 +11,7 @@ defmodule Chat.Scenario do
     %__MODULE__{
       id: id,
       actions: actions,
-      processes: processes,
+      processes: processes
     }
   end
 

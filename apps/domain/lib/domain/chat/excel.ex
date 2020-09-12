@@ -1,7 +1,7 @@
 defmodule Chat.Excel do
   @excel Xlsxir
 
-  def ext, do: ".xltx"
+  def ext, do: ".xlsx"
 
   def open_table(path) do
     @excel.multi_extract(path, 0)

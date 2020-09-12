@@ -12,7 +12,7 @@ defmodule DeinApotheker.MixProject do
           include_executables_for: [:unix],
           applications: [
             api: :permanent,
-            domain: :permanent,
+            domain: :permanent
           ]
         ]
       ]

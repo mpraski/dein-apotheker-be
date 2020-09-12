@@ -9,7 +9,7 @@ defmodule Chat.State.Process do
   def new(id, vars \\ %{}) do
     %__MODULE__{
       id: id,
-      variables: vars,
+      variables: vars
     }
   end
 end

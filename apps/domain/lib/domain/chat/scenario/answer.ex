@@ -11,7 +11,7 @@ defmodule Chat.Scenario.Answer do
       id: id,
       text: text,
       action: action,
-      output: output,
+      output: output
     }
   end
 end
