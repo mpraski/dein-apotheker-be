@@ -1,19 +1,23 @@
 defmodule Chat.Scenario.Process do
-  @keys ~w[id questions]a
-
-  @enforce_keys @keys
+  @enforce_keys ~w[id entry questions]a
 
   defstruct id: nil,
+            entry: nil,
             questions: %{}
 
-  def new(id, questions \\ %{}) do
+  def new(id, entry, questions \\ %{}) do
     %__MODULE__{
       id: id,
+      entry: entry,
       questions: questions
     }
   end
 
+  def entry(%__MODULE__{entry: e, questions: qs}) do
+    Map.fetch(qs, e)
+  end
+
   def question(%__MODULE__{questions: qs}, q) do
-    Map.get(qs, q)
+    Map.fetch(qs, q)
   end
 end

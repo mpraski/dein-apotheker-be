@@ -1,5 +1,5 @@
 defmodule Chat.Scenario.Question do
-  alias Chat.Scenario.Answer
+  alias Chat.Scenario.{Answer, Text}
 
   @types ~w[Q N P C F]a
 
@@ -8,7 +8,7 @@ defmodule Chat.Scenario.Question do
   defstruct id: nil,
             type: nil,
             query: nil,
-            text: nil,
+            text: "",
             action: nil,
             output: nil,
             answers: []
@@ -18,11 +18,18 @@ defmodule Chat.Scenario.Question do
       id: id,
       type: type,
       query: query,
-      text: text,
+      text: Text.new(text),
       action: action,
       output: output,
       answers: []
     }
+  end
+
+  def answer(%__MODULE__{answers: as}, a) do
+    case Enum.find(as, fn %Answer{id: id} -> id == a end) do
+      %Answer{} = a -> {:ok, a}
+      _ -> :error
+    end
   end
 
   def add_answer(%Answer{} = a, %__MODULE__{answers: as} = q) do

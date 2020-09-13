@@ -12,11 +12,11 @@ defmodule Chat.Languages.Process.Interpreter do
   end
 
   def interpret(program) do
-    &interpret_stmts(program, %Context{} = &1)
+    &interpret_stmts(program, %Context{state: %State{}} = &1)
   end
 
   defp interpret_stmts(stmts, %Context{state: state} = c) do
-    %State{} = Enum.reduce(state, stmts, &interpret_stmt(&1, %Context{c | state: &2}))
+    %State{} = Enum.reduce(stmts, state, &interpret_stmt(&1, %Context{c | state: &2}))
   end
 
   defp interpret_stmt({:call, f, a = {_, _}}, context) do

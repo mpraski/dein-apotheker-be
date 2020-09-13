@@ -19,7 +19,8 @@ defmodule Chat.Languages.Process.StdLib do
       GOTO: &goto/1,
       FINISH: &finish/1,
       IS_LOADED: &is_loaded/1,
-      IS_NEXT: &is_next/1
+      IS_NEXT: &is_next/1,
+      DEFER: &defer/1
     }
   end
 
@@ -56,24 +57,17 @@ defmodule Chat.Languages.Process.StdLib do
            } = s,
          scenarios: scenarios
        }) do
-    {:ok, %Scenario{actions: as}} = Map.fetch(scenarios, n)
+    {:ok, scenario} = Map.fetch(scenarios, n)
+    {:ok, action} = Scenario.action(scenario, id)
 
-    state = %State{s | processes: rest}
-
-    case Map.fetch(as, id) do
-      {:ok, action} ->
-        action.(%Context{
-          state: state,
-          scenarios: scenarios
-        })
-
-      _ ->
-        state
-    end
+    action.(%Context{
+      state: %State{s | processes: rest},
+      scenarios: scenarios
+    })
   end
 
   defp is_loaded(%Call{arg: p, state: %State{processes: ps}}) do
-    case Enum.find(ps, nil, fn %Process{id: i} -> i == p end) do
+    case Enum.find(ps, fn %Process{id: i} -> i == p end) do
       %Process{} -> true
       _ -> false
     end
@@ -89,4 +83,6 @@ defmodule Chat.Languages.Process.StdLib do
   defp is_next(%Call{state: %State{processes: _}}) do
     false
   end
+
+  defp defer(%Call{state: %State{} = s}), do: s
 end

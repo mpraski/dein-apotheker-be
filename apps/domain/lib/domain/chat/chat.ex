@@ -3,5 +3,7 @@ defmodule Chat do
 
   def scenario(_), do: nil
 
+  def scenarios(), do: nil
+
   def product(_, _), do: nil
 end

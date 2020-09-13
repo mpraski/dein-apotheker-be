@@ -7,9 +7,6 @@ defmodule Domain.Migration do
   @steps 100
   @interval 500
 
-  alias Chat.Translator
-  alias Repo.Translation
-
   defmacrop repeat(fun, steps \\ @steps, interval \\ @interval) do
     quote do
       Enum.reduce_while(1..unquote(steps), false, fn _, _ ->
@@ -38,8 +35,6 @@ defmodule Domain.Migration do
       for repo <- rs do
         {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
       end
-
-      load_translations()
     end
   end
 
@@ -60,14 +55,5 @@ defmodule Domain.Migration do
     # This is not in the phoenix documentation, but it's necessary to ensure :ssl is started
     {:ok, _} = Application.ensure_all_started(@app)
     Application.fetch_env!(@app, :ecto_repos)
-  end
-
-  defp load_translations do
-    Translation.clean()
-
-    for scenario <- Chat.scenarios(),
-        language <- Translator.languages() do
-      Translation.export(scenario, language)
-    end
   end
 end

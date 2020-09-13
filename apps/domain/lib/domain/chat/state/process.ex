@@ -1,7 +1,5 @@
 defmodule Chat.State.Process do
-  @keys ~w[id variables]a
-
-  @enforce_keys @keys
+  @enforce_keys ~w[id variables]a
 
   defstruct id: nil,
             variables: %{}

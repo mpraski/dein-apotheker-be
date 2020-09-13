@@ -29,10 +29,12 @@ defmodule Chat.Scenario.Parser do
          process_tables
        }) do
     actions =
+      [{entry, _} | _] =
       scenario_table
       |> validate_table(@scenario_header)
       |> Enum.map(&parse_actions/1)
-      |> Enum.into(Map.new())
+
+    actions = actions |> Enum.into(Map.new())
 
     processes =
       process_tables
@@ -41,7 +43,7 @@ defmodule Chat.Scenario.Parser do
       |> Stream.map(fn %Process{id: id} = p -> {id, p} end)
       |> Enum.into(Map.new())
 
-    Scenario.new(String.to_atom(scenario_name), actions, processes)
+    Scenario.new(String.to_atom(scenario_name), entry, actions, processes)
   end
 
   defp parse_actions([p, a]) do
@@ -67,14 +69,19 @@ defmodule Chat.Scenario.Parser do
     end
 
     questions =
+      [entry | _] =
       rows
       |> Enum.map(&fit(&1, @process_columns))
       |> Enum.reduce({[], []}, reducer)
       |> elem(0)
+      |> Enum.reverse()
+
+    questions =
+      questions
       |> Enum.map(fn %Question{id: id} = q -> {id, q} end)
       |> Enum.into(Map.new())
 
-    Process.new(String.to_atom(p), questions)
+    Process.new(String.to_atom(p), entry.id, questions)
   end
 
   defp parse_question([id, type, query, text, action, output]) do
