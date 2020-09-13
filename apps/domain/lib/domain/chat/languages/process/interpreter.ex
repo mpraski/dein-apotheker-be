@@ -19,8 +19,8 @@ defmodule Chat.Languages.Process.Interpreter do
     %State{} = Enum.reduce(stmts, state, &interpret_stmt(&1, %Context{c | state: &2}))
   end
 
-  defp interpret_stmt({:call, f, a = {_, _}}, context) do
-    %State{} = call_func(f, a, context)
+  defp interpret_stmt({:call, f, args}, context) do
+    %State{} = call_func(f, args, context)
   end
 
   defp interpret_stmt({:lif, a, b, c}, context) do
@@ -54,8 +54,8 @@ defmodule Chat.Languages.Process.Interpreter do
     end
   end
 
-  defp interpret_expr({:call, f, a = {_, _}}, context) do
-    case call_func(f, a, context) do
+  defp interpret_expr({:call, f, args}, context) do
+    case call_func(f, args, context) do
       b when is_boolean(b) -> b
       _ -> raise Failure, message: "function doesn't return a boolean"
     end
@@ -88,10 +88,9 @@ defmodule Chat.Languages.Process.Interpreter do
     end
   end
 
-  defp call_func(n, {arg, vars}, %Context{state: state, scenarios: scenarios}) do
+  defp call_func(n, args, %Context{state: state, scenarios: scenarios}) do
     call = %Call{
-      arg: arg,
-      optional: vars,
+      args: args,
       state: state,
       scenarios: scenarios
     }

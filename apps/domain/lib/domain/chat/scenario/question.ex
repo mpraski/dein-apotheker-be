@@ -8,7 +8,7 @@ defmodule Chat.Scenario.Question do
   defstruct id: nil,
             type: nil,
             query: nil,
-            text: "",
+            text: nil,
             action: nil,
             output: nil,
             answers: []

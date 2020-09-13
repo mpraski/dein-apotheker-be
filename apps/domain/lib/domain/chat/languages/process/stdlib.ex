@@ -5,7 +5,7 @@ defmodule Chat.Languages.Process.StdLib do
   alias Chat.Languages.Process.Interpreter.Context
 
   defmodule Call do
-    defstruct arg: nil, optional: nil, state: nil, scenarios: nil
+    defstruct args: [], state: nil, scenarios: nil
   end
 
   defmodule Failure do
@@ -25,24 +25,30 @@ defmodule Chat.Languages.Process.StdLib do
   end
 
   defp load(%Call{
-         arg: a,
-         optional: v,
+         args: [{:ident, proc}],
          state: %State{processes: p} = s
        }) do
-    with captured <- State.fetch_variables(s, v) do
-      %State{s | processes: p ++ [Process.new(a, captured)]}
+    %State{s | processes: p ++ [Process.new(proc)]}
+  end
+
+  defp load(%Call{
+         args: [{:ident, proc, vars}],
+         state: %State{processes: p} = s
+       }) do
+    with captured <- State.fetch_variables(s, vars) do
+      %State{s | processes: p ++ [Process.new(proc, captured)]}
     end
   end
 
   defp jump(%Call{
-         arg: a,
+         args: [{:ident, proc}],
          state: %State{processes: [_ | rest]} = s
        }) do
-    %State{s | processes: [Process.new(a) | rest]}
+    %State{s | processes: [Process.new(proc) | rest]}
   end
 
-  defp goto(%Call{arg: a, state: %State{} = s}) do
-    %State{s | question: a}
+  defp goto(%Call{args: [{:ident, question}], state: %State{} = s}) do
+    %State{s | question: question}
   end
 
   defp finish(%Call{state: %State{processes: []}}) do
@@ -66,18 +72,18 @@ defmodule Chat.Languages.Process.StdLib do
     })
   end
 
-  defp is_loaded(%Call{arg: p, state: %State{processes: ps}}) do
-    case Enum.find(ps, fn %Process{id: i} -> i == p end) do
+  defp is_loaded(%Call{args: [{:ident, proc}], state: %State{processes: ps}}) do
+    case Enum.find(ps, fn %Process{id: i} -> i == proc end) do
       %Process{} -> true
       _ -> false
     end
   end
 
   defp is_next(%Call{
-         arg: c,
+         args: [{:ident, proc}],
          state: %State{processes: [_ | [%Process{id: i} | _]]}
        }) do
-    i == c
+    i == proc
   end
 
   defp is_next(%Call{state: %State{processes: _}}) do

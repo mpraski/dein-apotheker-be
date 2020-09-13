@@ -36,11 +36,12 @@ logical_expr -> left_paren expr logical_op expr right_paren : {'$3', '$2', '$4'}
 
 comp_expr -> variable comp_op identifier : {'$2', '$1', '$3'}.
 
-function_expr -> identifier left_paren right_paren          : {call, '$1', {nil, nil}}.
+function_expr -> identifier left_paren right_paren          : {call, '$1', []  }.
 function_expr -> identifier left_paren arg_expr right_paren : {call, '$1', '$3'}.
 
-arg_expr -> identifier                   : {'$1', []  }.
-arg_expr -> identifier with variable_list: {'$1', '$3'}.
+arg_expr -> identifier                    : [{ident, '$1'      }].
+arg_expr -> identifier with variable_list : [{ident, '$1', '$3'}].
+arg_expr -> variable_list                 : '$1'.
 
 variable_list -> variable                     : ['$1'].
 variable_list -> variable comma variable_list : ['$1'|'$3'].

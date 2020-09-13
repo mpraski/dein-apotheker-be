@@ -5,12 +5,12 @@ defmodule Chat.Driver do
   alias Chat.Languages.Process.Interpreter.Context
 
   def next(
-        scenarios,
         %State{
           question: question,
           scenarios: [scenario | _],
           processes: [process | _]
         } = state,
+        scenarios,
         answer
       ) do
     {:ok, scenario = %Scenario{}} = Map.fetch(scenarios, scenario)

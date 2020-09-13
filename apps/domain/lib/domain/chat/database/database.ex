@@ -7,18 +7,11 @@ defmodule Chat.Database do
             indexed: %{}
 
   def new(id, [headers | rows]) do
-    with headers <- headers |> Enum.map(&to_atom/1) do
-      %__MODULE__{
-        id: id,
-        headers: headers,
-        rows: rows
-      }
-    end
-  end
-
-  def indexed(id, data) do
-    db = %__MODULE__{headers: headers, rows: rows} = new(id, data)
-    %__MODULE__{db | indexed: make_indexed(headers, rows)}
+    %__MODULE__{
+      id: id,
+      headers: Enum.map(headers, &to_atom/1),
+      rows: rows
+    }
   end
 
   def index(
@@ -29,6 +22,8 @@ defmodule Chat.Database do
       ) do
     %__MODULE__{db | indexed: make_indexed(headers, rows)}
   end
+
+  def count(%__MODULE__{rows: rows}), do: length(rows)
 
   defp make_indexed(headers, rows) do
     rows
@@ -46,4 +41,42 @@ defmodule Chat.Database do
   defp to_atom(a) when is_atom(a), do: a
 
   defp to_atom(a) when is_binary(a), do: String.to_atom(a)
+end
+
+defimpl Enumerable, for: Chat.Database do
+  alias Chat.Database
+
+  def count(%Database{} = d), do: {:ok, Database.count(d)}
+
+  def member?(_, _), do: {:error, __MODULE__}
+
+  def slice(%Database{headers: headers, rows: rows} = d) do
+    {:ok, Database.count(d),
+     fn start, len ->
+       rows
+       |> Enum.slice(start..(start + len))
+       |> Enum.map(&to_map(headers, &1))
+     end}
+  end
+
+  def reduce(%Database{}, {:halt, acc}, _), do: {:halted, acc}
+
+  def reduce(%Database{} = d, {:suspend, acc}, fun), do: {:suspended, acc, &reduce(d, &1, fun)}
+
+  def reduce(%Database{rows: []}, {:cont, acc}, _), do: {:done, acc}
+
+  def reduce(
+        %Database{
+          rows: [row | rest],
+          headers: headers
+        } = d,
+        {:cont, acc},
+        fun
+      ) do
+    reduce(%Database{d | rows: rest}, fun.(to_map(headers, row), acc), fun)
+  end
+
+  defp to_map(headers, row) do
+    Enum.zip(headers, row) |> Enum.into(Map.new())
+  end
 end

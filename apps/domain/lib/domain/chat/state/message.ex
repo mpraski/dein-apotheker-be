@@ -1,17 +1,21 @@
 defmodule Chat.State.Message do
-  @types ~w[question text image product list]a
-
   @enforce_keys ~w[type text data]a
 
   defstruct type: nil,
             text: "",
             data: %{}
 
-  def new(type, text, data \\ %{}) when type in @types do
+  def new(type, text, data \\ %{}) do
     %__MODULE__{
-      type: type,
+      type: decode_type(type),
       text: text,
       data: data
     }
   end
+
+  def decode_type(:Q), do: :question
+  def decode_type(:N), do: :list
+  def decode_type(:P), do: :product
+  def decode_type(:C), do: :comment
+  def decode_type(:F), do: :free
 end

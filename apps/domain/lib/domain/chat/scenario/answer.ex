@@ -1,4 +1,6 @@
 defmodule Chat.Scenario.Answer do
+  alias Chat.Scenario.Text
+
   @enforce_keys ~w[id text action]a
 
   defstruct id: nil,
@@ -9,7 +11,7 @@ defmodule Chat.Scenario.Answer do
   def new(id, text, action, output) do
     %__MODULE__{
       id: id,
-      text: text,
+      text: Text.new(text),
       action: action,
       output: output
     }
