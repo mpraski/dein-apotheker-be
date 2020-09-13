@@ -1,6 +1,7 @@
 defmodule Chat.Scenario.Text do
   alias Chat.State
   alias Chat.Database
+
   alias Chat.Languages.Data.Parser, as: DataParser
   alias Chat.Languages.Data.Interpreter, as: DataInterpreter
   alias Chat.Languages.Data.Interpreter.Context, as: DataContext
@@ -33,19 +34,16 @@ defmodule Chat.Scenario.Text do
         databases
       ) do
     subs
-    |> materialize(state, databases)
-    |> Enum.reduce(text, fn sub, text ->
-      Regex.replace(
+    |> Enum.map(&execute(&1, state, databases))
+    |> Enum.reduce(
+      text,
+      &Regex.replace(
         @substitute_regex,
-        text,
-        fn _, _ -> sub end,
+        &2,
+        fn _, _ -> &1 end,
         global: false
       )
-    end)
-  end
-
-  defp materialize(substitutes, %State{} = s, databases) do
-    substitutes |> Enum.map(&execute(&1, s, databases))
+    )
   end
 
   defp execute({:var, var}, %State{} = s, _) do
@@ -71,18 +69,13 @@ defmodule Chat.Scenario.Text do
   defp make_substitutes(text) do
     @substitute_regex
     |> Regex.scan(text)
-    |> Enum.map(fn [_, kind, action] -> {type(kind), action} end)
-    |> Enum.map(&parse/1)
+    |> Enum.map(fn [_, kind, action] -> parse(kind, action) end)
   end
 
-  defp parse({:var, var}), do: {:var, String.to_atom(var)}
+  defp parse("var", var), do: {:var, String.to_atom(var)}
 
-  defp parse({:data, source}) do
+  defp parse("data", source) do
     {:ok, program} = DataParser.parse(source)
     {:data, DataInterpreter.interpret(program)}
   end
-
-  defp type("var"), do: :var
-
-  defp type("data"), do: :data
 end
