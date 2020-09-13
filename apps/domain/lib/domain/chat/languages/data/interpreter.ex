@@ -59,25 +59,19 @@ defmodule Chat.Languages.Data.Interpreter do
 
   defp interpret_where({op, col, val}, state) do
     with op <- logical_op(op),
-         vars <- State.all_vars(state),
-         val <- data_value(val, vars) do
+         {:ok, value} <- State.get_var(state, value(val)) do
       fn %Database{id: id, headers: headers, rows: rows} ->
         idx = Enum.find_index(headers, &(&1 == col))
-        rows = Enum.filter(rows, &op.(Enum.at(&1, idx), val))
+        rows = Enum.filter(rows, &op.(Enum.at(&1, idx), value))
 
         Database.new(id, [headers | rows])
       end
     end
   end
 
-  defp data_value({:lit, l}, _), do: l
+  defp value({:lit, l}), do: l
 
-  defp data_value({:var, n}, variables) do
-    case Map.fetch(variables, n) do
-      {:ok, v} -> v
-      _ -> raise Failure, message: "failed to get #{n} variable, not defined"
-    end
-  end
+  defp value({:var, n}), do: n
 
   defp logical_op(:equals), do: &:erlang.==/2
 

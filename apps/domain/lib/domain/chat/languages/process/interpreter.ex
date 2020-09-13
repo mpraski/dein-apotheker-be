@@ -39,7 +39,7 @@ defmodule Chat.Languages.Process.Interpreter do
   end
 
   defp interpret_stmt({:for, i, v, stmts}, %Context{state: state} = c) do
-    case Map.fetch(State.all_vars(state), v) do
+    case State.get_var(state, v) do
       {:ok, items} ->
         state
         |> Enum.reduce(items, fn a, s ->
