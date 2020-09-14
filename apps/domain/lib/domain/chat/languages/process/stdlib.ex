@@ -25,14 +25,14 @@ defmodule Chat.Languages.Process.StdLib do
   end
 
   defp load(%Call{
-         args: [{:ident, proc}],
+         args: [proc],
          state: %State{processes: p} = s
        }) do
     %State{s | processes: p ++ [Process.new(proc)]}
   end
 
   defp load(%Call{
-         args: [{:ident, proc, vars}],
+         args: [{proc, vars}],
          state: %State{processes: p} = s
        }) do
     with captured <- State.fetch_variables(s, vars) do
@@ -41,13 +41,13 @@ defmodule Chat.Languages.Process.StdLib do
   end
 
   defp jump(%Call{
-         args: [{:ident, proc}],
+         args: [proc],
          state: %State{processes: [_ | rest]} = s
        }) do
     %State{s | processes: [Process.new(proc) | rest]}
   end
 
-  defp goto(%Call{args: [{:ident, question}], state: %State{} = s}) do
+  defp goto(%Call{args: [question], state: %State{} = s}) do
     %State{s | question: question}
   end
 
@@ -72,7 +72,7 @@ defmodule Chat.Languages.Process.StdLib do
     })
   end
 
-  defp is_loaded(%Call{args: [{:ident, proc}], state: %State{processes: ps}}) do
+  defp is_loaded(%Call{args: [proc], state: %State{processes: ps}}) do
     case Enum.find(ps, fn %Process{id: i} -> i == proc end) do
       %Process{} -> true
       _ -> false
@@ -80,7 +80,7 @@ defmodule Chat.Languages.Process.StdLib do
   end
 
   defp is_next(%Call{
-         args: [{:ident, proc}],
+         args: [proc],
          state: %State{processes: [_ | [%Process{id: i} | _]]}
        }) do
     i == proc
