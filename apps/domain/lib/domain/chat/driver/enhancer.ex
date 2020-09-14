@@ -88,11 +88,13 @@ defmodule Chat.Driver.Enhancer do
       |> query.()
       |> Enum.to_list()
 
-    Message.new(
-      :P,
-      Text.render(text, state, databases),
-      %{product: product}
-    )
+    [
+      Message.new(
+        :P,
+        Text.render(text, state, databases),
+        %{product: product}
+      )
+    ]
   end
 
   defp load_messages(
