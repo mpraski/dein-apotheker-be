@@ -69,7 +69,7 @@ defmodule Chat.Languages.Data.Interpreter do
     end
   end
 
-  defp value({:lit, l}), do: l
+  defp value({:str, l}), do: l
 
   defp value({:var, n}), do: n
 

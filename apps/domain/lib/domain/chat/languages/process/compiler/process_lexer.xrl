@@ -48,10 +48,14 @@ Rules.
 {LeftParen}  : {token, {left_paren, TokenLine}}.
 {RightParen} : {token, {right_paren, TokenLine}}.
 
-{Identifier} : {token, {ident, TokenLine, list_to_atom(TokenChars)}}.
-{Variable}   : {token, {var, TokenLine, trim_var(TokenChars)}}.
+{Identifier}     : {token, {ident, TokenLine, list_to_atom(TokenChars)}}.
+{Variable}       : {token, {var, TokenLine, trim_var(TokenChars)}}.
+\"{Identifier}\" : {token, {str, TokenLine, trim_str(TokenChars)}}.
 
 Erlang code.
 
 trim_var(Var) ->
     list_to_atom(string:trim(Var, both, "[]")).
+
+trim_str(Var) ->
+    string:trim(Var, both, "\"").

@@ -14,7 +14,6 @@ defmodule Api.Router do
     pipe_through(:api)
 
     post("/answer", ChatController, :answer)
-    post("/languages", ChatController, :languages)
     post("/token", TokenController, :token)
   end
 

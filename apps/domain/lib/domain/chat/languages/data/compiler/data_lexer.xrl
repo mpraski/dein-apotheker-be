@@ -30,10 +30,14 @@ Rules.
 {Equals}     : {token, {equals, TokenLine}}.
 {NotEquals}  : {token, {not_equals, TokenLine}}.
 
-{Identifier} : {token, {ident, TokenLine, TokenChars}}.
-{Variable}   : {token, {var, TokenLine, trim_var(TokenChars)}}.
+{Identifier}     : {token, {ident, TokenLine, TokenChars}}.
+{Variable}       : {token, {var, TokenLine, trim_var(TokenChars)}}.
+\"{Identifier}\" : {token, {str, TokenLine, trim_str(TokenChars)}}.
 
 Erlang code.
 
 trim_var(Var) ->
     list_to_atom(string:trim(Var, both, "[]")).
+
+trim_str(Var) ->
+    string:trim(Var, both, "\"").

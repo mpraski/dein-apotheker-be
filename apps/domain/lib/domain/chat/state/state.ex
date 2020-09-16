@@ -1,6 +1,7 @@
 defmodule Chat.State do
   alias Chat.State.{Process, Message}
 
+  @derive Jason.Encoder
   defstruct question: nil,
             scenarios: [],
             processes: [],
@@ -11,7 +12,7 @@ defmodule Chat.State do
     defexception message: "State failure"
   end
 
-  def new(question, scenarios, processes, messages \\ [], variables \\ %{}) do
+  def new(question, scenarios, processes, variables \\ %{}, messages \\ []) do
     %__MODULE__{
       question: question,
       scenarios: scenarios,

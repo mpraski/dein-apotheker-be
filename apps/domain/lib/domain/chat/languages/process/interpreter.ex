@@ -55,10 +55,7 @@ defmodule Chat.Languages.Process.Interpreter do
   end
 
   defp interpret_expr({:call, {:ident, f}, args}, context) do
-    case call_func(f, args, context) do
-      b when is_boolean(b) -> b
-      _ -> raise Failure, message: "function doesn't return a boolean"
-    end
+    call_func(f, args, context)
   end
 
   defp interpret_expr({:ident, i}, _) when is_atom(i), do: i
@@ -71,6 +68,8 @@ defmodule Chat.Languages.Process.Interpreter do
     State.all_vars(state) |> Map.has_key?(v)
   end
 
+  defp interpret_expr({:string, s}, _) when is_list(s), do: to_string(s)
+
   defp interpret_expr({:lor, a, b}, context) do
     interpret_expr(a, context) || interpret_expr(b, context)
   end
@@ -82,19 +81,12 @@ defmodule Chat.Languages.Process.Interpreter do
   defp interpret_expr({:equals, v, i}, %Context{state: state} = c) do
     with v <- interpret_expr(v, c),
          i <- interpret_expr(i, c) do
-      State.all_vars(state) |> check_equality(v, i)
+      State.get_var(state, v) == {:ok, i}
     end
   end
 
   defp interpret_expr({:not_equals, v, i}, context) do
     interpret_expr({:equals, v, i}, context) |> Kernel.not()
-  end
-
-  defp check_equality(m, v, c) do
-    case Map.fetch(m, v) do
-      {:ok, a} -> a == c
-      _ -> false
-    end
   end
 
   defp call_func(n, args, %Context{state: state, scenarios: scenarios} = context) do

@@ -1,6 +1,7 @@
 defmodule Chat.State.Message do
   @enforce_keys ~w[type text data]a
 
+  @derive Jason.Encoder
   defstruct type: nil,
             text: "",
             data: %{}

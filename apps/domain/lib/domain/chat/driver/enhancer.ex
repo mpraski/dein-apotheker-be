@@ -1,5 +1,6 @@
 defmodule Chat.Driver.Enhancer do
   alias Chat.State
+  alias Chat.State.Process, as: StateProcess
   alias Chat.Scenario
   alias Chat.Scenario.{Process, Question, Answer, Text}
   alias Chat.State.Message
@@ -13,7 +14,7 @@ defmodule Chat.Driver.Enhancer do
         state = %State{
           question: question,
           scenarios: [scenario | _],
-          processes: [process | _]
+          processes: [%StateProcess{id: process} | _]
         },
         scenarios,
         databases

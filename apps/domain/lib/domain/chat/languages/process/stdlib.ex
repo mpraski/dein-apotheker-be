@@ -47,6 +47,13 @@ defmodule Chat.Languages.Process.StdLib do
     %State{s | processes: [Process.new(proc) | rest]}
   end
 
+  defp jump(%Call{
+         args: [proc],
+         state: %State{processes: []} = s
+       }) do
+    %State{s | processes: [Process.new(proc)]}
+  end
+
   defp goto(%Call{args: [question], state: %State{} = s}) do
     %State{s | question: question}
   end
@@ -90,5 +97,5 @@ defmodule Chat.Languages.Process.StdLib do
     false
   end
 
-  defp defer(%Call{state: %State{} = s}), do: s
+  defp defer(%Call{args: [], state: %State{} = s}), do: s
 end

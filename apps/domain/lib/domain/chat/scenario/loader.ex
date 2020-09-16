@@ -1,7 +1,7 @@
 defmodule Chat.Scenario.Loader do
   alias Chat.Excel
 
-  @scenario_file "Scenario.xlsx"
+  @scenario_file "Scenario#{Excel.ext()}"
   @process_directory "processes"
 
   def load(path) do

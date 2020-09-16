@@ -2,13 +2,14 @@ defmodule Chat.Driver do
   alias Chat.State
   alias Chat.Scenario
   alias Chat.Scenario.{Process, Question, Answer}
+  alias Chat.State.Process, as: StateProcess
   alias Chat.Languages.Process.Interpreter.Context
 
   def next(
         %State{
           question: question,
           scenarios: [scenario | _],
-          processes: [process | _]
+          processes: [%StateProcess{id: process} | _]
         } = state,
         scenarios,
         answer
@@ -26,7 +27,8 @@ defmodule Chat.Driver do
          question = %Question{type: :Q, output: name_output},
          {:single, answer}
        ) do
-    {:ok, %Answer{action: a, output: o}} = Question.answer(question, answer)
+    {:ok, %Answer{action: a, output: o}} =
+      Question.answer(question, String.to_existing_atom(answer))
 
     a.(%Context{
       scenarios: scenarios,
@@ -38,7 +40,7 @@ defmodule Chat.Driver do
          scenarios,
          state = %State{},
          %Question{type: :C, action: action},
-         :ok
+         {:comment, "ok"}
        ) do
     action.(%Context{
       scenarios: scenarios,
@@ -74,7 +76,7 @@ defmodule Chat.Driver do
        ) do
     action.(%Context{
       scenarios: scenarios,
-      state: State.set_var(state, output, select)
+      state: State.set_var(state, output, String.to_existing_atom(select))
     })
   end
 
@@ -85,6 +87,6 @@ defmodule Chat.Driver do
     {:ok, %Process{id: pid} = p} = Scenario.entry(cough)
     {:ok, %Question{id: qid}} = Process.entry(p)
 
-    State.new(qid, [@cough], [pid])
+    State.new(qid, [@cough], [StateProcess.new(pid)])
   end
 end

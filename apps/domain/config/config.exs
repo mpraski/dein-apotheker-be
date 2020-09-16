@@ -20,7 +20,9 @@ config :domain, Domain.Repo,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
-config :domain, scenario_path: "../../local-scenarios"
+config :domain,
+  scenario_path: "local-scenarios",
+  database_path: "local-databases"
 
 # Configures Elixir's Logger
 config :logger, :console,

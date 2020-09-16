@@ -34,13 +34,12 @@ defmodule Api do
       # Import convenience functions from controllers
       import Phoenix.Controller, only: [get_flash: 1, get_flash: 2, view_module: 1]
 
-      import Api.ErrorHelpers
       alias Api.Router.Helpers, as: Routes
 
       defp in_envelope(item) do
         %{
           error: nil,
-          content: item
+          state: item
         }
       end
     end
