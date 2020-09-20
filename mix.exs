@@ -26,7 +26,8 @@ defmodule DeinApotheker.MixProject do
   # Run "mix help deps" for examples and options.
   defp deps do
     [
-      {:credo, "~> 1.2", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.2", only: [:dev, :test], runtime: false},
+      {:typed_struct, "~> 0.2.1"}
     ]
   end
 end

@@ -3,7 +3,7 @@ defmodule Chat.Driver do
   alias Chat.Scenario
   alias Chat.Scenario.{Process, Question, Answer}
   alias Chat.State.Process, as: StateProcess
-  alias Chat.Languages.Process.Interpreter.Context
+  alias Chat.Language.Interpreter.Context
 
   def next(
         %State{
@@ -11,18 +11,18 @@ defmodule Chat.Driver do
           scenarios: [scenario | _],
           processes: [%StateProcess{id: process} | _]
         } = state,
-        scenarios,
+        {scenarios, databases},
         answer
       ) do
     {:ok, scenario = %Scenario{}} = Map.fetch(scenarios, scenario)
     {:ok, process = %Process{}} = Scenario.process(scenario, process)
     {:ok, question = %Question{}} = Process.question(process, question)
 
-    answer(scenarios, state, question, answer)
+    {scenarios, databases} |> answer(state, question, answer)
   end
 
   defp answer(
-         scenarios,
+         {scenarios, databases},
          state = %State{},
          question = %Question{type: :Q, output: name_output},
          {:single, answer}
@@ -30,26 +30,26 @@ defmodule Chat.Driver do
     {:ok, %Answer{action: a, output: o}} =
       Question.answer(question, String.to_existing_atom(answer))
 
-    a.(%Context{
-      scenarios: scenarios,
-      state: State.set_var(state, name_output, o)
-    })
+    a.(
+      Context.new(scenarios, databases),
+      State.set_var(state, name_output, o)
+    )
   end
 
   defp answer(
-         scenarios,
+         {scenarios, databases},
          state = %State{},
          %Question{type: :C, action: action},
          {:comment, "ok"}
        ) do
-    action.(%Context{
-      scenarios: scenarios,
-      state: state
-    })
+    action.(
+      Context.new(scenarios, databases),
+      state
+    )
   end
 
   defp answer(
-         scenarios,
+         {scenarios, databases},
          state = %State{},
          %Question{
            type: :F,
@@ -58,14 +58,14 @@ defmodule Chat.Driver do
          },
          {:free, text}
        ) do
-    action.(%Context{
-      scenarios: scenarios,
-      state: State.set_var(state, output, text)
-    })
+    action.(
+      Context.new(scenarios, databases),
+      State.set_var(state, output, text)
+    )
   end
 
   defp answer(
-         scenarios,
+         {scenarios, databases},
          state = %State{},
          %Question{
            type: :N,
@@ -74,10 +74,10 @@ defmodule Chat.Driver do
          },
          {:select, select}
        ) do
-    action.(%Context{
-      scenarios: scenarios,
-      state: State.set_var(state, output, String.to_existing_atom(select))
-    })
+    action.(
+      Context.new(scenarios, databases),
+      State.set_var(state, output, String.to_existing_atom(select))
+    )
   end
 
   @cough :cough

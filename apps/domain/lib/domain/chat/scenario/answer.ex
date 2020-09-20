@@ -1,12 +1,14 @@
 defmodule Chat.Scenario.Answer do
   alias Chat.Scenario.Text
 
-  @enforce_keys ~w[id text action]a
+  use TypedStruct
 
-  defstruct id: nil,
-            text: nil,
-            action: nil,
-            output: nil
+  typedstruct do
+    field(:id, atom(), enforce: true)
+    field(:text, Text.t(), enforce: true)
+    field(:action, (any(), any() -> any()), enforce: true)
+    field(:output, atom())
+  end
 
   def new(id, text, action, output) do
     %__MODULE__{

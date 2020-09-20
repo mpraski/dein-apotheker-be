@@ -20,11 +20,12 @@ defmodule Api.ChatController do
       with state <- conn.assigns.state,
            answer <- {String.to_existing_atom(type), value},
            scenarios <- Chat.scenarios(),
-           databases <- Chat.databases() do
+           databases <- Chat.databases(),
+           data <- {scenarios, databases} do
         state =
           state
-          |> Driver.next(scenarios, answer)
-          |> Enhancer.enhance(scenarios, databases)
+          |> Driver.next(data, answer)
+          |> Enhancer.enhance(data)
 
         conn |> render("answer.json", state: state)
       end
@@ -36,10 +37,9 @@ defmodule Api.ChatController do
   def answer(conn, %{}) do
     if conn.assigns.has_state? do
       with scenarios <- Chat.scenarios(),
-           databases <- Chat.databases() do
-        state =
-          Driver.initial(scenarios)
-          |> Enhancer.enhance(scenarios, databases)
+           databases <- Chat.databases(),
+           data <- {scenarios, databases} do
+        state = Driver.initial(scenarios) |> Enhancer.enhance(data)
 
         conn |> render("answer.json", state: state)
       end

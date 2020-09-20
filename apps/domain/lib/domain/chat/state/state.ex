@@ -1,24 +1,29 @@
 defmodule Chat.State do
   alias Chat.State.{Process, Message}
 
+  use TypedStruct
+
   @derive Jason.Encoder
-  defstruct question: nil,
-            scenarios: [],
-            processes: [],
-            messages: [],
-            variables: %{}
+
+  typedstruct do
+    field(:question, atom(), enforce: true)
+    field(:message, Message.t(), default: nil)
+    field(:scenarios, list(atom()), enforce: true, default: [])
+    field(:processes, list(Process.t()), enforce: true, default: [])
+    field(:variables, map(), enforce: true, default: Map.new())
+  end
 
   defmodule Failure do
     defexception message: "State failure"
   end
 
-  def new(question, scenarios, processes, variables \\ %{}, messages \\ []) do
+  def new(question, scenarios, processes, variables \\ %{}) do
     %__MODULE__{
       question: question,
       scenarios: scenarios,
       processes: processes,
-      messages: messages,
-      variables: variables
+      variables: variables,
+      message: nil
     }
   end
 
@@ -59,12 +64,10 @@ defmodule Chat.State do
   def set_var(%__MODULE__{variables: v} = s, n, i) do
     %__MODULE__{s | variables: Map.put(v, n, i)}
   end
+end
 
-  def delete_var(%__MODULE__{variables: v} = s, n) do
-    %__MODULE__{s | variables: Map.delete(v, n)}
-  end
+defimpl String.Chars, for: Chat.State do
+  alias Chat.State
 
-  def add_message(%__MODULE__{messages: ms} = s, %Message{} = m) do
-    %__MODULE__{s | messages: ms ++ [m]}
-  end
+  def to_string(%State{}), do: "User State"
 end

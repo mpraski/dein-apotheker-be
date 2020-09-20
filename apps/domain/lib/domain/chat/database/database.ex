@@ -1,41 +1,48 @@
 defmodule Chat.Database do
-  @enforce_keys ~w[id headers rows]a
+  use TypedStruct
 
-  defstruct id: nil,
-            headers: [],
-            rows: [],
-            indexed: %{}
+  typedstruct do
+    field(:id, atom(), enforce: true)
+    field(:headers, list(atom()), enforce: true, default: [])
+    field(:rows, list(list(binary())), enforce: true, default: [])
+  end
 
   def new(id, [headers | rows]) do
     %__MODULE__{
       id: id,
-      headers: Enum.map(headers, &to_atom/1),
+      headers: headers |> Enum.map(&to_atom/1),
       rows: rows
     }
   end
 
-  def index(
-        %__MODULE__{
-          headers: headers,
-          rows: rows
-        } = db
-      ) do
-    %__MODULE__{db | indexed: make_indexed(headers, rows)}
+  def new(id) do
+    %__MODULE__{
+      id: id,
+      headers: [],
+      rows: []
+    }
+  end
+
+  def find(%__MODULE__{id: id} = db, column, value) do
+    idx = header_index(db, column)
+
+    finder = &(Enum.at(&1, idx) |> elem(1) == value)
+
+    db |> Enum.filter(finder) |> Enum.into(__MODULE__.new(id))
   end
 
   def count(%__MODULE__{rows: rows}), do: length(rows)
 
-  defp make_indexed(headers, rows) do
-    rows
-    |> Enum.reduce(%{}, fn r, m ->
-      headers
-      |> Enum.zip(r)
-      |> Enum.reduce(m, fn {h, v}, m ->
-        Map.update(m, h, [v], &[v | &1])
-      end)
-    end)
-    |> Enum.map(fn {k, v} -> {k, Enum.reverse(v)} end)
-    |> Enum.into(Map.new())
+  def header_index(%__MODULE__{headers: headers}, n) do
+    headers |> Enum.find_index(&(&1 == n))
+  end
+
+  def to_list(headers, row) do
+    Enum.zip(headers, row)
+  end
+
+  def from_list(list) do
+    Enum.unzip(list)
   end
 
   defp to_atom(a) when is_atom(a), do: a
@@ -55,7 +62,7 @@ defimpl Enumerable, for: Chat.Database do
      fn start, len ->
        rows
        |> Enum.slice(start..(start + len))
-       |> Enum.map(&to_map(headers, &1))
+       |> Enum.map(&Database.to_list(headers, &1))
      end}
   end
 
@@ -73,10 +80,40 @@ defimpl Enumerable, for: Chat.Database do
         {:cont, acc},
         fun
       ) do
-    reduce(%Database{d | rows: rest}, fun.(to_map(headers, row), acc), fun)
+    reduce(%Database{d | rows: rest}, fun.(Database.to_list(headers, row), acc), fun)
   end
+end
 
-  defp to_map(headers, row) do
-    Enum.zip(headers, row) |> Enum.into(Map.new())
+defimpl Collectable, for: Chat.Database do
+  alias Chat.Database
+
+  def into(db) do
+    {db,
+     fn
+       %Database{headers: []} = db, {:cont, row} ->
+         IO.inspect(row)
+         {headers, row} = Database.from_list(row)
+         %Database{db | headers: headers, rows: [row]}
+
+       %Database{rows: rows} = db, {:cont, row} ->
+         {_, row} = Database.from_list(row)
+         %Database{db | rows: rows ++ [row]}
+
+       db, :done ->
+         db
+
+       _, :halt ->
+         nil
+     end}
+  end
+end
+
+defimpl String.Chars, for: Chat.Database do
+  alias Chat.Database
+
+  def to_string(%Database{rows: rows}) do
+    rows
+    |> Enum.map(&Enum.join(&1, ", "))
+    |> Enum.join("\n")
   end
 end

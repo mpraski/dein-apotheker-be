@@ -1,20 +1,18 @@
 defmodule Chat.Scenario.Text do
   alias Chat.State
-  alias Chat.Database
 
-  alias Chat.Languages.Data.Parser, as: DataParser
-  alias Chat.Languages.Data.Interpreter, as: DataInterpreter
-  alias Chat.Languages.Data.Interpreter.Context, as: DataContext
+  alias Chat.Language.Parser
+  alias Chat.Language.Interpreter
+  alias Chat.Language.Interpreter.Context
 
-  @substitute_regex ~r/\{(var|data)\}\{([^\}]*)\}/
+  use TypedStruct
 
-  @enforce_keys ~w[text substitutes]a
-
-  defstruct text: "", substitutes: []
-
-  defmodule Failure do
-    defexception message: "Text substitution failure"
+  typedstruct do
+    field(:text, binary(), enforce: true)
+    field(:substitutes, list({:var | :prog, any()}), enforce: true, default: [])
   end
+
+  @substitute_regex ~r/\{(var|prog)\}\{([^\}]*)\}/
 
   def new(text) do
     %__MODULE__{
@@ -31,10 +29,11 @@ defmodule Chat.Scenario.Text do
           text: text
         },
         %State{} = state,
+        scenarios,
         databases
       ) do
     subs
-    |> Enum.map(&execute(&1, state, databases))
+    |> Enum.map(&execute(&1, state, scenarios, databases))
     |> Enum.reduce(
       text,
       &Regex.replace(
@@ -46,24 +45,13 @@ defmodule Chat.Scenario.Text do
     )
   end
 
-  defp execute({:var, var}, %State{} = s, _) do
-    case State.get_var(s, var) do
-      {:ok, value} -> value
-      _ -> raise Failure, message: "variable #{var} not defined"
-    end
+  defp execute({:var, var}, %State{} = s, _, _) do
+    {:ok, value} = State.get_var(s, var)
+    value
   end
 
-  defp execute({:data, program}, %State{} = s, databases) do
-    result =
-      program.(%DataContext{
-        state: s,
-        databases: databases
-      })
-
-    case result do
-      %Database{rows: [row]} -> Enum.join(row, ", ")
-      _ -> raise Failure, message: "DB query didn't return exactly one row"
-    end
+  defp execute({:prog, program}, state, scenarios, databases) do
+    Context.new(scenarios, databases) |> program.(state) |> to_string()
   end
 
   defp make_substitutes(text) do
@@ -74,8 +62,8 @@ defmodule Chat.Scenario.Text do
 
   defp parse("var", var), do: {:var, String.to_atom(var)}
 
-  defp parse("data", source) do
-    {:ok, program} = DataParser.parse(source)
-    {:data, DataInterpreter.interpret(program)}
+  defp parse("prog", source) do
+    {:ok, program} = Parser.parse(source)
+    {:prog, Interpreter.interpret(program)}
   end
 end

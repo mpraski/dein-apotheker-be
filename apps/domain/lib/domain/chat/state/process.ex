@@ -1,8 +1,12 @@
 defmodule Chat.State.Process do
-  @enforce_keys ~w[id variables]a
+  use TypedStruct
 
   @derive Jason.Encoder
-  defstruct id: nil, variables: %{}
+
+  typedstruct do
+    field(:id, atom(), enforce: true)
+    field(:variables, map(), enforce: true, default: Map.new())
+  end
 
   def new(id, vars \\ %{}) do
     %__MODULE__{

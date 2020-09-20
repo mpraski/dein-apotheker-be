@@ -2,10 +2,8 @@ defmodule Chat.Scenario.Parser do
   alias Chat.Scenario
   alias Chat.Scenario.{Process, Question, Answer}
 
-  alias Chat.Languages.Process.Parser, as: ProcessParser
-  alias Chat.Languages.Process.Interpreter, as: ProcessInterpreter
-  alias Chat.Languages.Data.Parser, as: DataParser
-  alias Chat.Languages.Data.Interpreter, as: DataInterpreter
+  alias Chat.Language.Parser, as: ProcessParser
+  alias Chat.Language.Interpreter, as: ProcessInterpreter
 
   @scenario_header ~w[Process Action]
   @process_header ~w[ID Type Query Text Action Output]
@@ -47,7 +45,7 @@ defmodule Chat.Scenario.Parser do
   end
 
   defp parse_actions([p, a]) do
-    {String.to_atom(p), parse_process_program(a)}
+    {String.to_atom(p), parse_program(a)}
   end
 
   defp parse_process({p, rows}) do
@@ -85,8 +83,8 @@ defmodule Chat.Scenario.Parser do
   end
 
   defp parse_question([id, type, query, text, action, output]) do
-    with action <- parse_process_program(action),
-         query <- parse_data_program(query),
+    with action <- parse_program(action),
+         query <- parse_program(query),
          id <- String.to_atom(id),
          type <- String.to_atom(type),
          output <- parse_question_output(output) do
@@ -102,7 +100,7 @@ defmodule Chat.Scenario.Parser do
   end
 
   defp parse_answer([_, _, _, text, action, output]) do
-    with action <- parse_process_program(action),
+    with action <- parse_program(action),
          output <- parse_answer_output(output) do
       Answer.new(
         :unknown,
@@ -113,18 +111,11 @@ defmodule Chat.Scenario.Parser do
     end
   end
 
-  defp parse_process_program(nil), do: nil
+  defp parse_program(nil), do: nil
 
-  defp parse_process_program(source) do
+  defp parse_program(source) do
     {:ok, program} = ProcessParser.parse(source)
     ProcessInterpreter.interpret(program)
-  end
-
-  defp parse_data_program(nil), do: nil
-
-  defp parse_data_program(source) do
-    {:ok, program} = DataParser.parse(source)
-    DataInterpreter.interpret(program)
   end
 
   defp parse_question_output(nil), do: nil
