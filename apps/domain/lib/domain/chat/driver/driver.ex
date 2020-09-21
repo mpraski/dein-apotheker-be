@@ -11,19 +11,19 @@ defmodule Chat.Driver do
           scenarios: [scenario | _],
           processes: [%StateProcess{id: process} | _]
         } = state,
-        {scenarios, databases},
+        {scenarios, _} = data,
         answer
       ) do
     {:ok, scenario = %Scenario{}} = Map.fetch(scenarios, scenario)
     {:ok, process = %Process{}} = Scenario.process(scenario, process)
     {:ok, question = %Question{}} = Process.question(process, question)
 
-    {scenarios, databases} |> answer(state, question, answer)
+    state |> answer(data, question, answer)
   end
 
   defp answer(
-         {scenarios, databases},
          state = %State{},
+         {scenarios, databases},
          question = %Question{type: :Q, output: name_output},
          {:single, answer}
        ) do
@@ -36,21 +36,15 @@ defmodule Chat.Driver do
     )
   end
 
-  defp answer(
-         {scenarios, databases},
-         state = %State{},
-         %Question{type: :C, action: action},
-         {:comment, "ok"}
-       ) do
-    action.(
-      Context.new(scenarios, databases),
-      state
-    )
+  defp answer(state = %State{}, _, %Question{type: :C}, {:comment, "ok"}) do
+    {:ok, previous} = State.get_var(state, :previous_question)
+
+    %State{state | question: previous}
   end
 
   defp answer(
-         {scenarios, databases},
          state = %State{},
+         {scenarios, databases},
          %Question{
            type: :F,
            action: action,
@@ -65,8 +59,8 @@ defmodule Chat.Driver do
   end
 
   defp answer(
-         {scenarios, databases},
          state = %State{},
+         {scenarios, databases},
          %Question{
            type: :N,
            action: action,

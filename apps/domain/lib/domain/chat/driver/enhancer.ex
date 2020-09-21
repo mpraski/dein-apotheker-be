@@ -6,25 +6,21 @@ defmodule Chat.Driver.Enhancer do
   alias Chat.State.Message
   alias Chat.Language.Interpreter.Context
 
-  defmodule Failure do
-    defexception message: "enhancement failure"
-  end
-
   def enhance(
         state = %State{
           question: question,
           scenarios: [scenario | _],
           processes: [%StateProcess{id: process} | _]
         },
-        {scenarios, _} = d
+        {scenarios, databases}
       ) do
     {:ok, scenario = %Scenario{}} = Map.fetch(scenarios, scenario)
     {:ok, process = %Process{}} = Scenario.process(scenario, process)
     {:ok, question = %Question{}} = Process.question(process, question)
 
-    message = question |> create_message(state, d)
+    message = question |> create_message({state, scenarios, databases})
 
-    %State{state | message: message}
+    %State{state | message: message} |> dump_data()
   end
 
   defp create_message(
@@ -33,13 +29,12 @@ defmodule Chat.Driver.Enhancer do
            text: text,
            answers: answers
          },
-         state = %State{},
-         {scenarios, databases}
+         data
        ) do
     Message.new(
       :Q,
-      Text.render(text, state, scenarios, databases),
-      %{answers: load_answers(answers, state, {scenarios, databases})}
+      Text.render(text, data),
+      %{answers: load_answers(answers, data)}
     )
   end
 
@@ -49,8 +44,7 @@ defmodule Chat.Driver.Enhancer do
            text: text,
            query: query
          },
-         state = %State{},
-         {scenarios, databases}
+         {state, scenarios, databases} = data
        ) do
     results =
       query.(Context.new(scenarios, databases), state)
@@ -58,7 +52,7 @@ defmodule Chat.Driver.Enhancer do
 
     Message.new(
       :N,
-      Text.render(text, state, scenarios, databases),
+      Text.render(text, data),
       %{results: results}
     )
   end
@@ -69,8 +63,7 @@ defmodule Chat.Driver.Enhancer do
            text: text,
            query: query
          },
-         state = %State{},
-         {scenarios, databases}
+         {state, scenarios, databases} = data
        ) do
     [product] =
       query.(Context.new(scenarios, databases), state)
@@ -78,7 +71,7 @@ defmodule Chat.Driver.Enhancer do
 
     Message.new(
       :P,
-      Text.render(text, state, scenarios, databases),
+      Text.render(text, data),
       %{product: product}
     )
   end
@@ -88,24 +81,23 @@ defmodule Chat.Driver.Enhancer do
            type: type,
            text: text
          },
-         state = %State{},
-         {scenarios, databases}
+         data
        )
        when type in ~w[C F]a do
-    Message.new(type, Text.render(text, state, scenarios, databases))
+    Message.new(type, Text.render(text, data))
   end
 
-  defp load_answers(
-         answers,
-         state = %State{},
-         {scenarios, databases}
-       ) do
+  defp load_answers(answers, data) do
     answers
     |> Enum.map(fn %Answer{id: id, text: text} ->
       %{
         id: id,
-        text: Text.render(text, state, scenarios, databases)
+        text: Text.render(text, data)
       }
     end)
+  end
+
+  defp dump_data(%State{question: question} = state) do
+    state |> State.set_var(:previous_question, question)
   end
 end

@@ -21,16 +21,14 @@ defmodule Chat.Scenario.Text do
     }
   end
 
-  def render(%__MODULE__{substitutes: [], text: text}, _, _), do: text
+  def render(%__MODULE__{substitutes: [], text: text}, _), do: text
 
   def render(
         %__MODULE__{
           substitutes: subs,
           text: text
         },
-        %State{} = state,
-        scenarios,
-        databases
+        {%State{} = state, scenarios, databases}
       ) do
     subs
     |> Enum.map(&execute(&1, state, scenarios, databases))
