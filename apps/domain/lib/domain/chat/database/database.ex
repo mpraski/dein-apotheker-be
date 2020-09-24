@@ -46,15 +46,15 @@ defmodule Chat.Database do
   end
 
   def join(
-        %__MODULE__{id: id1} = db1,
-        %__MODULE__{id: id2} = db2,
+        %__MODULE__{id: id} = db1,
+        %__MODULE__{} = db2,
         col1,
         col2,
         prefix,
         pred
       ) do
-    h1 = __MODULE__.header_index(db1, col1) || raise "column #{col1} does not exist in #{id1}"
-    h2 = __MODULE__.header_index(db2, col2) || raise "column #{col2} does not exist in #{id2}"
+    h1 = __MODULE__.header_index(db1, col1)
+    h2 = __MODULE__.header_index(db2, col2)
 
     prefixer = fn {k, v} -> {:"#{prefix}.#{k}", v} end
 
@@ -69,15 +69,15 @@ defmodule Chat.Database do
       end)
     end)
     |> Enum.map(&List.delete_at(&1, __MODULE__.width(db1) + h2))
-    |> Enum.into(__MODULE__.new(id1))
+    |> Enum.into(__MODULE__.new(id))
   end
 
   def width(%__MODULE__{headers: headers}), do: length(headers)
 
   def height(%__MODULE__{rows: rows}), do: length(rows)
 
-  def header_index(%__MODULE__{headers: headers}, n) do
-    headers |> Enum.find_index(&(&1 == n))
+  def header_index(%__MODULE__{id: id, headers: headers}, n) do
+    headers |> Enum.find_index(&(&1 == n)) || raise "column #{n} does not exist in #{id}"
   end
 
   def to_list(headers, row) do
