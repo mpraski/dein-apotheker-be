@@ -23,15 +23,58 @@ defmodule Chat.Database do
     }
   end
 
-  def find(%__MODULE__{id: id} = db, column, value) do
+  def where(%__MODULE__{id: id} = db, column, value) do
     idx = header_index(db, column)
 
-    finder = &(Enum.at(&1, idx) |> elem(1) == value)
+    predicate = &(Enum.at(&1, idx) |> elem(1) == value)
 
-    db |> Enum.filter(finder) |> Enum.into(__MODULE__.new(id))
+    db |> Enum.filter(predicate) |> Enum.into(__MODULE__.new(id))
   end
 
-  def count(%__MODULE__{rows: rows}), do: length(rows)
+  def union(
+        %__MODULE__{id: id, headers: h, rows: r1},
+        %__MODULE__{id: id, headers: h, rows: r2}
+      ) do
+    __MODULE__.new(id, [h | r1 ++ r2])
+  end
+
+  def intersection(
+        %__MODULE__{id: id, headers: h, rows: r1},
+        %__MODULE__{id: id, headers: h, rows: r2}
+      ) do
+    __MODULE__.new(id, [h | r1 -- r1 -- r2])
+  end
+
+  def join(
+        %__MODULE__{id: id1} = db1,
+        %__MODULE__{id: id2} = db2,
+        col1,
+        col2,
+        prefix,
+        pred
+      ) do
+    h1 = __MODULE__.header_index(db1, col1) || raise "column #{col1} does not exist in #{id1}"
+    h2 = __MODULE__.header_index(db2, col2) || raise "column #{col2} does not exist in #{id2}"
+
+    prefixer = fn {k, v} -> {:"#{prefix}.#{k}", v} end
+
+    db1
+    |> Enum.flat_map(fn r1 ->
+      db2
+      |> Enum.map(fn r2 ->
+        v1 = Enum.at(r1, h1) |> elem(1)
+        v2 = Enum.at(r2, h2) |> elem(1)
+
+        if pred.(v1, v2), do: r1 ++ Enum.map(r2, prefixer), else: []
+      end)
+    end)
+    |> Enum.map(&List.delete_at(&1, __MODULE__.width(db1) + h2))
+    |> Enum.into(__MODULE__.new(id1))
+  end
+
+  def width(%__MODULE__{headers: headers}), do: length(headers)
+
+  def height(%__MODULE__{rows: rows}), do: length(rows)
 
   def header_index(%__MODULE__{headers: headers}, n) do
     headers |> Enum.find_index(&(&1 == n))
@@ -53,12 +96,12 @@ end
 defimpl Enumerable, for: Chat.Database do
   alias Chat.Database
 
-  def count(%Database{} = d), do: {:ok, Database.count(d)}
+  def count(%Database{} = d), do: {:ok, Database.height(d)}
 
   def member?(_, _), do: {:error, __MODULE__}
 
   def slice(%Database{headers: headers, rows: rows} = d) do
-    {:ok, Database.count(d),
+    {:ok, Database.height(d),
      fn start, len ->
        rows
        |> Enum.slice(start..(start + len))
@@ -91,7 +134,6 @@ defimpl Collectable, for: Chat.Database do
     {db,
      fn
        %Database{headers: []} = db, {:cont, row} ->
-         IO.inspect(row)
          {headers, row} = Database.from_list(row)
          %Database{db | headers: headers, rows: [row]}
 

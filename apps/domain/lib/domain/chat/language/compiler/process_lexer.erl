@@ -12,7 +12,7 @@
 -export([format_error/1]).
 
 %% User code. This is placed here to allow extra attributes.
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 75).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 76).
 
 trim_var(Var) ->
     list_to_atom(string:trim(Var, both, "[]")).
@@ -310,7 +310,7 @@ adjust_line(T, A, [_|Cs], L) ->
 %% return signal either an unrecognised character or end of current
 %% input.
 
--file("lib/domain/chat/languages/process/compiler/process_lexer.erl", 313).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.erl", 313).
 yystate() -> 66.
 
 yystate(69, [95|Ics], Line, Tlen, _, _) ->
@@ -637,6 +637,8 @@ yystate(44, [95|Ics], Line, Tlen, Action, Alen) ->
     yystate(44, Ics, Line, Tlen+1, Action, Alen);
 yystate(44, [34|Ics], Line, Tlen, Action, Alen) ->
     yystate(48, Ics, Line, Tlen+1, Action, Alen);
+yystate(44, [32|Ics], Line, Tlen, Action, Alen) ->
+    yystate(44, Ics, Line, Tlen+1, Action, Alen);
 yystate(44, [C|Ics], Line, Tlen, Action, Alen) when C >= 48, C =< 57 ->
     yystate(44, Ics, Line, Tlen+1, Action, Alen);
 yystate(44, [C|Ics], Line, Tlen, Action, Alen) when C >= 65, C =< 90 ->
@@ -680,6 +682,8 @@ yystate(41, [C|Ics], Line, Tlen, _, _) when C >= 97, C =< 122 ->
 yystate(41, Ics, Line, Tlen, _, _) ->
     {21,Tlen,Ics,Line,41};
 yystate(40, [95|Ics], Line, Tlen, Action, Alen) ->
+    yystate(44, Ics, Line, Tlen+1, Action, Alen);
+yystate(40, [32|Ics], Line, Tlen, Action, Alen) ->
     yystate(44, Ics, Line, Tlen+1, Action, Alen);
 yystate(40, [C|Ics], Line, Tlen, Action, Alen) when C >= 48, C =< 57 ->
     yystate(44, Ics, Line, Tlen+1, Action, Alen);
@@ -1192,147 +1196,147 @@ yyaction(28, TokenLen, YYtcs, TokenLine) ->
 yyaction(_, _, _, _) -> error.
 
 -compile({inline,yyaction_0/0}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 41).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 42).
 yyaction_0() ->
      skip_token .
 
 -compile({inline,yyaction_1/0}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 42).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 43).
 yyaction_1() ->
      skip_token .
 
 -compile({inline,yyaction_2/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 44).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 45).
 yyaction_2(TokenLine) ->
      { token, { dot, TokenLine } } .
 
 -compile({inline,yyaction_3/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 45).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 46).
 yyaction_3(TokenLine) ->
      { token, { comma, TokenLine } } .
 
 -compile({inline,yyaction_4/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 46).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 47).
 yyaction_4(TokenLine) ->
      { token, { sep, TokenLine } } .
 
 -compile({inline,yyaction_5/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 47).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 48).
 yyaction_5(TokenLine) ->
      { token, { assign, TokenLine } } .
 
 -compile({inline,yyaction_6/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 48).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 49).
 yyaction_6(TokenLine) ->
      { token, { lif, TokenLine } } .
 
 -compile({inline,yyaction_7/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 49).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 50).
 yyaction_7(TokenLine) ->
      { token, { unless, TokenLine } } .
 
 -compile({inline,yyaction_8/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 50).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 51).
 yyaction_8(TokenLine) ->
      { token, { then, TokenLine } } .
 
 -compile({inline,yyaction_9/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 51).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 52).
 yyaction_9(TokenLine) ->
      { token, { else, TokenLine } } .
 
 -compile({inline,yyaction_10/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 52).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 53).
 yyaction_10(TokenLine) ->
      { token, { for, TokenLine } } .
 
 -compile({inline,yyaction_11/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 53).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 54).
 yyaction_11(TokenLine) ->
      { token, { in, TokenLine } } .
 
 -compile({inline,yyaction_12/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 54).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 55).
 yyaction_12(TokenLine) ->
      { token, { do, TokenLine } } .
 
 -compile({inline,yyaction_13/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 55).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 56).
 yyaction_13(TokenLine) ->
      { token, { with, TokenLine } } .
 
 -compile({inline,yyaction_14/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 56).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 57).
 yyaction_14(TokenLine) ->
      { token, { land, TokenLine } } .
 
 -compile({inline,yyaction_15/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 57).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 58).
 yyaction_15(TokenLine) ->
      { token, { lor, TokenLine } } .
 
 -compile({inline,yyaction_16/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 58).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 59).
 yyaction_16(TokenLine) ->
      { token, { equals, TokenLine } } .
 
 -compile({inline,yyaction_17/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 59).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 60).
 yyaction_17(TokenLine) ->
      { token, { not_equals, TokenLine } } .
 
 -compile({inline,yyaction_18/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 60).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 61).
 yyaction_18(TokenLine) ->
      { token, { left_paren, TokenLine } } .
 
 -compile({inline,yyaction_19/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 61).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 62).
 yyaction_19(TokenLine) ->
      { token, { right_paren, TokenLine } } .
 
 -compile({inline,yyaction_20/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 62).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 63).
 yyaction_20(TokenLine) ->
      { token, { all, TokenLine } } .
 
 -compile({inline,yyaction_21/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 63).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 64).
 yyaction_21(TokenLine) ->
      { token, { select, TokenLine } } .
 
 -compile({inline,yyaction_22/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 64).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 65).
 yyaction_22(TokenLine) ->
      { token, { from, TokenLine } } .
 
 -compile({inline,yyaction_23/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 65).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 66).
 yyaction_23(TokenLine) ->
      { token, { where, TokenLine } } .
 
 -compile({inline,yyaction_24/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 66).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 67).
 yyaction_24(TokenLine) ->
      { token, { join, TokenLine } } .
 
 -compile({inline,yyaction_25/1}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 67).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 68).
 yyaction_25(TokenLine) ->
      { token, { on, TokenLine } } .
 
 -compile({inline,yyaction_26/2}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 69).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 70).
 yyaction_26(TokenChars, TokenLine) ->
      { token, { ident, TokenLine, list_to_atom (TokenChars) } } .
 
 -compile({inline,yyaction_27/2}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 70).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 71).
 yyaction_27(TokenChars, TokenLine) ->
      { token, { var, TokenLine, trim_var (TokenChars) } } .
 
 -compile({inline,yyaction_28/2}).
--file("lib/domain/chat/languages/process/compiler/process_lexer.xrl", 71).
+-file("apps/domain/lib/domain/chat/language/compiler/process_lexer.xrl", 72).
 yyaction_28(TokenChars, TokenLine) ->
      { token, { str, TokenLine, trim_str (TokenChars) } } .
 

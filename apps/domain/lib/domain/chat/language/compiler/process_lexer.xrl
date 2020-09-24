@@ -36,6 +36,7 @@ On = ON
 
 %% Objects
 Identifier = [A-Za-z0-9_]+
+Stringy = [A-Za-z0-9_\s]+
 Variable = {LeftBracket}{Identifier}{RightBracket}
 
 Rules.
@@ -68,9 +69,9 @@ Rules.
 {Join}       : {token, {join, TokenLine}}.
 {On}         : {token, {on, TokenLine}}.
 
-{Identifier}     : {token, {ident, TokenLine, list_to_atom(TokenChars)}}.
-{Variable}       : {token, {var, TokenLine, trim_var(TokenChars)}}.
-\"{Identifier}\" : {token, {str, TokenLine, trim_str(TokenChars)}}.
+{Identifier}  : {token, {ident, TokenLine, list_to_atom(TokenChars)}}.
+{Variable}    : {token, {var, TokenLine, trim_var(TokenChars)}}.
+\"{Stringy}\" : {token, {str, TokenLine, trim_str(TokenChars)}}.
 
 Erlang code.
 

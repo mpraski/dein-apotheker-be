@@ -4,6 +4,7 @@ defmodule Chat.Driver do
   alias Chat.Scenario.{Process, Question, Answer}
   alias Chat.State.Process, as: StateProcess
   alias Chat.Language.Interpreter.Context
+  alias Chat.Driver.Enhancer
 
   def next(
         %State{
@@ -18,7 +19,9 @@ defmodule Chat.Driver do
     {:ok, process = %Process{}} = Scenario.process(scenario, process)
     {:ok, question = %Question{}} = Process.question(process, question)
 
-    state |> answer(data, question, answer)
+    state
+    |> answer(data, question, answer)
+    |> Enhancer.enhance(data)
   end
 
   defp answer(

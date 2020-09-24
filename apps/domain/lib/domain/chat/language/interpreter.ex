@@ -37,6 +37,10 @@ defmodule Chat.Language.Interpreter do
     def delete_var(%__MODULE__{memory: v} = c, n) do
       %__MODULE__{c | memory: Map.delete(v, n)}
     end
+
+    def get_db(%__MODULE__{databases: dbs}, n) do
+      Map.fetch(dbs, n)
+    end
   end
 
   def interpret(program) do
@@ -160,24 +164,24 @@ defmodule Chat.Language.Interpreter do
   end
 
   defp interpret_expr(data, {:select, columns, database, joins, nil}) do
-    db =
+    data =
       data
       |> dump_state()
       |> interpret_from(database)
 
     joins
-    |> Enum.reduce(db, &interpret_join(&2, &1))
+    |> Enum.reduce(data, &interpret_join(&2, &1))
     |> interpret_select(columns)
   end
 
   defp interpret_expr(data, {:select, columns, database, joins, where}) do
-    db =
+    data =
       data
       |> dump_state()
       |> interpret_from(database)
 
     joins
-    |> Enum.reduce(db, &interpret_join(&2, &1))
+    |> Enum.reduce(data, &interpret_join(&2, &1))
     |> interpret_where(where)
     |> interpret_select(columns)
   end
@@ -210,13 +214,12 @@ defmodule Chat.Language.Interpreter do
     end
   end
 
-  defp interpret_join({%Context{databases: dbs}, _} = d, {:join, name, on_expr}) do
+  defp interpret_join({_, r} = d, {:join, name, on_expr}) do
     {c, {:qualified_db, name, aliaz}} = d |> interpret_expr(name)
+
     c = Context.set_var(c, qualified_db_alias(aliaz), name)
 
-    {:ok, db} = Map.fetch(dbs, name)
-
-    {c, db}
+    {c, {c, aliaz, r} |> evaluate_on_expr(on_expr)}
   end
 
   defp interpret_where({c, %Database{id: id} = db}, where_expr) do
@@ -246,7 +249,9 @@ defmodule Chat.Language.Interpreter do
     {_, v} = d |> interpret_expr(v)
     {_, i} = d |> interpret_expr(i)
 
-    {:ok, v} = Keyword.fetch(r, normalize_column(v))
+    v =
+      Keyword.get(r, normalize_column(v)) ||
+        Keyword.get(r, possibly_qualified_column(v))
 
     v == i
   end
@@ -256,30 +261,49 @@ defmodule Chat.Language.Interpreter do
   end
 
   defp evaluate_on_expr(data, {:lor, a, b}) do
-    a = data |> evaluate_where_expr(a)
-    b = data |> evaluate_where_expr(b)
+    a = data |> evaluate_on_expr(a)
+    b = data |> evaluate_on_expr(b)
 
-    a || b
+    Database.union(a, b)
   end
 
   defp evaluate_on_expr(data, {:land, a, b}) do
-    a = data |> evaluate_where_expr(a)
-    b = data |> evaluate_where_expr(b)
+    a = data |> evaluate_on_expr(a)
+    b = data |> evaluate_on_expr(b)
 
-    a && b
+    Database.intersection(a, b)
   end
 
-  defp evaluate_on_expr({_, r} = d, {:equals, v, i}) do
-    {:qualified_ident, db1, col1} = d |> interpret_expr(v)
-    {:qualified_ident, db2, col2} = d |> interpret_expr(i)
+  defp evaluate_on_expr(data, {:equals, v, i}) do
+    {db1, db2, col1, col2, n} = data |> prepare_join(v, i)
 
-    {:ok, v} = Keyword.fetch(r, normalize_column(v))
-
-    v == i
+    Database.join(db1, db2, col1, col2, n, &Kernel.==/2)
   end
 
   defp evaluate_on_expr(data, {:not_equals, v, i}) do
-    data |> evaluate_where_expr({:equals, v, i}) |> Kernel.not()
+    {db1, db2, col1, col2, n} = data |> prepare_join(v, i)
+
+    Database.join(db1, db2, col1, col2, n, &Kernel.!=/2)
+  end
+
+  defp prepare_join({c, n, db}, v, i) do
+    {c, {:qualified_ident, n1, col1}} = {c, nil} |> interpret_expr(v)
+    {c, {:qualified_ident, n2, col2}} = {c, nil} |> interpret_expr(i)
+
+    col1 = normalize_column(col1)
+    col2 = normalize_column(col2)
+
+    {target, col1, col2} =
+      if n1 == n do
+        {n1, col2, col1}
+      else
+        {n2, col1, col2}
+      end
+
+    {:ok, target} = Context.get_var(c, qualified_db_alias(target))
+    {:ok, target} = Context.get_db(c, target)
+
+    {db, target, col1, col2, n}
   end
 
   defp normalize_column(v) when is_atom(v), do: v
@@ -289,6 +313,10 @@ defmodule Chat.Language.Interpreter do
   defp normalize_column({:qualified_ident, db, col}) do
     qualified_col_alias(db, col)
   end
+
+  defp possibly_qualified_column({:qualified_ident, _, col}), do: col
+
+  defp possibly_qualified_column(v), do: v
 
   defp qualified_db_alias(aliaz), do: :"q_db_#{aliaz}"
 

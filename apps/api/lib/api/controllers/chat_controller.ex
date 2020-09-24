@@ -5,7 +5,6 @@ defmodule Api.ChatController do
   alias Api.FallbackController
 
   alias Chat.Driver
-  alias Chat.Driver.Enhancer
 
   plug(RequireToken)
   plug(FromState)
@@ -25,7 +24,6 @@ defmodule Api.ChatController do
         state =
           state
           |> Driver.next(data, answer)
-          |> Enhancer.enhance(data)
 
         conn |> render("answer.json", state: state)
       end
@@ -36,10 +34,8 @@ defmodule Api.ChatController do
 
   def answer(conn, %{}) do
     if conn.assigns.has_state? do
-      with scenarios <- Chat.scenarios(),
-           databases <- Chat.databases(),
-           data <- {scenarios, databases} do
-        state = Driver.initial(scenarios) |> Enhancer.enhance(data)
+      with scenarios <- Chat.scenarios() do
+        state = Driver.initial(scenarios)
 
         conn |> render("answer.json", state: state)
       end
