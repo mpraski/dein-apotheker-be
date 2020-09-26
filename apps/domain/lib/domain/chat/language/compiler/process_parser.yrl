@@ -4,14 +4,15 @@ Nonterminals
 expr_list exprs_paren expr decl_expr if_expr unless_expr 
 for_expr logical_expr comp_expr function_expr select_expr 
 where_expr on_expr join_expr join_expr_list select_list column_list 
-qualified_database maybe_qualified_database variable_list comp_op 
+qualified_database maybe_qualified_database variable_list eq_op comp_op
 logical_op identifier qualified_identifier maybe_qualified_identifier
-variable string column.
+variable string number column.
 
 Terminals
 dot comma assign lif unless then else for in do with 
-land lor equals not_equals left_paren right_paren ident 
-var str all select from where join on.
+land lor equals not_equals greater greater_equal 
+lower lower_equal left_paren right_paren ident 
+var str num all select from where join on.
 
 Rootsymbol expr_list.
 
@@ -25,6 +26,7 @@ expr -> identifier                                           : '$1'.
 expr -> identifier with left_paren variable_list right_paren : {with, '$1', '$3'}.
 expr -> variable                                             : '$1'.
 expr -> string                                               : '$1'.
+expr -> number                                               : '$1'.
 expr -> logical_expr                                         : '$1'.
 expr -> comp_expr                                            : '$1'.
 expr -> function_expr                                        : '$1'.
@@ -36,7 +38,7 @@ expr -> select_expr                                          : '$1'.
 
 logical_expr -> left_paren expr logical_op expr right_paren : {'$3', '$2', '$4'}.
 
-comp_expr -> variable comp_op expr : {'$2', '$1', '$3'}.
+comp_expr -> left_paren expr comp_op expr right_paren : {'$3', '$2', '$4'}.
 
 function_expr -> identifier left_paren           right_paren : {call, '$1', []  }.
 function_expr -> identifier left_paren expr_list right_paren : {call, '$1', '$3'}.
@@ -54,11 +56,11 @@ select_expr -> select select_list from maybe_qualified_database                w
 select_expr -> select select_list from maybe_qualified_database join_expr_list                  : {action('$1'), '$2', '$4', '$5',  nil}.
 select_expr -> select select_list from maybe_qualified_database join_expr_list where where_expr : {action('$1'), '$2', '$4', '$5', '$7'}.
 
-where_expr -> maybe_qualified_identifier comp_op string               : {'$2', '$1', '$3'}.
-where_expr -> maybe_qualified_identifier comp_op variable             : {'$2', '$1', '$3'}.
+where_expr -> maybe_qualified_identifier eq_op string                 : {'$2', '$1', '$3'}.
+where_expr -> maybe_qualified_identifier eq_op variable               : {'$2', '$1', '$3'}.
 where_expr -> left_paren where_expr logical_op where_expr right_paren : {'$3', '$2', '$4'}.
 
-on_expr -> qualified_identifier comp_op qualified_identifier : {'$2', '$1', '$3'}.
+on_expr -> qualified_identifier eq_op qualified_identifier   : {'$2', '$1', '$3'}.
 on_expr -> left_paren on_expr logical_op on_expr right_paren : {'$3', '$2', '$4'}.
 
 join_expr -> join qualified_database on on_expr : {action('$1'), '$2', '$4'}.
@@ -94,8 +96,17 @@ maybe_qualified_identifier -> identifier dot identifier : {qualified_ident, '$1'
 
 string -> str : {string, unwrap('$1')}.
 
-comp_op -> equals     : action('$1').
-comp_op -> not_equals : action('$1').
+number -> num : {number, unwrap('$1')}.
+
+eq_op -> equals     : action('$1').
+eq_op -> not_equals : action('$1').
+
+comp_op -> equals        : action('$1').
+comp_op -> not_equals    : action('$1').
+comp_op -> greater       : action('$1').
+comp_op -> greater_equal : action('$1').
+comp_op -> lower         : action('$1').
+comp_op -> lower_equal   : action('$1').
 
 logical_op -> lor  : action('$1').
 logical_op -> land : action('$1').

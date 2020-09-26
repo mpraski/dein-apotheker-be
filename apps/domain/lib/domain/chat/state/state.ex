@@ -38,31 +38,38 @@ defmodule Chat.State do
   def process(%__MODULE__{processes: []}) do
     raise Failure, message: "No processes on stack"
   end
+end
 
-  def fetch_variables(_, nil), do: Map.new()
+defimpl Chat.Language.Memory, for: Chat.State do
+  alias Chat.State
+  alias Chat.State.Process
 
-  def fetch_variables(%__MODULE__{variables: v}, vars) do
-    {m, _} = Map.split(v, vars)
-    m
+  def store(%State{} = s, nil, _), do: s
+
+  def store(%State{variables: v} = s, n, i) do
+    %State{s | variables: Map.put(v, n, i)}
   end
 
-  def all_vars(%__MODULE__{variables: v, processes: []}), do: v
+  def load(%State{} = s, v) do
+    Chat.Language.Memory.all(s) |> Map.fetch(v)
+  end
 
-  def all_vars(%__MODULE__{
+  def load_many(%State{variables: v}, vars) do
+    {v, _} = Map.split(v, vars)
+    v
+  end
+
+  def delete(%State{variables: v} = s, n) do
+    %State{s | variables: Map.delete(v, n)}
+  end
+
+  def all(%State{variables: v, processes: []}), do: v
+
+  def all(%State{
         variables: v,
         processes: [%Process{variables: pv} | _]
       }) do
     Map.merge(v, pv)
-  end
-
-  def get_var(%__MODULE__{} = s, v) do
-    __MODULE__.all_vars(s) |> Map.fetch(v)
-  end
-
-  def set_var(%__MODULE__{} = s, nil, _), do: s
-
-  def set_var(%__MODULE__{variables: v} = s, n, i) do
-    %__MODULE__{s | variables: Map.put(v, n, i)}
   end
 end
 

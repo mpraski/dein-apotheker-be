@@ -1,9 +1,10 @@
 defmodule Chat.Language.StdLib do
   alias Chat.State
   alias Chat.State.Process
-  alias Chat.Database
   alias Chat.Scenario
-  alias Chat.Language.Interpreter.Context
+  alias Chat.Database
+  alias Chat.Language.Memory
+  alias Chat.Language.Context
 
   defmodule Call do
     use TypedStruct
@@ -34,8 +35,10 @@ defmodule Chat.Language.StdLib do
       IS_LOADED: &is_loaded/1,
       IS_NEXT: &is_next/1,
       DEFER: &defer/1,
-      ROW: &row/1,
-      HELLO: &hello/1
+      TO_TEXT: &to_text/1,
+      ROWS: &rows/1,
+      COLS: &cols/1,
+      MATCH: &match/1
     }
   end
 
@@ -44,7 +47,7 @@ defmodule Chat.Language.StdLib do
   end
 
   defp load(%Call{args: [%State{processes: p} = s, {proc, vars}]}) do
-    captured = State.fetch_variables(s, vars)
+    captured = Memory.load_many(s, vars)
     %State{s | processes: p ++ [Process.new(proc, captured)]}
   end
 
@@ -98,11 +101,17 @@ defmodule Chat.Language.StdLib do
 
   defp defer(%Call{args: [%State{} = s]}), do: s
 
-  defp row(%Call{args: [%Database{rows: [[value]]}]}), do: value
-
-  defp row(%Call{}) do
-    raise Failure, message: "expected a database with single row and column"
+  defp to_text(%Call{args: [_ | args]}) do
+    args
+    |> Enum.map(&to_string/1)
+    |> Enum.join(" ")
   end
 
-  defp hello(%Call{args: [str]}), do: str <> " there"
+  defp to_text(%Call{}), do: ""
+
+  defp rows(%Call{args: [_, db]}), do: Database.height(db)
+
+  defp cols(%Call{args: [_, db]}), do: Database.width(db)
+
+  defp match(%Call{}), do: nil
 end

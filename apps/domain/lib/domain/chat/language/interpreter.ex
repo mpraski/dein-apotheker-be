@@ -1,52 +1,13 @@
 defmodule Chat.Language.Interpreter do
-  alias Chat.State
   alias Chat.Database
   alias Chat.Language.StdLib
   alias Chat.Language.StdLib.Call
-
-  defmodule Context do
-    use TypedStruct
-
-    typedstruct do
-      field(:scenarios, map(), enforce: true)
-      field(:databases, map(), enforce: true)
-      field(:memory, map(), default: Map.new())
-    end
-
-    def new(scenarios, databases) do
-      %__MODULE__{
-        scenarios: scenarios,
-        databases: databases
-      }
-    end
-
-    def get_var(%__MODULE__{memory: m}, n) do
-      Map.fetch(m, n)
-    end
-
-    def set_var(%__MODULE__{} = c, nil, _), do: c
-
-    def set_var(%__MODULE__{memory: m} = c, n, i) do
-      %__MODULE__{c | memory: Map.put(m, n, i)}
-    end
-
-    def set_vars(%__MODULE__{memory: m} = c, vars) do
-      %__MODULE__{c | memory: Map.merge(m, vars)}
-    end
-
-    def delete_var(%__MODULE__{memory: v} = c, n) do
-      %__MODULE__{c | memory: Map.delete(v, n)}
-    end
-
-    def get_db(%__MODULE__{databases: dbs}, n) do
-      Map.fetch(dbs, n)
-    end
-  end
+  alias Chat.Language.Memory
+  alias Chat.Language.Context
 
   def interpret(program) do
     fn %Context{} = c, r ->
-      {_, r} = {c, r} |> interpret_exprs(program)
-      r
+      {c, r} |> interpret_exprs(program) |> elem(1)
     end
   end
 
@@ -69,14 +30,14 @@ defmodule Chat.Language.Interpreter do
   end
 
   defp interpret_expr({_, s} = data, {:for, {:var, i}, {:var, v}, exprs}) do
-    case State.get_var(s, v) do
+    case Memory.load(s, v) do
       {:ok, items} ->
         {c, s} =
           Enum.reduce(items, data, fn a, {c, s} ->
-            {Context.set_var(c, i, a), s} |> interpret_exprs(exprs)
+            {Memory.store(c, i, a), s} |> interpret_exprs(exprs)
           end)
 
-        {Context.delete_var(c, i), s}
+        {Memory.delete(c, i), s}
 
       _ ->
         data
@@ -89,7 +50,7 @@ defmodule Chat.Language.Interpreter do
 
   defp interpret_expr({c, r} = d, {:assign, {:var, v}, expr}) do
     {_, e} = d |> interpret_expr(expr)
-    {Context.set_var(c, v, e), r}
+    {Memory.store(c, v, e), r}
   end
 
   defp interpret_expr({c, _}, {:ident, i}) when is_atom(i), do: {c, i}
@@ -98,21 +59,13 @@ defmodule Chat.Language.Interpreter do
     {interpret_expr(data, i), Enum.map(w, &interpret_expr(data, &1))}
   end
 
-  defp interpret_expr(
-         {%Context{memory: m} = c, %State{} = s},
-         {:var, v}
-       )
-       when is_atom(v),
-       do: {c, Map.merge(State.all_vars(s), m) |> Map.get(v)}
-
-  defp interpret_expr(
-         {%Context{memory: m} = c, _},
-         {:var, v}
-       )
-       when is_atom(v),
-       do: {c, Map.get(m, v)}
+  defp interpret_expr({c, s}, {:var, v}) when is_atom(v) do
+    {c, Map.merge(Memory.all(s), Memory.all(c)) |> Map.get(v)}
+  end
 
   defp interpret_expr({c, _}, {:string, s}) when is_list(s), do: {c, to_string(s)}
+
+  defp interpret_expr({c, _}, {:number, n}) when is_integer(n), do: {c, n}
 
   defp interpret_expr({c, _}, {:qualified_db, {:ident, d}, {:ident, n}}) do
     {c, {:qualified_db, d, n}}
@@ -146,6 +99,34 @@ defmodule Chat.Language.Interpreter do
   defp interpret_expr(data, {:not_equals, v, i}) do
     {c, r} = data |> interpret_expr({:equals, v, i})
     {c, Kernel.not(r)}
+  end
+
+  defp interpret_expr({c, _} = data, {:greater, v, i}) do
+    {_, v} = data |> interpret_expr(v)
+    {_, i} = data |> interpret_expr(i)
+
+    {c, v > i}
+  end
+
+  defp interpret_expr({c, _} = data, {:greater_equal, v, i}) do
+    {_, v} = data |> interpret_expr(v)
+    {_, i} = data |> interpret_expr(i)
+
+    {c, v >= i}
+  end
+
+  defp interpret_expr({c, _} = data, {:lower, v, i}) do
+    {_, v} = data |> interpret_expr(v)
+    {_, i} = data |> interpret_expr(i)
+
+    {c, v < i}
+  end
+
+  defp interpret_expr({c, _} = data, {:lower_equal, v, i}) do
+    {_, v} = data |> interpret_expr(v)
+    {_, i} = data |> interpret_expr(i)
+
+    {c, v <= i}
   end
 
   defp interpret_expr(data, {:select, columns, database, [], nil}) do
@@ -200,13 +181,13 @@ defmodule Chat.Language.Interpreter do
     {c, db |> Enum.map(reducer) |> Enum.into(Database.new(id))}
   end
 
-  defp interpret_from({%Context{databases: dbs}, _} = d, name) do
-    {c, name} = d |> interpret_expr(name)
+  defp interpret_from({%Context{databases: dbs} = c, _} = d, name) do
+    {_, name} = d |> interpret_expr(name)
 
     case name do
       {:qualified_db, name, aliaz} ->
         {:ok, db} = Map.fetch(dbs, name)
-        {Context.set_var(c, qualified_db_alias(aliaz), name), db}
+        {Memory.store(c, qualified_db_alias(aliaz), name), db}
 
       name ->
         {:ok, db} = Map.fetch(dbs, name)
@@ -217,7 +198,7 @@ defmodule Chat.Language.Interpreter do
   defp interpret_join({_, r} = d, {:join, name, on_expr}) do
     {c, {:qualified_db, name, aliaz}} = d |> interpret_expr(name)
 
-    c = Context.set_var(c, qualified_db_alias(aliaz), name)
+    c = Memory.store(c, qualified_db_alias(aliaz), name)
 
     {c, {c, aliaz, r} |> evaluate_on_expr(on_expr)}
   end
@@ -286,9 +267,9 @@ defmodule Chat.Language.Interpreter do
     Database.join(db1, db2, col1, col2, n, &Kernel.!=/2)
   end
 
-  defp prepare_join({c, n, db}, v, i) do
-    {c, {:qualified_ident, n1, col1}} = {c, nil} |> interpret_expr(v)
-    {c, {:qualified_ident, n2, col2}} = {c, nil} |> interpret_expr(i)
+  defp prepare_join({%Context{databases: dbs} = c, n, db}, v, i) do
+    {_, {:qualified_ident, n1, col1}} = {c, nil} |> interpret_expr(v)
+    {_, {:qualified_ident, n2, col2}} = {c, nil} |> interpret_expr(i)
 
     col1 = normalize_column(col1)
     col2 = normalize_column(col2)
@@ -300,8 +281,8 @@ defmodule Chat.Language.Interpreter do
         {n2, col1, col2}
       end
 
-    {:ok, target} = Context.get_var(c, qualified_db_alias(target))
-    {:ok, target} = Context.get_db(c, target)
+    {:ok, target} = Memory.load(c, qualified_db_alias(target))
+    {:ok, target} = Map.fetch(dbs, target)
 
     {db, target, col1, col2, n}
   end
@@ -336,8 +317,12 @@ defmodule Chat.Language.Interpreter do
     |> Enum.map(&elem(&1, 1))
   end
 
-  defp dump_state({%Context{} = c, %State{} = s}) do
-    {Context.set_vars(c, State.all_vars(s)), s}
+  defp dump_state({c, s}) do
+    c =
+      Memory.all(s)
+      |> Enum.reduce(c, fn {k, v}, c -> Memory.store(c, k, v) end)
+
+    {c, s}
   end
 
   defp dump_state(data), do: data

@@ -2,8 +2,9 @@ defmodule Chat.Scenario.Text do
   alias Chat.State
 
   alias Chat.Language.Parser
+  alias Chat.Language.Memory
   alias Chat.Language.Interpreter
-  alias Chat.Language.Interpreter.Context
+  alias Chat.Language.Context
 
   use TypedStruct
 
@@ -44,7 +45,7 @@ defmodule Chat.Scenario.Text do
   end
 
   defp execute({:var, var}, %State{} = s, _, _) do
-    {:ok, value} = State.get_var(s, var)
+    {:ok, value} = Memory.load(s, var)
     value
   end
 

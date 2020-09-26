@@ -4,7 +4,8 @@ defmodule Chat.Driver.Enhancer do
   alias Chat.Scenario
   alias Chat.Scenario.{Process, Question, Answer, Text}
   alias Chat.State.Message
-  alias Chat.Language.Interpreter.Context
+  alias Chat.Language.Memory
+  alias Chat.Language.Context
 
   def enhance(
         state = %State{
@@ -98,6 +99,6 @@ defmodule Chat.Driver.Enhancer do
   end
 
   defp dump_data(%State{question: question} = state) do
-    state |> State.set_var(:previous_question, question)
+    state |> Memory.store(:previous_question, question)
   end
 end

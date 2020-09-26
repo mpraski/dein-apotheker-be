@@ -3,7 +3,8 @@ defmodule Chat.Driver do
   alias Chat.Scenario
   alias Chat.Scenario.{Process, Question, Answer}
   alias Chat.State.Process, as: StateProcess
-  alias Chat.Language.Interpreter.Context
+  alias Chat.Language.Memory
+  alias Chat.Language.Context
   alias Chat.Driver.Enhancer
 
   def next(
@@ -35,12 +36,12 @@ defmodule Chat.Driver do
 
     a.(
       Context.new(scenarios, databases),
-      State.set_var(state, name_output, o)
+      Memory.store(state, name_output, o)
     )
   end
 
   defp answer(state = %State{}, _, %Question{type: :C}, {:comment, "ok"}) do
-    {:ok, previous} = State.get_var(state, :previous_question)
+    {:ok, previous} = Memory.load(state, :previous_question)
 
     %State{state | question: previous}
   end
@@ -57,7 +58,7 @@ defmodule Chat.Driver do
        ) do
     action.(
       Context.new(scenarios, databases),
-      State.set_var(state, output, text)
+      Memory.store(state, output, text)
     )
   end
 
@@ -73,7 +74,7 @@ defmodule Chat.Driver do
        ) do
     action.(
       Context.new(scenarios, databases),
-      State.set_var(state, output, String.to_existing_atom(select))
+      Memory.store(state, output, String.to_existing_atom(select))
     )
   end
 
