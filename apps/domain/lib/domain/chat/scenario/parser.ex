@@ -3,7 +3,6 @@ defmodule Chat.Scenario.Parser do
   alias Chat.Scenario.{Process, Question, Answer}
 
   alias Chat.Language.Parser, as: ProcessParser
-  alias Chat.Language.Interpreter, as: ProcessInterpreter
 
   @scenario_header ~w[Process Action]
   @process_header ~w[ID Type Query Text Action Output]
@@ -114,8 +113,7 @@ defmodule Chat.Scenario.Parser do
   defp parse_program(nil), do: nil
 
   defp parse_program(source) do
-    {:ok, program} = ProcessParser.parse(source)
-    ProcessInterpreter.interpret(program)
+    ProcessParser.parse(source)
   end
 
   defp parse_question_output(nil), do: nil

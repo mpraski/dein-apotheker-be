@@ -30,7 +30,7 @@ defmodule Chat.Language.StdLib do
     %{
       LOAD: &load/1,
       JUMP: &jump/1,
-      GOTO: &goto/1,
+      GO: &go/1,
       FINISH: &finish/1,
       IS_LOADED: &is_loaded/1,
       IS_NEXT: &is_next/1,
@@ -38,6 +38,7 @@ defmodule Chat.Language.StdLib do
       TO_TEXT: &to_text/1,
       ROWS: &rows/1,
       COLS: &cols/1,
+      SIZE: &size/1,
       MATCH: &match/1
     }
   end
@@ -59,7 +60,7 @@ defmodule Chat.Language.StdLib do
     %State{s | processes: [Process.new(proc)]}
   end
 
-  defp goto(%Call{args: [%State{} = s, question]}) do
+  defp go(%Call{args: [%State{} = s, question]}) do
     %State{s | question: question}
   end
 
@@ -108,6 +109,8 @@ defmodule Chat.Language.StdLib do
   end
 
   defp to_text(%Call{}), do: ""
+
+  defp size(%Call{args: [_, v]}) when is_list(v), do: length(v)
 
   defp rows(%Call{args: [_, db]}), do: Database.height(db)
 

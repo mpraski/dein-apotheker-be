@@ -3,6 +3,7 @@ defmodule Chat.Driver.Enhancer do
   alias Chat.State.Process, as: StateProcess
   alias Chat.Scenario
   alias Chat.Scenario.{Process, Question, Answer, Text}
+  alias Chat.Database
   alias Chat.State.Message
   alias Chat.Language.Memory
   alias Chat.Language.Context
@@ -21,7 +22,7 @@ defmodule Chat.Driver.Enhancer do
 
     message = question |> create_message({state, scenarios, databases})
 
-    %State{state | message: message} |> dump_data()
+    %State{state | message: message} |> save_question()
   end
 
   defp create_message(
@@ -32,30 +33,30 @@ defmodule Chat.Driver.Enhancer do
          },
          data
        ) do
-    Message.new(
-      :Q,
-      Text.render(text, data),
-      %{answers: load_answers(answers, data)}
-    )
+    text = Text.render(text, data)
+
+    input = %{answers: answers_input(answers, data)}
+
+    Message.new(:Q, text, input)
   end
 
   defp create_message(
          %Question{
-           type: :N,
+           type: type,
            text: text,
            query: query
          },
          {state, scenarios, databases} = data
-       ) do
-    results =
-      query.(Context.new(scenarios, databases), state)
-      |> Enum.to_list()
+       )
+       when type in ~w[N B]a do
+    input =
+      Context.new(scenarios, databases)
+      |> query.(state)
+      |> database_input()
 
-    Message.new(
-      :N,
-      Text.render(text, data),
-      %{results: results}
-    )
+    text = Text.render(text, data)
+
+    Message.new(type, text, input)
   end
 
   defp create_message(
@@ -67,14 +68,15 @@ defmodule Chat.Driver.Enhancer do
          {state, scenarios, databases} = data
        ) do
     [product] =
-      query.(Context.new(scenarios, databases), state)
+      Context.new(scenarios, databases)
+      |> query.(state)
       |> Enum.to_list()
 
-    Message.new(
-      :P,
-      Text.render(text, data),
-      %{product: product}
-    )
+    text = Text.render(text, data)
+
+    input = %{product: product}
+
+    Message.new(:P, text, input)
   end
 
   defp create_message(
@@ -88,7 +90,7 @@ defmodule Chat.Driver.Enhancer do
     Message.new(type, Text.render(text, data))
   end
 
-  defp load_answers(answers, data) do
+  defp answers_input(answers, data) do
     answers
     |> Enum.map(fn %Answer{id: id, text: text} ->
       %{
@@ -98,7 +100,14 @@ defmodule Chat.Driver.Enhancer do
     end)
   end
 
-  defp dump_data(%State{question: question} = state) do
+  defp database_input(%Database{id: id} = db) do
+    %{
+      database: id,
+      rows: Enum.to_list(db)
+    }
+  end
+
+  defp save_question(%State{question: question} = state) do
     state |> Memory.store(:previous_question, question)
   end
 end

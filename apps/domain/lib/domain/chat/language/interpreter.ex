@@ -1,9 +1,9 @@
 defmodule Chat.Language.Interpreter do
   alias Chat.Database
-  alias Chat.Language.StdLib
-  alias Chat.Language.StdLib.Call
   alias Chat.Language.Memory
   alias Chat.Language.Context
+  alias Chat.Language.StdLib
+  alias Chat.Language.StdLib.Call
 
   def interpret(program) do
     fn %Context{} = c, r ->
@@ -55,8 +55,12 @@ defmodule Chat.Language.Interpreter do
 
   defp interpret_expr({c, _}, {:ident, i}) when is_atom(i), do: {c, i}
 
-  defp interpret_expr(data, {:with, i, w}) do
-    {interpret_expr(data, i), Enum.map(w, &interpret_expr(data, &1))}
+  defp interpret_expr({c, _} = data, {:with, i, w}) do
+    {_, i} = data |> interpret_expr(i)
+
+    vars = Enum.map(w, &elem(&1, 1))
+
+    {c, {i, vars}}
   end
 
   defp interpret_expr({c, s}, {:var, v}) when is_atom(v) do

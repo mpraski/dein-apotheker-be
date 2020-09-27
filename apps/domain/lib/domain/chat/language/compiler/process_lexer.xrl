@@ -39,9 +39,14 @@ Join = JOIN
 On = ON
 
 %% Objects
-Identifier = [A-Za-z_][A-Za-z0-9_]*
-Number = [0-9]+
-Stringy = [A-Za-z0-9_\s]+
+Digit = [0-9]
+Binary = [A-Za-z0-9_\.\!\?,\s]
+IdentifierStart = [A-Za-z_]
+IdentifierRest = [A-Za-z0-9_]
+
+Number = {Digit}+
+String = '{Binary}+'
+Identifier = {IdentifierStart}{IdentifierRest}*
 Variable = {LeftBracket}{Identifier}{RightBracket}
 
 Rules.
@@ -78,10 +83,10 @@ Rules.
 {Join}         : {token, {join, TokenLine}}.
 {On}           : {token, {on, TokenLine}}.
 
-{Identifier} : {token, {ident, TokenLine, list_to_atom(TokenChars)}}.
-{Variable}   : {token, {var, TokenLine, trim_var(TokenChars)}}.
 {Number}     : {token, {num, TokenLine, trim_num(TokenChars)}}.
-'{Stringy}'  : {token, {str, TokenLine, trim_str(TokenChars)}}.
+{String}     : {token, {str, TokenLine, trim_str(TokenChars)}}.
+{Variable}   : {token, {var, TokenLine, trim_var(TokenChars)}}.
+{Identifier} : {token, {ident, TokenLine, list_to_atom(TokenChars)}}.
 
 Erlang code.
 

@@ -70,21 +70,39 @@ defmodule Chat.Driver do
            action: action,
            output: output
          },
-         {:select, select}
+         {:selection, selection}
        ) do
     action.(
       Context.new(scenarios, databases),
-      Memory.store(state, output, String.to_existing_atom(select))
+      Memory.store(state, output, selection)
     )
+  end
+
+  defp answer(
+         state = %State{},
+         {scenarios, databases},
+         %Question{
+           type: :B,
+           action: action
+         },
+         {:cart, cart}
+       ) do
+    {:ok, items} = state |> Memory.load(State.cart())
+
+    items = (items ++ cart) |> Enum.uniq()
+
+    state = state |> Memory.store(State.cart(), items)
+
+    Context.new(scenarios, databases) |> action.(state)
   end
 
   @cough :cough
 
-  def initial(scenarios) do
+  def initial({scenarios, _} = data) do
     {:ok, cough} = Map.fetch(scenarios, @cough)
     {:ok, %Process{id: pid} = p} = Scenario.entry(cough)
     {:ok, %Question{id: qid}} = Process.entry(p)
 
-    State.new(qid, [@cough], [StateProcess.new(pid)])
+    State.new(qid, [@cough], [StateProcess.new(pid)]) |> Enhancer.enhance(data)
   end
 end

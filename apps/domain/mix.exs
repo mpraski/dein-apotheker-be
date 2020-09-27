@@ -13,8 +13,7 @@ defmodule Domain.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       erlc_paths: [
-        "lib/domain/chat/languages/data/compiler",
-        "lib/domain/chat/languages/process/compiler"
+        "lib/domain/chat/language/compiler"
       ]
     ]
   end

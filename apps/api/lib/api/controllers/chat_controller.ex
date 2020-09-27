@@ -16,17 +16,15 @@ defmodule Api.ChatController do
         "value" => value
       }) do
     if conn.assigns.has_state? do
-      with state <- conn.assigns.state,
-           answer <- {String.to_existing_atom(type), value},
-           scenarios <- Chat.scenarios(),
-           databases <- Chat.databases(),
-           data <- {scenarios, databases} do
-        state =
-          state
-          |> Driver.next(data, answer)
+      state = conn.assigns.state
+      answer = {String.to_existing_atom(type), value}
+      data = {Chat.scenarios(), Chat.databases()}
 
-        conn |> render("answer.json", state: state)
-      end
+      state =
+        state
+        |> Driver.next(data, answer)
+
+      conn |> render("answer.json", state: state)
     else
       {:error, 400, "Badly formed request"}
     end
@@ -34,11 +32,9 @@ defmodule Api.ChatController do
 
   def answer(conn, %{}) do
     if conn.assigns.has_state? do
-      with scenarios <- Chat.scenarios() do
-        state = Driver.initial(scenarios)
+      state = {Chat.scenarios(), Chat.databases()} |> Driver.initial()
 
-        conn |> render("answer.json", state: state)
-      end
+      conn |> render("answer.json", state: state)
     else
       {:error, 400, "Badly formed request"}
     end

@@ -6,7 +6,7 @@ for_expr logical_expr comp_expr function_expr select_expr
 where_expr on_expr join_expr join_expr_list select_list column_list 
 qualified_database maybe_qualified_database variable_list eq_op comp_op
 logical_op identifier qualified_identifier maybe_qualified_identifier
-variable string number column.
+stacked_identifier variable string number column.
 
 Terminals
 dot comma assign lif unless then else for in do with 
@@ -22,19 +22,19 @@ expr_list -> expr comma expr_list : ['$1'|'$3'].
 exprs_paren -> expr                             : ['$1'].
 exprs_paren -> left_paren expr_list right_paren :  '$2'.
 
-expr -> identifier                                           : '$1'.
-expr -> identifier with left_paren variable_list right_paren : {with, '$1', '$3'}.
-expr -> variable                                             : '$1'.
-expr -> string                                               : '$1'.
-expr -> number                                               : '$1'.
-expr -> logical_expr                                         : '$1'.
-expr -> comp_expr                                            : '$1'.
-expr -> function_expr                                        : '$1'.
-expr -> decl_expr                                            : '$1'.
-expr -> if_expr                                              : '$1'.
-expr -> unless_expr                                          : '$1'.
-expr -> for_expr                                             : '$1'.
-expr -> select_expr                                          : '$1'.
+expr -> logical_expr       : '$1'.
+expr -> comp_expr          : '$1'.
+expr -> function_expr      : '$1'.
+expr -> decl_expr          : '$1'.
+expr -> if_expr            : '$1'.
+expr -> unless_expr        : '$1'.
+expr -> for_expr           : '$1'.
+expr -> select_expr        : '$1'.
+expr -> identifier         : '$1'.
+expr -> stacked_identifier : '$1'.
+expr -> variable           : '$1'.
+expr -> string             : '$1'.
+expr -> number             : '$1'.
 
 logical_expr -> left_paren expr logical_op expr right_paren : {'$3', '$2', '$4'}.
 
@@ -93,6 +93,8 @@ qualified_identifier -> identifier dot identifier : {qualified_ident, '$1', '$3'
 
 maybe_qualified_identifier -> identifier                : '$1'.
 maybe_qualified_identifier -> identifier dot identifier : {qualified_ident, '$1', '$3'}.
+
+stacked_identifier -> identifier with left_paren variable_list right_paren : {with, '$1', '$4'}.
 
 string -> str : {string, unwrap('$1')}.
 

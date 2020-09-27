@@ -38,6 +38,8 @@ defmodule Chat.State do
   def process(%__MODULE__{processes: []}) do
     raise Failure, message: "No processes on stack"
   end
+
+  def cart(), do: :cart
 end
 
 defimpl Chat.Language.Memory, for: Chat.State do
