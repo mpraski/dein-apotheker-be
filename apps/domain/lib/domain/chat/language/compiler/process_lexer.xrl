@@ -14,7 +14,7 @@ Comma = ,
 Separator = ;
 Assign = \=
 If = IF
-Unless = UNLESS
+Elif = ELIF
 Then = THEN
 Else = ELSE
 For = FOR
@@ -59,7 +59,7 @@ Rules.
 {Separator}    : {token, {sep, TokenLine}}.
 {Assign}       : {token, {assign, TokenLine}}.
 {If}           : {token, {lif, TokenLine}}.
-{Unless}       : {token, {unless, TokenLine}}.
+{Elif}         : {token, {elif, TokenLine}}.
 {Then}         : {token, {then, TokenLine}}.
 {Else}         : {token, {else, TokenLine}}.
 {For}          : {token, {for, TokenLine}}.

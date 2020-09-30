@@ -1,7 +1,7 @@
 %% process.yrl
 
 Nonterminals
-expr_list exprs_paren expr decl_expr if_expr unless_expr 
+expr_list exprs_paren expr decl_expr if_expr elif_expr 
 for_expr logical_expr comp_expr function_expr select_expr 
 where_expr on_expr join_expr join_expr_list select_list column_list 
 qualified_database maybe_qualified_database variable_list eq_op comp_op
@@ -9,7 +9,7 @@ logical_op identifier qualified_identifier maybe_qualified_identifier
 stacked_identifier variable string number column.
 
 Terminals
-dot comma assign lif unless then else for in do with 
+dot comma assign lif elif then else for in do with 
 land lor equals not_equals greater greater_equal 
 lower lower_equal left_paren right_paren ident 
 var str num all select from where join on.
@@ -27,7 +27,6 @@ expr -> comp_expr          : '$1'.
 expr -> function_expr      : '$1'.
 expr -> decl_expr          : '$1'.
 expr -> if_expr            : '$1'.
-expr -> unless_expr        : '$1'.
 expr -> for_expr           : '$1'.
 expr -> select_expr        : '$1'.
 expr -> identifier         : '$1'.
@@ -45,9 +44,11 @@ function_expr -> identifier left_paren expr_list right_paren : {call, '$1', '$3'
 
 decl_expr -> variable assign expr : {action('$2'), '$1', '$3'}.
 
-if_expr -> lif expr then exprs_paren else exprs_paren : {action('$1'), '$2', '$4', '$6'}.
+if_expr -> lif expr then expr           else expr : {lif, [{'$2', '$4'}       ], '$6'}.
+if_expr -> lif expr then expr elif_expr else expr : {lif, [{'$2', '$4'} | '$5'], '$7'}.
 
-unless_expr -> unless expr then exprs_paren else exprs_paren : {action('$1'), '$2', '$4', '$6'}.
+elif_expr -> elif expr then expr           : [{'$2', '$4'}     ].
+elif_expr -> elif expr then expr elif_expr : [{'$2', '$4'} | $5].
 
 for_expr -> for variable in variable do exprs_paren : {action('$1'), '$2', '$4', '$6'}.
 

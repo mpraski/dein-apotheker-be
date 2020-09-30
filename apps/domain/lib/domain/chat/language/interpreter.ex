@@ -15,13 +15,21 @@ defmodule Chat.Language.Interpreter do
     Enum.reduce(exprs, data, &interpret_expr(&2, &1))
   end
 
-  defp interpret_expr(data, {:lif, a, b, d}) do
-    {_, p} = data |> interpret_expr(a)
+  defp interpret_expr(data, {:lif, exprs, otherwise}) do
+    reduced =
+      Enum.reduce_while(exprs, {:next, data}, fn {c, t}, {_, data} ->
+        {_, c} = data |> interpret_expr(c)
 
-    if p do
-      data |> interpret_exprs(b)
-    else
-      data |> interpret_exprs(d)
+        if c do
+          {:halt, {:done, data |> interpret_expr(t)}}
+        else
+          {:cont, {:next, data}}
+        end
+      end)
+
+    case reduced do
+      {:done, data} -> data
+      {:next, _} -> data |> interpret_expr(otherwise)
     end
   end
 
