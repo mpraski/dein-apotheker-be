@@ -48,7 +48,7 @@ defmodule Chat.Driver.Enhancer do
          },
          {state, scenarios, databases} = data
        )
-       when type in ~w[N B]a do
+       when type in ~w[PN N]a do
     input =
       Context.new(scenarios, databases)
       |> query.(state)

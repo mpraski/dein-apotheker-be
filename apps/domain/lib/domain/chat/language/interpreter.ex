@@ -33,10 +33,6 @@ defmodule Chat.Language.Interpreter do
     end
   end
 
-  defp interpret_expr(data, {:unless, a, b, c}) do
-    data |> interpret_expr({:lif, a, c, b})
-  end
-
   defp interpret_expr({_, s} = data, {:for, {:var, i}, {:var, v}, exprs}) do
     case Memory.load(s, v) do
       {:ok, items} ->
@@ -143,14 +139,14 @@ defmodule Chat.Language.Interpreter do
 
   defp interpret_expr(data, {:select, columns, database, [], nil}) do
     data
-    |> dump_state()
+    |> dump_register()
     |> interpret_from(database)
     |> interpret_select(columns)
   end
 
   defp interpret_expr(data, {:select, columns, database, [], where}) do
     data
-    |> dump_state()
+    |> dump_register()
     |> interpret_from(database)
     |> interpret_select(columns)
     |> interpret_where(where)
@@ -159,7 +155,7 @@ defmodule Chat.Language.Interpreter do
   defp interpret_expr(data, {:select, columns, database, joins, nil}) do
     data =
       data
-      |> dump_state()
+      |> dump_register()
       |> interpret_from(database)
 
     joins
@@ -170,7 +166,7 @@ defmodule Chat.Language.Interpreter do
   defp interpret_expr(data, {:select, columns, database, joins, where}) do
     data =
       data
-      |> dump_state()
+      |> dump_register()
       |> interpret_from(database)
 
     joins
@@ -316,7 +312,7 @@ defmodule Chat.Language.Interpreter do
   defp qualified_col_alias(db, col), do: :"#{db}.#{col}"
 
   defp call_func({c, r} = data, n, args) do
-    {:ok, f} = Map.fetch(StdLib.functions(), n)
+    {:ok, f} = StdLib.functions() |> Map.fetch(n)
 
     call = [r | data |> evaluate_exprs(args)] |> Call.new(c)
 
@@ -329,7 +325,7 @@ defmodule Chat.Language.Interpreter do
     |> Enum.map(&elem(&1, 1))
   end
 
-  defp dump_state({c, s}) do
+  defp dump_register({c, s}) do
     c =
       Memory.all(s)
       |> Enum.reduce(c, fn {k, v}, c -> Memory.store(c, k, v) end)
@@ -337,5 +333,5 @@ defmodule Chat.Language.Interpreter do
     {c, s}
   end
 
-  defp dump_state(data), do: data
+  defp dump_register(data), do: data
 end

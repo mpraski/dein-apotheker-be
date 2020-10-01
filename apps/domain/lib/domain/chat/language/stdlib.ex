@@ -29,6 +29,7 @@ defmodule Chat.Language.StdLib do
   def functions do
     %{
       LOAD: &load/1,
+      LOAD_WITH: &load_with/1,
       JUMP: &jump/1,
       GO: &go/1,
       FINISH: &finish/1,
@@ -47,7 +48,7 @@ defmodule Chat.Language.StdLib do
     %State{s | processes: p ++ [Process.new(proc)]}
   end
 
-  defp load(%Call{args: [%State{processes: p} = s, {proc, vars}]}) do
+  defp load_with(%Call{args: [%State{processes: p} = s, proc | vars]}) do
     captured = Memory.load_many(s, vars)
     %State{s | processes: p ++ [Process.new(proc, captured)]}
   end

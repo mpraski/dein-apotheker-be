@@ -19,7 +19,7 @@ defmodule Chat.State.Message do
 
   def decode_type(:Q), do: :question
   def decode_type(:N), do: :list
-  def decode_type(:B), do: :buy
+  def decode_type(:PN), do: :product_list
   def decode_type(:P), do: :product
   def decode_type(:C), do: :comment
   def decode_type(:F), do: :free

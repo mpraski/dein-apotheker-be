@@ -13,7 +13,7 @@ defmodule Chat.Scenario.Question do
     field(:output, atom())
   end
 
-  @types ~w[Q N B P C F]a
+  @types ~w[Q N P PN C F]a
 
   def new(id, type, query, text, action, output) when type in @types do
     %__MODULE__{

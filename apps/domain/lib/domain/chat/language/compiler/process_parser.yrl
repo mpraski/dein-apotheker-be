@@ -4,12 +4,12 @@ Nonterminals
 expr_list exprs_paren expr decl_expr if_expr elif_expr 
 for_expr logical_expr comp_expr function_expr select_expr 
 where_expr on_expr join_expr join_expr_list select_list column_list 
-qualified_database maybe_qualified_database variable_list eq_op comp_op
-logical_op identifier qualified_identifier maybe_qualified_identifier
-stacked_identifier variable string number column.
+qualified_database maybe_qualified_database eq_op comp_op logical_op 
+identifier qualified_identifier maybe_qualified_identifier
+variable string number column.
 
 Terminals
-dot comma assign lif elif then else for in do with 
+dot comma assign lif elif then else for in do 
 land lor equals not_equals greater greater_equal 
 lower lower_equal left_paren right_paren ident 
 var str num all select from where join on.
@@ -30,7 +30,6 @@ expr -> if_expr            : '$1'.
 expr -> for_expr           : '$1'.
 expr -> select_expr        : '$1'.
 expr -> identifier         : '$1'.
-expr -> stacked_identifier : '$1'.
 expr -> variable           : '$1'.
 expr -> string             : '$1'.
 expr -> number             : '$1'.
@@ -83,10 +82,11 @@ qualified_database -> identifier identifier : {qualified_db, '$1', '$2'}.
 maybe_qualified_database -> identifier            : '$1'.
 maybe_qualified_database -> identifier identifier : {qualified_db, '$1', '$2'}.
 
-variable -> var : {var, unwrap('$1')}.
+string -> str : {string, unwrap('$1')}.
 
-variable_list -> variable                     : ['$1'].
-variable_list -> variable comma variable_list : ['$1'|'$3'].
+number -> num : {number, unwrap('$1')}.
+
+variable -> var : {var, unwrap('$1')}.
 
 identifier -> ident : {ident, unwrap('$1')}.
 
@@ -94,12 +94,6 @@ qualified_identifier -> identifier dot identifier : {qualified_ident, '$1', '$3'
 
 maybe_qualified_identifier -> identifier                : '$1'.
 maybe_qualified_identifier -> identifier dot identifier : {qualified_ident, '$1', '$3'}.
-
-stacked_identifier -> identifier with left_paren variable_list right_paren : {with, '$1', '$4'}.
-
-string -> str : {string, unwrap('$1')}.
-
-number -> num : {number, unwrap('$1')}.
 
 eq_op -> equals     : action('$1').
 eq_op -> not_equals : action('$1').

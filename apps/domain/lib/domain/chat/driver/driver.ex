@@ -82,7 +82,7 @@ defmodule Chat.Driver do
          state = %State{},
          {scenarios, databases},
          %Question{
-           type: :B,
+           type: :NP,
            action: action
          },
          {:cart, cart}
