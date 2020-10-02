@@ -325,6 +325,8 @@ defmodule Chat.Language.Interpreter do
     |> Enum.map(&elem(&1, 1))
   end
 
+  defp dump_register({c, nil}), do: {c, nil}
+
   defp dump_register({c, s}) do
     c =
       Memory.all(s)

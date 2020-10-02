@@ -22,10 +22,6 @@ defmodule Chat.Language.StdLib do
     end
   end
 
-  defmodule Failure do
-    defexception message: "std lib failure"
-  end
-
   def functions do
     %{
       LOAD: &load/1,
@@ -63,10 +59,6 @@ defmodule Chat.Language.StdLib do
 
   defp go(%Call{args: [%State{} = s, question]}) do
     %State{s | question: question}
-  end
-
-  defp finish(%Call{args: [%State{processes: []}]}) do
-    raise Failure, message: "empty process queue"
   end
 
   defp finish(

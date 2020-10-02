@@ -159,3 +159,37 @@ defimpl String.Chars, for: Chat.Database do
     |> Enum.join("\n")
   end
 end
+
+defimpl Chat.Language.Memory, for: Chat.Database do
+  alias Chat.Database
+
+  def store(%Database{} = d, _, _), do: d
+
+  def load(%Database{} = d, v) do
+    h =
+      try do
+        Database.header_index(d, v)
+      rescue
+        _ -> nil
+      end
+
+    case h do
+      nil -> :error
+      h -> {:ok, d |> Enum.map(&(Enum.at(&1, h) |> elem(1)))}
+    end
+  end
+
+  def load_many(%Database{} = d, vars) do
+    vars
+    |> Enum.reduce(Map.new(), fn v, acc ->
+      case load(d, v) do
+        {:ok, c} -> Map.put(acc, v, c)
+        :error -> acc
+      end
+    end)
+  end
+
+  def delete(%Database{} = d, _), do: d
+
+  def all(%Database{}), do: Map.new()
+end
