@@ -26,10 +26,6 @@ defmodule Domain.MixProject do
     ]
   end
 
-
-  defp elixirc_paths(:test), do: ["lib","lib/domain/chat"]
-  defp elixirc_paths(_), do: ["lib"]
-
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
@@ -38,7 +34,6 @@ defmodule Domain.MixProject do
       # {:sibling_app_in_umbrella, in_umbrella: true}
       {:ecto_sql, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
-      {:yaml_elixir, "~> 2.4"},
       {:xlsxir, "~> 1.6.4"},
       {:benchee, "~> 1.0", only: :dev}
     ]

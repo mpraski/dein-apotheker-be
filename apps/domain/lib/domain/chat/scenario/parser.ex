@@ -1,16 +1,11 @@
 defmodule Chat.Scenario.Parser do
   alias Chat.Scenario
   alias Chat.Scenario.{Process, Question, Answer}
-
   alias Chat.Language.Parser, as: ProcessParser
 
   @scenario_header ~w[Process Action]
   @process_header ~w[ID Type Query Text Action Output]
   @process_columns length(@process_header)
-
-  defmodule Failure do
-    defexception message: "XLSX parsing failure"
-  end
 
   def parse(scenarios) do
     scenarios
@@ -130,13 +125,7 @@ defmodule Chat.Scenario.Parser do
     String.to_atom(output)
   end
 
-  defp validate_table([h | r], header) do
-    if h == header do
-      r
-    else
-      raise Failure, message: "failed to parse scenario, wrong header #{h}"
-    end
-  end
+  defp validate_table([h | r], header) when h == header, do: r
 
   defp fit(list, length, base \\ nil) do
     delta = length - length(list)
