@@ -15,8 +15,8 @@ defmodule Domain.MixProject do
       erlc_paths: [
         "lib/domain/chat/language/compiler"
       ],
-      test_paths: test_paths(),
-      test_pattern: test_pattern()
+      test_pattern: test_pattern(),
+      test_paths: if(Mix.env() == :test, do: test_paths(), else: [])
     ]
   end
 

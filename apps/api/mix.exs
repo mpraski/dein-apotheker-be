@@ -13,8 +13,9 @@ defmodule Api.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
-      aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      test_pattern: test_pattern(),
+      test_paths: if(Mix.env() == :test, do: test_paths(), else: [])
     ]
   end
 
@@ -46,10 +47,21 @@ defmodule Api.MixProject do
     ]
   end
 
-  # Aliases are shortcuts or tasks specific to the current project.
-  #
-  # See the documentation for `Mix` for more info on aliases.
-  defp aliases do
-    []
+  @test_helper "test_helper.exs"
+
+  def test_pattern, do: "*.test.exs"
+
+  def test_paths(paths \\ [], dir \\ "lib") do
+    File.ls!(dir)
+    |> Enum.reduce(paths, fn file, paths ->
+      file = Path.join(dir, file)
+      base = Path.basename(file)
+
+      cond do
+        File.dir?(file) -> test_paths(paths, file)
+        File.regular?(file) and base == @test_helper -> [dir | paths]
+        true -> paths
+      end
+    end)
   end
 end
