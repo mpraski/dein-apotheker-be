@@ -1,4 +1,4 @@
-defmodule LanguageTest do
+defmodule Chat.Language.Parser.Test do
   use ExUnit.Case, async: true
   doctest Chat.Language.Parser
 
@@ -25,9 +25,9 @@ defmodule LanguageTest do
         headers: [:id],
         id: :Products,
         rows: [
-          [1],
-          [2],
-          [3]
+          ["1"],
+          ["2"],
+          ["3"]
         ]
       }
     ],
@@ -49,9 +49,38 @@ defmodule LanguageTest do
         headers: [:id, :name],
         id: :Products,
         rows: [
-          [1, "Product 1"],
-          [2, "Product 2"],
-          [3, "Product 3"]
+          ["1", "Product 1"],
+          ["2", "Product 2"],
+          ["3", "Product 3"]
+        ]
+      }
+    ],
+    select_all_products_where: [
+      program: "SELECT * FROM Products WHERE id == '2'",
+      expected: Map.get(Chat.databases(), :Products) |> Database.where(:id, "2")
+    ],
+    select_all_brands_where: [
+      program: "SELECT * FROM Brands WHERE id == '2'",
+      expected: Map.get(Chat.databases(), :Brands) |> Database.where(:id, "2")
+    ],
+    select_columns_products_where: [
+      program: "SELECT id, name FROM Products WHERE id == '2'",
+      expected: %Chat.Database{
+        headers: [:id, :name],
+        id: :Products,
+        rows: [
+          ["2", "Product 2"]
+        ]
+      }
+    ],
+    select_columns_products_where_or: [
+      program: "SELECT id, name FROM Products WHERE (id == '2' OR id == '3')",
+      expected: %Chat.Database{
+        headers: [:id, :name],
+        id: :Products,
+        rows: [
+          ["2", "Product 2"],
+          ["3", "Product 3"]
         ]
       }
     ]

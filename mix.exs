@@ -15,7 +15,8 @@ defmodule DeinApotheker.MixProject do
             domain: :permanent
           ]
         ]
-      ]
+      ],
+      preferred_cli_env: [test_all: :test]
     ]
   end
 

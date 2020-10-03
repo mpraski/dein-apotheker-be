@@ -14,7 +14,9 @@ defmodule Domain.MixProject do
       deps: deps(),
       erlc_paths: [
         "lib/domain/chat/language/compiler"
-      ]
+      ],
+      test_paths: test_paths(),
+      test_pattern: test_pattern()
     ]
   end
 
@@ -37,5 +39,25 @@ defmodule Domain.MixProject do
       {:xlsxir, "~> 1.6.4"},
       {:benchee, "~> 1.0", only: :dev}
     ]
+  end
+
+  @test_helper "test_helper.exs"
+
+  def test_pattern, do: "*.test.exs"
+
+  def test_paths(paths \\ [], dir \\ "lib") do
+    File.ls!(dir)
+    |> Enum.reduce(paths, fn file, paths ->
+      file = Path.join(dir, file)
+
+      paths =
+        if File.regular?(file) and Path.basename(file) == @test_helper do
+          [dir | paths]
+        else
+          paths
+        end
+
+      if File.dir?(file), do: test_paths(paths, file), else: paths
+    end)
   end
 end

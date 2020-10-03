@@ -11,7 +11,7 @@ defmodule Chat.Database do
     %__MODULE__{
       id: id,
       headers: headers |> Enum.map(&to_atom/1),
-      rows: rows
+      rows: rows |> Enum.map(&Enum.map(&1, fn r -> to_string(r) end))
     }
   end
 
