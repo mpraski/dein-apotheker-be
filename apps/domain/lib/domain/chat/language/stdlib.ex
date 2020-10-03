@@ -32,6 +32,7 @@ defmodule Chat.Language.StdLib do
       IS_LOADED: &is_loaded/1,
       IS_NEXT: &is_next/1,
       DEFER: &defer/1,
+      SAVE: &save/1,
       TO_TEXT: &to_text/1,
       ROWS: &rows/1,
       COLS: &cols/1,
@@ -46,8 +47,13 @@ defmodule Chat.Language.StdLib do
     %State{s | processes: p ++ [Process.new(proc)]}
   end
 
-  defp load_with(%Call{args: [%State{processes: p} = s, proc | vars]}) do
-    captured = Memory.load_many(s, vars)
+  defp load_with(%Call{args: [%State{processes: p} = s, proc | vars], context: c}) do
+    captured =
+      Map.merge(
+        Memory.load_many(s, vars),
+        Memory.load_many(c, vars)
+      )
+
     %State{s | processes: p ++ [Process.new(proc, captured)]}
   end
 
@@ -80,6 +86,23 @@ defmodule Chat.Language.StdLib do
     action.(%Call{c | args: [%State{s | processes: rest}]})
   end
 
+  defp finish(
+         %Call{
+           args: [
+             %State{
+               processes: [%Process{id: id}],
+               scenarios: [n | _]
+             } = s
+           ],
+           context: %Context{scenarios: scenarios}
+         } = c
+       ) do
+    {:ok, scenario} = Map.fetch(scenarios, n)
+    {:ok, action} = Scenario.action(scenario, id)
+
+    action.(%Call{c | args: [%State{s | processes: []}]})
+  end
+
   defp is_loaded(%Call{args: [%State{processes: ps}, proc]}) do
     case Enum.find(ps, fn %Process{id: i} -> i == proc end) do
       %Process{} -> true
@@ -96,6 +119,11 @@ defmodule Chat.Language.StdLib do
   end
 
   defp defer(%Call{args: [%State{} = s]}), do: s
+
+  defp save(%Call{args: [m, n], context: c}) do
+    {:ok, v} = Memory.load(c, n)
+    Memory.store(m, n, v)
+  end
 
   defp to_text(%Call{args: [_ | args]}) do
     args

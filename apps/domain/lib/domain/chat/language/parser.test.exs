@@ -19,6 +19,10 @@ defmodule Chat.Language.Parser.Test do
       program: "12321",
       expected: 12321
     ],
+    nil_variable: [
+      program: "[undefined]",
+      expected: nil
+    ],
     comp_expression_1: [
       program: "(2 > 1)",
       expected: true
@@ -52,31 +56,31 @@ defmodule Chat.Language.Parser.Test do
       expected: false
     ],
     decl_expression_1: [
-      program: "[v] = 1, [v]",
+      program: "v = 1, [v]",
       expected: 1
     ],
     decl_expression_2: [
-      program: "[v] = 1, [c] = [v], [c]",
+      program: "v = 1, c = [v], [c]",
       expected: 1
     ],
     if_expression_1: [
       program: """
-        [var1] = 'val',
+        var1 = 'val',
         IF ([var1] == 'val') THEN 1 ELSE 2
       """,
       expected: 1
     ],
     if_expression_2: [
       program: """
-        [var1] = 'val',
+        var1 = 'val',
         IF ([var1] != 'val') THEN 1 ELSE 2
       """,
       expected: 2
     ],
     if_expression_3: [
       program: """
-        [var1] = 'val',
-        [var2] = 'val2',
+        var1 = 'val',
+        var2 = 'val2',
         IF (
           ([var1] == 'val2')
           OR
@@ -87,8 +91,8 @@ defmodule Chat.Language.Parser.Test do
     ],
     if_expression_4: [
       program: """
-        [var1] = 'val',
-        [var2] = 'val2',
+        var1 = 'val',
+        var2 = 'val2',
         IF (
           ([var1] == 'val2')
           AND
@@ -99,29 +103,39 @@ defmodule Chat.Language.Parser.Test do
     ],
     if_expression_5: [
       program: """
-        [var1] = 'val',
-        [var2] = 'val2',
+        var1 = 'val',
+        var2 = 'val2',
         IF ([var1] == 'val2') THEN 1
-        ELIF ([var2] == 'val2') THEN 2
-        ELSE 3
+          ELIF ([var2] == 'val2') THEN 2
+          ELSE 3
       """,
       expected: 2
     ],
     if_expression_6: [
       program: """
-        [var1] = 'val',
-        [var2] = 'val3',
+        var1 = 'val',
+        var2 = 'val3',
         IF ([var1] == 'val2') THEN 1
-        ELIF ([var2] == 'val2') THEN 2
-        ELSE 3
+          ELIF ([var2] == 'val2') THEN 2
+          ELSE 3
       """,
       expected: 3
     ],
     for_expr_1: [
       program: """
-      [j] = 0,
-      [l] = LIST(1, 2, 3),
-      FOR [i] IN [l] DO ([j] = ADD([j], [i])),
+      j = 0,
+      FOR i IN LIST(1, 2, 3)
+        DO (j = ADD([j], [i])),
+      [j]
+      """,
+      expected: 6
+    ],
+    for_expr_2: [
+      program: """
+      j = 0,
+      l = LIST(1, 2, 3),
+      FOR i IN [l]
+        DO (j = ADD([j], [i])),
       [j]
       """,
       expected: 6
@@ -309,8 +323,8 @@ defmodule Chat.Language.Parser.Test do
     ],
     select_columns_join_where_brands_variable: [
       program: """
-        [col1] = id,
-        [col2] = 'b.name',
+        col1 = id,
+        col2 = 'b.name',
         SELECT [col1], [col2]
         FROM Products p
         JOIN Brands b ON p.brand_id == b.id
@@ -326,8 +340,8 @@ defmodule Chat.Language.Parser.Test do
     ],
     select_columns_join_where_brands_variable_inverse_order: [
       program: """
-        [col1] = id,
-        [col2] = 'b.name',
+        col1 = id,
+        col2 = 'b.name',
         SELECT [col2], [col1]
         FROM Products p
         JOIN Brands b ON p.brand_id == b.id
@@ -340,6 +354,18 @@ defmodule Chat.Language.Parser.Test do
           ["Brand 2", "2"]
         ]
       }
+    ],
+    select_columns_join_where_brands_to_text: [
+      program: """
+        col2 = 'b.name',
+        prod_id = '2',
+        res = SELECT [col2]
+          FROM Products p
+          JOIN Brands b ON p.brand_id == b.id
+          WHERE p.id == [prod_id],
+        TO_TEXT([res])
+      """,
+      expected: "Brand 2"
     ]
   ]
 

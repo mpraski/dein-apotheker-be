@@ -33,47 +33,35 @@ defmodule Chat.Language.Interpreter do
     end
   end
 
-  defp interpret_expr(data, {:for, {:var, i}, {:var, v}, exprs}) do
-    case fetch(data, v) do
-      {:ok, items} ->
-        {c, s} =
-          Enum.reduce(items, data, fn a, {c, s} ->
-            {Memory.store(c, i, a), s} |> interpret_exprs(exprs)
-          end)
+  defp interpret_expr(data, {:for, {:ident, i}, expr, exprs}) do
+    {_, e} = data |> interpret_expr(expr)
 
-        {Memory.delete(c, i), s}
+    {c, s} =
+      Enum.reduce(e, data, fn a, {c, s} ->
+        {Memory.store(c, i, a), s} |> interpret_exprs(exprs)
+      end)
 
-      _ ->
-        data
-    end
+    {Memory.delete(c, i), s}
   end
 
   defp interpret_expr(data, {:call, {:ident, f}, args}) do
     data |> call_func(f, args)
   end
 
-  defp interpret_expr({c, r} = d, {:assign, {:var, v}, expr}) do
+  defp interpret_expr({c, r} = d, {:assign, name, expr}) do
+    {_, n} = d |> interpret_expr(name)
     {_, e} = d |> interpret_expr(expr)
-    {Memory.store(c, v, e), r}
+
+    {Memory.store(c, n, e), r}
   end
 
   defp interpret_expr({c, _}, {:ident, i}) when is_atom(i), do: {c, i}
 
-  defp interpret_expr({c, _} = data, {:with, i, w}) do
-    {_, i} = data |> interpret_expr(i)
-
-    vars = Enum.map(w, &elem(&1, 1))
-
-    {c, {i, vars}}
-  end
-
-  defp interpret_expr({c, s}, {:var, v}) when is_atom(v) do
-    {c, Map.merge(Memory.all(s), Memory.all(c)) |> Map.get(v)}
-  end
-
   defp interpret_expr({c, _}, {:string, s}) when is_list(s), do: {c, to_string(s)}
 
   defp interpret_expr({c, _}, {:number, n}) when is_integer(n), do: {c, n}
+
+  defp interpret_expr({c, _} = d, {:var, v}) when is_atom(v), do: {c, get(d, v)}
 
   defp interpret_expr({c, _}, {:qualified_db, {:ident, d}, {:ident, n}}) do
     {c, {:qualified_db, d, n}}
@@ -325,8 +313,8 @@ defmodule Chat.Language.Interpreter do
     |> Enum.map(&elem(&1, 1))
   end
 
-  defp fetch({c, s}, v) do
-    Map.merge(Memory.all(s), Memory.all(c)) |> Map.fetch(v)
+  defp get({c, s}, v) do
+    Map.merge(Memory.all(s), Memory.all(c)) |> Map.get(v)
   end
 
   defp dump_register({c, s}) do
