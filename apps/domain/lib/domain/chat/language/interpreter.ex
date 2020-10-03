@@ -33,7 +33,8 @@ defmodule Chat.Language.Interpreter do
     end
   end
 
-  defp interpret_expr(data, {:for, {:ident, i}, expr, exprs}) do
+  defp interpret_expr(data, {:for, iter, expr, exprs}) do
+    {_, i} = data |> interpret_expr(iter)
     {_, e} = data |> interpret_expr(expr)
 
     {c, s} =
@@ -44,7 +45,9 @@ defmodule Chat.Language.Interpreter do
     {Memory.delete(c, i), s}
   end
 
-  defp interpret_expr(data, {:call, {:ident, f}, args}) do
+  defp interpret_expr(data, {:call, func, args}) do
+    {_, f} = data |> interpret_expr(func)
+
     data |> call_func(f, args)
   end
 
