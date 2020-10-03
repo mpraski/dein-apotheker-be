@@ -27,15 +27,13 @@ defmodule Mix.Tasks.TestAll do
     File.ls!(dir)
     |> Enum.reduce(paths, fn file, paths ->
       file = Path.join(dir, file)
+      base = Path.basename(file)
 
-      paths =
-        if File.regular?(file) and String.match?(Path.basename(file), @test_file) do
-          MapSet.put(paths, dir)
-        else
-          paths
-        end
-
-      if File.dir?(file), do: test_path_candidates(paths, file), else: paths
+      cond do
+        File.dir?(file) -> test_path_candidates(paths, file)
+        String.match?(base, @test_file) -> MapSet.put(paths, dir)
+        true -> paths
+      end
     end)
   end
 end
