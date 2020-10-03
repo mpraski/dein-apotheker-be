@@ -49,15 +49,13 @@ defmodule Domain.MixProject do
     File.ls!(dir)
     |> Enum.reduce(paths, fn file, paths ->
       file = Path.join(dir, file)
+      base = Path.basename(file)
 
-      paths =
-        if File.regular?(file) and Path.basename(file) == @test_helper do
-          [dir | paths]
-        else
-          paths
-        end
-
-      if File.dir?(file), do: test_paths(paths, file), else: paths
+      cond do
+        File.dir?(file) -> test_paths(paths, file)
+        File.regular?(file) and base == @test_helper -> [dir | paths]
+        true -> paths
+      end
     end)
   end
 end

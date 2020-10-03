@@ -10,17 +10,11 @@ defmodule Mix.Tasks.TestAll do
   def run(_) do
     paths = test_path_candidates()
 
-    paths
-    |> Stream.map(&Path.join(&1, @test_helper))
-    |> Stream.filter(&(!File.exists?(&1)))
-    |> Enum.each(&File.write!(&1, @test_helper_contents))
+    paths |> add_helpers()
 
     Mix.Task.run(@test)
 
-    paths
-    |> Stream.map(&Path.join(&1, @test_helper))
-    |> Stream.filter(&File.exists?/1)
-    |> Enum.each(&File.rm!/1)
+    paths |> clean_helpers()
   end
 
   defp test_path_candidates(paths \\ MapSet.new(), dir \\ ".") do
@@ -35,5 +29,19 @@ defmodule Mix.Tasks.TestAll do
         true -> paths
       end
     end)
+  end
+
+  defp clean_helpers(paths) do
+    paths
+    |> Stream.map(&Path.join(&1, @test_helper))
+    |> Stream.filter(&File.exists?/1)
+    |> Enum.each(&File.rm!/1)
+  end
+
+  defp add_helpers(paths) do
+    paths
+    |> Stream.map(&Path.join(&1, @test_helper))
+    |> Stream.filter(&(!File.exists?(&1)))
+    |> Enum.each(&File.write!(&1, @test_helper_contents))
   end
 end

@@ -33,8 +33,8 @@ defmodule Chat.Language.Interpreter do
     end
   end
 
-  defp interpret_expr({_, s} = data, {:for, {:var, i}, {:var, v}, exprs}) do
-    case Memory.load(s, v) do
+  defp interpret_expr(data, {:for, {:var, i}, {:var, v}, exprs}) do
+    case fetch(data, v) do
       {:ok, items} ->
         {c, s} =
           Enum.reduce(items, data, fn a, {c, s} ->
@@ -325,7 +325,9 @@ defmodule Chat.Language.Interpreter do
     |> Enum.map(&elem(&1, 1))
   end
 
-  defp dump_register({c, nil}), do: {c, nil}
+  defp fetch({c, s}, v) do
+    Map.merge(Memory.all(s), Memory.all(c)) |> Map.fetch(v)
+  end
 
   defp dump_register({c, s}) do
     c =

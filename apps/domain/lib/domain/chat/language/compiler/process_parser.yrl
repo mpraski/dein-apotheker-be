@@ -22,17 +22,17 @@ expr_list -> expr comma expr_list : ['$1'|'$3'].
 exprs_paren -> expr                             : ['$1'].
 exprs_paren -> left_paren expr_list right_paren :  '$2'.
 
-expr -> logical_expr       : '$1'.
-expr -> comp_expr          : '$1'.
-expr -> function_expr      : '$1'.
-expr -> decl_expr          : '$1'.
-expr -> if_expr            : '$1'.
-expr -> for_expr           : '$1'.
-expr -> select_expr        : '$1'.
-expr -> identifier         : '$1'.
-expr -> variable           : '$1'.
-expr -> string             : '$1'.
-expr -> number             : '$1'.
+expr -> logical_expr  : '$1'.
+expr -> comp_expr     : '$1'.
+expr -> function_expr : '$1'.
+expr -> decl_expr     : '$1'.
+expr -> if_expr       : '$1'.
+expr -> for_expr      : '$1'.
+expr -> select_expr   : '$1'.
+expr -> identifier    : '$1'.
+expr -> variable      : '$1'.
+expr -> string        : '$1'.
+expr -> number        : '$1'.
 
 logical_expr -> left_paren expr logical_op expr right_paren : {'$3', '$2', '$4'}.
 

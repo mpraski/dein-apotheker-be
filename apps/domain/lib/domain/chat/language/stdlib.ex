@@ -36,6 +36,8 @@ defmodule Chat.Language.StdLib do
       ROWS: &rows/1,
       COLS: &cols/1,
       SIZE: &size/1,
+      LIST: &list/1,
+      ADD: &add/1,
       MATCH: &match/1
     }
   end
@@ -108,6 +110,10 @@ defmodule Chat.Language.StdLib do
   defp rows(%Call{args: [_, db]}), do: Database.height(db)
 
   defp cols(%Call{args: [_, db]}), do: Database.width(db)
+
+  defp add(%Call{args: [_, a, b]}), do: a + b
+
+  defp list(%Call{args: [_ | items]}), do: items
 
   defp match(%Call{}), do: nil
 end

@@ -1,4 +1,6 @@
 defprotocol Chat.Language.Memory do
+  @fallback_to_any true
+
   @spec store(__MODULE__.t(), atom(), any()) :: __MODULE__.t()
   def store(impl, name, value)
 

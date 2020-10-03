@@ -23,12 +23,12 @@ defmodule Chat.Database do
     }
   end
 
-  def where(%__MODULE__{id: id} = db, column, value) do
+  def where(%__MODULE__{id: id, headers: hs} = db, column, value) do
     idx = header_index(db, column)
 
     predicate = &(Enum.at(&1, idx) |> elem(1) == value)
 
-    db |> Enum.filter(predicate) |> Enum.into(__MODULE__.new(id))
+    db |> Enum.filter(predicate) |> Enum.into(__MODULE__.new(id, [hs]))
   end
 
   def union(
@@ -38,6 +38,22 @@ defmodule Chat.Database do
     __MODULE__.new(id, [h | r1 ++ r2])
   end
 
+  def union(
+        %__MODULE__{id: id, headers: h, rows: r},
+        %__MODULE__{id: id, headers: h, rows: []}
+      )
+      when length(r) > 0 do
+    __MODULE__.new(id, [h | r])
+  end
+
+  def union(
+        %__MODULE__{id: id, headers: h, rows: []},
+        %__MODULE__{id: id, headers: h, rows: r}
+      )
+      when length(r) > 0 do
+    __MODULE__.new(id, [h | r])
+  end
+
   def intersection(
         %__MODULE__{id: id, headers: h, rows: r1},
         %__MODULE__{id: id, headers: h, rows: r2}
@@ -45,18 +61,38 @@ defmodule Chat.Database do
     __MODULE__.new(id, [h | r1 -- r1 -- r2])
   end
 
+  def intersection(
+        %__MODULE__{id: id, headers: h},
+        %__MODULE__{id: id, headers: []}
+      )
+      when length(h) > 0 do
+    __MODULE__.new(id, [h | []])
+  end
+
+  def intersection(
+        %__MODULE__{id: id, headers: []},
+        %__MODULE__{id: id, headers: h}
+      )
+      when length(h) > 0 do
+    __MODULE__.new(id, [h | []])
+  end
+
   def join(
-        %__MODULE__{id: id} = db1,
-        %__MODULE__{} = db2,
+        %__MODULE__{id: id, headers: hs1} = db1,
+        %__MODULE__{headers: hs2} = db2,
         col1,
         col2,
         prefix,
         pred
       ) do
+    prefixer = &:"#{prefix}.#{&1}"
+
     h1 = __MODULE__.header_index(db1, col1)
     h2 = __MODULE__.header_index(db2, col2)
 
-    prefixer = fn {k, v} -> {:"#{prefix}.#{k}", v} end
+    del_idx = __MODULE__.width(db1) + h2
+
+    hs = (hs1 ++ Enum.map(hs2, prefixer)) |> List.delete_at(del_idx)
 
     db1
     |> Enum.flat_map(fn r1 ->
@@ -65,11 +101,12 @@ defmodule Chat.Database do
         v1 = Enum.at(r1, h1) |> elem(1)
         v2 = Enum.at(r2, h2) |> elem(1)
 
-        if pred.(v1, v2), do: r1 ++ Enum.map(r2, prefixer), else: []
+        if pred.(v1, v2), do: r1 ++ Enum.map(r2, fn {k, v} -> {prefixer.(k), v} end), else: []
       end)
     end)
-    |> Enum.map(&List.delete_at(&1, __MODULE__.width(db1) + h2))
-    |> Enum.into(__MODULE__.new(id))
+    |> Enum.filter(&(!Enum.empty?(&1)))
+    |> Enum.map(&List.delete_at(&1, del_idx))
+    |> Enum.into(__MODULE__.new(id, [hs]))
   end
 
   def width(%__MODULE__{headers: headers}), do: length(headers)
