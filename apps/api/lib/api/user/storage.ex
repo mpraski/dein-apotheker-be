@@ -2,6 +2,7 @@ defmodule Api.User.Storage do
   @cache :user_cache
 
   alias Api.User
+  alias Chat.State
 
   def spec do
     {ConCache,
@@ -16,8 +17,8 @@ defmodule Api.User.Storage do
     ConCache.get(@cache, user_id)
   end
 
-  def put(%User{id: id} = u) do
-    ConCache.put(@cache, id, u)
+  def put(%User{id: id, state: s} = u) do
+    ConCache.put(@cache, id, %User{u | state: %State{s | message: nil}})
   end
 
   def ttl do
