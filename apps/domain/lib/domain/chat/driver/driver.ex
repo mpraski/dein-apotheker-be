@@ -22,6 +22,7 @@ defmodule Chat.Driver do
 
     state
     |> answer(data, question, answer)
+    |> State.generate_id()
     |> Enhancer.enhance(data)
   end
 
@@ -113,6 +114,7 @@ defmodule Chat.Driver do
       [StateProcess.new(pid)],
       %{cart: []}
     )
+    |> State.generate_id()
     |> Enhancer.enhance(data)
   end
 end

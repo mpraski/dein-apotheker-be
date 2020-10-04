@@ -3,9 +3,10 @@ defmodule Chat.State do
 
   use TypedStruct
 
-  @derive {Jason.Encoder, only: [:message, :variables]}
+  @derive {Jason.Encoder, only: [:id, :message, :variables]}
 
   typedstruct do
+    field(:id, binary(), enforce: true, defautl: nil)
     field(:question, atom(), enforce: true)
     field(:message, Message.t(), default: nil)
     field(:scenarios, list(atom()), enforce: true, default: [])
@@ -19,12 +20,17 @@ defmodule Chat.State do
 
   def new(question, scenarios, processes, variables \\ %{}) do
     %__MODULE__{
+      id: nil,
+      message: nil,
       question: question,
       scenarios: scenarios,
       processes: processes,
-      variables: variables,
-      message: nil
+      variables: variables
     }
+  end
+
+  def generate_id(%__MODULE__{} = s) do
+    %__MODULE__{s | id: UUID.uuid4()}
   end
 
   def scenario(%__MODULE__{scenarios: [s | _]}), do: s

@@ -6,21 +6,13 @@ defmodule Api.ChatController do
   alias Api.User.Token
   alias Api.User.Journeys
   alias Api.FallbackController
-  alias Chat.State
   alias Chat.Driver
 
   plug(Api.User.Plug)
 
   action_fallback(FallbackController)
 
-  def answer(
-        %Conn{
-          body_params: %{
-            "answer" => answer
-          }
-        } = conn,
-        _params
-      ) do
+  def answer(%Conn{} = conn, answer) do
     if conn.assigns.has_journey? do
       with_journey(conn, answer)
     else
@@ -33,15 +25,11 @@ defmodule Api.ChatController do
   end
 
   defp with_journey(conn, answer) do
-    %User{} = user = conn.assigns.user
-    %State{} = state = conn.assigns.state
+    user = conn.assigns.user
+    state = conn.assigns.state
+    context = {Chat.scenarios(), Chat.databases()}
 
-    state =
-      state
-      |> Driver.next(
-        {Chat.scenarios(), Chat.databases()},
-        answer
-      )
+    state = state |> Driver.next(context, answer)
 
     user |> Journeys.progress(state)
 

@@ -9,18 +9,18 @@ defmodule Api.User.Journeys do
 
     typedstruct do
       field(:user, User.t(), enforce: true)
-      field(:states, list(State.t()), enforce: true)
+      field(:states, map(), enforce: true)
     end
 
-    def new(user, state) do
+    def new(user, %State{id: id} = state) do
       %__MODULE__{
         user: user,
-        states: [state]
+        states: %{id => state}
       }
     end
 
-    def add(%__MODULE__{states: ss} = j, %State{} = s) do
-      %__MODULE__{j | states: [s | ss]}
+    def add(%__MODULE__{states: ss} = j, %State{id: id} = s) do
+      %__MODULE__{j | states: Map.put(ss, id, s)}
     end
   end
 
@@ -41,17 +41,6 @@ defmodule Api.User.Journeys do
     ConCache.update(@cache, id, fn
       nil -> {:ok, Journey.new(u, s)}
       journey -> {:ok, Journey.add(journey, s)}
-    end)
-  end
-
-  def regress(%User{id: id}, steps) do
-    ConCache.isolated(@cache, id, fn ->
-      ConCache.update_existing(@cache, id, fn %Journey{states: states} = j ->
-        a = max(length(states) - 1, steps)
-        %Journey{j | states: Enum.drop(states, a)}
-      end)
-
-      ConCache.get(@cache, id)
     end)
   end
 
