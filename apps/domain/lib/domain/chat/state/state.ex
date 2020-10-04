@@ -3,7 +3,7 @@ defmodule Chat.State do
 
   use TypedStruct
 
-  @derive Jason.Encoder
+  @derive {Jason.Encoder, only: [:message, :variables]}
 
   typedstruct do
     field(:question, atom(), enforce: true)

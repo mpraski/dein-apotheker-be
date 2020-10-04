@@ -1,11 +1,16 @@
 defmodule Api.Endpoint do
   use Phoenix.Endpoint, otp_app: :api
 
+  alias Api.User.Storage
+
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
   @session_options [
     store: :cookie,
+    secure: true,
+    http_only: true,
+    max_age: Storage.ttl(),
     key: "_api_key",
     signing_salt: "Q+aBTFr8"
   ]
@@ -25,10 +30,11 @@ defmodule Api.Endpoint do
     json_decoder: Phoenix.json_library()
   )
 
-  plug(Api.Plugs.HealthCheck)
+  plug(Api.HealthCheck.Plug)
   plug(Plug.MethodOverride)
   plug(Plug.Head)
   plug(Plug.Session, @session_options)
+  plug(:fetch_session)
   plug(Corsica, origins: "*", allow_headers: :all)
   plug(Api.Router)
 end

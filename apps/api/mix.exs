@@ -38,11 +38,12 @@ defmodule Api.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.4.15"},
-      {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.0"},
+      {:phoenix, "~> 1.5"},
+      {:jason, "~> 1.2"},
+      {:plug_cowboy, "~> 2.1"},
       {:elixir_uuid, "~> 1.2"},
-      {:corsica, "~> 1.0"},
+      {:corsica, "~> 1.1"},
+      {:con_cache, "~> 0.14.0"},
       {:domain, in_umbrella: true}
     ]
   end

@@ -4,13 +4,15 @@ defmodule Chat.State.Message do
   @derive Jason.Encoder
 
   typedstruct do
+    field(:question, atom(), enforce: true)
     field(:type, atom(), enforce: true)
     field(:text, binary(), enforce: true, default: "")
-    field(:input, map(), enforce: true, default: Map.new())
+    field(:input, any(), enforce: true, default: nil)
   end
 
-  def new(type, text, input \\ %{}) do
+  def new(question, type, text, input \\ nil) do
     %__MODULE__{
+      question: question,
       type: decode_type(type),
       text: text,
       input: input

@@ -29,8 +29,9 @@ defmodule Chat.Driver do
          state = %State{},
          {scenarios, databases},
          question = %Question{type: :Q, output: name_output},
-         {:single, answer}
-       ) do
+         answer
+       )
+       when is_binary(answer) do
     {:ok, %Answer{action: a, output: o}} =
       Question.answer(question, String.to_existing_atom(answer))
 
@@ -40,7 +41,7 @@ defmodule Chat.Driver do
     )
   end
 
-  defp answer(state = %State{}, _, %Question{type: :C}, {:comment, "ok"}) do
+  defp answer(state = %State{}, _, %Question{type: :C}, "ok") do
     {:ok, previous} = Memory.load(state, :previous_question)
 
     %State{state | question: previous}
@@ -54,8 +55,9 @@ defmodule Chat.Driver do
            action: action,
            output: output
          },
-         {:free, text}
-       ) do
+         text
+       )
+       when is_binary(text) do
     action.(
       Context.new(scenarios, databases),
       Memory.store(state, output, text)
@@ -70,8 +72,9 @@ defmodule Chat.Driver do
            action: action,
            output: output
          },
-         {:selection, selection}
-       ) do
+         selection
+       )
+       when is_list(selection) do
     action.(
       Context.new(scenarios, databases),
       Memory.store(state, output, selection)
@@ -85,8 +88,9 @@ defmodule Chat.Driver do
            type: :NP,
            action: action
          },
-         {:cart, cart}
-       ) do
+         cart
+       )
+       when is_list(cart) do
     {:ok, items} = state |> Memory.load(State.cart())
 
     items = (items ++ cart) |> Enum.uniq()
@@ -103,6 +107,12 @@ defmodule Chat.Driver do
     {:ok, %Process{id: pid} = p} = Scenario.entry(cough)
     {:ok, %Question{id: qid}} = Process.entry(p)
 
-    State.new(qid, [@cough], [StateProcess.new(pid)]) |> Enhancer.enhance(data)
+    State.new(
+      qid,
+      [@cough],
+      [StateProcess.new(pid)],
+      %{cart: []}
+    )
+    |> Enhancer.enhance(data)
   end
 end

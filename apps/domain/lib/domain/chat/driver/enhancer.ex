@@ -27,6 +27,7 @@ defmodule Chat.Driver.Enhancer do
 
   defp create_message(
          %Question{
+           id: id,
            type: :Q,
            text: text,
            answers: answers
@@ -35,13 +36,12 @@ defmodule Chat.Driver.Enhancer do
        ) do
     text = Text.render(text, data)
 
-    input = %{answers: answers_input(answers, data)}
-
-    Message.new(:Q, text, input)
+    Message.new(id, :Q, text, answers_input(answers, data))
   end
 
   defp create_message(
          %Question{
+           id: id,
            type: type,
            text: text,
            query: query
@@ -56,11 +56,12 @@ defmodule Chat.Driver.Enhancer do
 
     text = Text.render(text, data)
 
-    Message.new(type, text, input)
+    Message.new(id, type, text, input)
   end
 
   defp create_message(
          %Question{
+           id: id,
            type: :P,
            text: text,
            query: query
@@ -74,20 +75,19 @@ defmodule Chat.Driver.Enhancer do
 
     text = Text.render(text, data)
 
-    input = %{product: product}
-
-    Message.new(:P, text, input)
+    Message.new(id, :P, text, product)
   end
 
   defp create_message(
          %Question{
+           id: id,
            type: type,
            text: text
          },
          data
        )
        when type in ~w[C F]a do
-    Message.new(type, Text.render(text, data))
+    Message.new(id, type, Text.render(text, data))
   end
 
   defp answers_input(answers, data) do

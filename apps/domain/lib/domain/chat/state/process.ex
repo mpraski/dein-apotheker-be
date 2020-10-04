@@ -1,8 +1,6 @@
 defmodule Chat.State.Process do
   use TypedStruct
 
-  @derive Jason.Encoder
-
   typedstruct do
     field(:id, atom(), enforce: true)
     field(:variables, map(), enforce: true, default: Map.new())

@@ -1,11 +1,12 @@
-defmodule Api.Plugs.HealthCheck do
+defmodule Api.HealthCheck.Plug do
   @moduledoc """
-  Plug for routing health check requests 
+  Plug for routing health check requests
   """
+
+  import Plug.Conn
 
   alias Api.HealthCheck
 
-  import Plug.Conn
   @behaviour Plug
 
   def init(_params) do
@@ -23,10 +24,7 @@ defmodule Api.Plugs.HealthCheck do
     |> halt()
   end
 
-  # nope, not for us, pass it down the chain.
   def call(conn, _opts), do: conn
-
-  # Private
 
   defp code(r) do
     case r do

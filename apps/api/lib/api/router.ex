@@ -14,7 +14,6 @@ defmodule Api.Router do
     pipe_through(:api)
 
     post("/answer", ChatController, :answer)
-    post("/token", TokenController, :token)
   end
 
   def handle_errors(conn, %{kind: _kind, reason: _reason, stack: _stack}) do
