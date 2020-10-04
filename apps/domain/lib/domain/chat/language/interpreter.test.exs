@@ -1,6 +1,6 @@
-defmodule Chat.Language.Parser.Test do
+defmodule Chat.Language.Interpreter.Test do
   use ExUnit.Case, async: true
-  doctest Chat.Language.Parser
+  doctest Chat.Language.Interpreter
 
   alias Chat.Database
   alias Chat.Language.Parser

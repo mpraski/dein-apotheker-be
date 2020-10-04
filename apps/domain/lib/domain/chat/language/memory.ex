@@ -28,3 +28,18 @@ defimpl Chat.Language.Memory, for: Any do
 
   def all(_), do: Map.new()
 end
+
+defimpl Chat.Language.Memory, for: Map do
+  def store(m, k, v), do: Map.put(m, k, v)
+
+  def load(m, k), do: Map.fetch(m, k)
+
+  def load_many(m, ks) do
+    {m, _} = Map.split(m, ks)
+    m
+  end
+
+  def delete(m, k), do: Map.delete(m, k)
+
+  def all(m), do: m
+end

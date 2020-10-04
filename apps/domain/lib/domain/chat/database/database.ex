@@ -38,43 +38,11 @@ defmodule Chat.Database do
     __MODULE__.new(id, [h | r1 ++ r2])
   end
 
-  def union(
-        %__MODULE__{id: id, headers: h, rows: r},
-        %__MODULE__{id: id, headers: h, rows: []}
-      )
-      when length(r) > 0 do
-    __MODULE__.new(id, [h | r])
-  end
-
-  def union(
-        %__MODULE__{id: id, headers: h, rows: []},
-        %__MODULE__{id: id, headers: h, rows: r}
-      )
-      when length(r) > 0 do
-    __MODULE__.new(id, [h | r])
-  end
-
   def intersection(
         %__MODULE__{id: id, headers: h, rows: r1},
         %__MODULE__{id: id, headers: h, rows: r2}
       ) do
     __MODULE__.new(id, [h | r1 -- r1 -- r2])
-  end
-
-  def intersection(
-        %__MODULE__{id: id, headers: h},
-        %__MODULE__{id: id, headers: []}
-      )
-      when length(h) > 0 do
-    __MODULE__.new(id, [h | []])
-  end
-
-  def intersection(
-        %__MODULE__{id: id, headers: []},
-        %__MODULE__{id: id, headers: h}
-      )
-      when length(h) > 0 do
-    __MODULE__.new(id, [h | []])
   end
 
   def join(
@@ -101,10 +69,12 @@ defmodule Chat.Database do
         v1 = Enum.at(r1, h1) |> elem(1)
         v2 = Enum.at(r2, h2) |> elem(1)
 
-        if pred.(v1, v2), do: r1 ++ Enum.map(r2, fn {k, v} -> {prefixer.(k), v} end), else: []
+        namer = fn {k, v} -> {prefixer.(k), v} end
+
+        if pred.(v1, v2), do: r1 ++ Enum.map(r2, namer), else: []
       end)
+      |> Enum.filter(&(!Enum.empty?(&1)))
     end)
-    |> Enum.filter(&(!Enum.empty?(&1)))
     |> Enum.map(&List.delete_at(&1, del_idx))
     |> Enum.into(__MODULE__.new(id, [hs]))
   end
