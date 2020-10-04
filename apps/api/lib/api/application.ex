@@ -6,13 +6,13 @@ defmodule Api.Application do
   use Application
 
   alias Api.Endpoint
-  alias Api.User.Storage
+  alias Api.User.Journeys
 
   def start(_type, _args) do
     {:ok, _} = Application.ensure_all_started(:domain)
 
     children = [
-      Storage.spec(),
+      Journeys.spec(),
       Endpoint
     ]
 

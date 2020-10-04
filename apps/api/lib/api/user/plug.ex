@@ -2,12 +2,13 @@ defmodule Api.User.Plug do
   import Plug.Conn
 
   alias Plug.Conn
-  alias Api.User.Storage
   alias Api.User.Token
+  alias Api.User.Journeys
+  alias Api.User.Journeys.Journey
 
   @state :state
-  @has_user :has_user?
-  @user_token :user_token
+  @user :user
+  @has_journey :has_journey?
 
   def init(_params) do
   end
@@ -15,25 +16,26 @@ defmodule Api.User.Plug do
   def call(%Conn{} = conn, _params) do
     user_id =
       conn
-      |> get_session(@user_token)
+      |> get_session(:user_token)
       |> Token.verify()
 
     case user_id do
       nil ->
-        conn |> assign(@has_user, false)
+        conn |> assign(@has_journey, false)
 
       {:error, _} ->
-        conn |> assign(@has_user, false)
+        conn |> assign(@has_journey, false)
 
       {:ok, user_id} ->
-        case Storage.get(user_id) do
+        case Journeys.get(user_id) do
           nil ->
-            conn |> assign(@has_user, false)
+            conn |> assign(@has_journey, false)
 
-          state ->
+          %Journey{user: u, states: [s | _]} ->
             conn
-            |> assign(@state, state)
-            |> assign(@has_user, true)
+            |> assign(@user, u)
+            |> assign(@state, s)
+            |> assign(@has_journey, true)
         end
     end
   end

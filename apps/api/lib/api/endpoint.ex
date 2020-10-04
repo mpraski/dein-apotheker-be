@@ -1,7 +1,7 @@
 defmodule Api.Endpoint do
   use Phoenix.Endpoint, otp_app: :api
 
-  alias Api.User.Storage
+  alias Api.User.Journeys
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
@@ -10,7 +10,7 @@ defmodule Api.Endpoint do
     store: :cookie,
     secure: true,
     http_only: true,
-    max_age: Storage.ttl(),
+    max_age: Journeys.ttl(),
     key: "_api_key",
     signing_salt: "Q+aBTFr8"
   ]
