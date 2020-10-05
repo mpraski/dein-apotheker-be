@@ -1,14 +1,11 @@
 defmodule Chat.State do
-  alias Chat.State.{Process, Message}
+  alias Chat.State.Process
 
   use TypedStruct
-
-  @derive {Jason.Encoder, only: [:id, :message, :variables]}
 
   typedstruct do
     field(:id, binary(), enforce: true, defautl: nil)
     field(:question, atom(), enforce: true)
-    field(:message, Message.t(), default: nil)
     field(:scenarios, list(atom()), enforce: true, default: [])
     field(:processes, list(Process.t()), enforce: true, default: [])
     field(:variables, map(), enforce: true, default: Map.new())
@@ -21,7 +18,6 @@ defmodule Chat.State do
   def new(question, scenarios, processes, variables \\ %{}) do
     %__MODULE__{
       id: nil,
-      message: nil,
       question: question,
       scenarios: scenarios,
       processes: processes,

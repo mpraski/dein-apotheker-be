@@ -5,7 +5,6 @@ defmodule Chat.Driver do
   alias Chat.State.Process, as: StateProcess
   alias Chat.Language.Memory
   alias Chat.Language.Context
-  alias Chat.Driver.Enhancer
 
   def next(
         %State{
@@ -23,7 +22,6 @@ defmodule Chat.Driver do
     state
     |> answer(data, question, answer)
     |> State.generate_id()
-    |> Enhancer.enhance(data)
   end
 
   defp answer(
@@ -103,7 +101,7 @@ defmodule Chat.Driver do
 
   @cough :cough
 
-  def initial({scenarios, _} = data) do
+  def initial({scenarios, _}) do
     {:ok, cough} = Map.fetch(scenarios, @cough)
     {:ok, %Process{id: pid} = p} = Scenario.entry(cough)
     {:ok, %Question{id: qid}} = Process.entry(p)
@@ -115,6 +113,5 @@ defmodule Chat.Driver do
       %{cart: []}
     )
     |> State.generate_id()
-    |> Enhancer.enhance(data)
   end
 end

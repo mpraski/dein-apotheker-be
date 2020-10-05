@@ -1,9 +1,9 @@
 defmodule Api.User.Sessions do
-  @cache :user_cache
-
   alias Api.User
   alias Api.User.Session
   alias Chat.State
+
+  @cache :user_cache
 
   def spec do
     {ConCache,

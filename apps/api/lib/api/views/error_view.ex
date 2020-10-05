@@ -17,6 +17,4 @@ defmodule Api.ErrorView do
   def render("server.json", _), do: %{error: "Something went wrong"}
 
   def render("api.json", %{error: error}), do: %{error: error}
-
-  def render("missing_token.json", _), do: %{error: "Token missing"}
 end

@@ -1,15 +1,17 @@
-defmodule Chat.Driver.Enhancer do
+defmodule Api.Chat.Presenter do
   alias Chat.State
   alias Chat.State.Process, as: StateProcess
   alias Chat.Scenario
   alias Chat.Scenario.{Process, Question, Answer, Text}
   alias Chat.Database
-  alias Chat.State.Message
-  alias Chat.Language.Memory
   alias Chat.Language.Context
 
-  def enhance(
+  alias Api.Chat.Message
+  alias Api.Chat.State, as: Representation
+
+  def present(
         state = %State{
+          id: id,
           question: question,
           scenarios: [scenario | _],
           processes: [%StateProcess{id: process} | _]
@@ -22,7 +24,7 @@ defmodule Chat.Driver.Enhancer do
 
     message = question |> create_message({state, scenarios, databases})
 
-    %State{state | message: message} |> save_question()
+    Representation.new(id, message)
   end
 
   defp create_message(
@@ -105,9 +107,5 @@ defmodule Chat.Driver.Enhancer do
       database: id,
       rows: Enum.to_list(db)
     }
-  end
-
-  defp save_question(%State{question: question} = state) do
-    state |> Memory.store(:previous_question, question)
   end
 end
