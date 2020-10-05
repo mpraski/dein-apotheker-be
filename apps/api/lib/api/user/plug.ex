@@ -3,48 +3,24 @@ defmodule Api.User.Plug do
 
   alias Plug.Conn
   alias Api.User.Token
-  alias Api.User.Journeys
-  alias Api.User.Journeys.Journey
-
-  @has_journey :has_journey?
-  @state :state
-  @user :user
+  alias Api.User.Session
+  alias Api.User.Sessions
 
   def init(_params) do
   end
 
-  def call(
-        %Conn{
-          body_params: %{
-            "state" => state,
-            "answer" => answer
-          }
-        } = conn,
-        _params
-      ) do
-    user_id =
-      conn
-      |> get_session(:user_token)
-      |> Token.verify()
+  def call(%Conn{} = conn, _params) do
+    token = conn |> get_session(:user_token)
 
-    conn =
-      %Conn{conn | params: answer}
-      |> assign(@has_journey, false)
+    conn = conn |> assign(:has_session?, false)
 
-    case user_id do
+    case Token.verify(token) do
       {:ok, user_id} ->
-        case Journeys.get(user_id) do
-          %Journey{user: u, states: ss} ->
-            case Map.fetch(ss, state) do
-              {:ok, s} ->
-                conn
-                |> assign(@user, u)
-                |> assign(@state, s)
-                |> assign(@has_journey, true)
-
-              :error ->
-                conn
-            end
+        case Sessions.get(user_id) do
+          %Session{} = s ->
+            conn
+            |> assign(:session, s)
+            |> assign(:has_session?, true)
 
           _ ->
             conn

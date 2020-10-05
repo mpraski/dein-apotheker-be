@@ -4,7 +4,8 @@ defmodule Api.ChatController do
   alias Plug.Conn
   alias Api.User
   alias Api.User.Token
-  alias Api.User.Journeys
+  alias Api.User.Session
+  alias Api.User.Sessions
   alias Api.FallbackController
   alias Chat.Driver
 
@@ -12,11 +13,19 @@ defmodule Api.ChatController do
 
   action_fallback(FallbackController)
 
-  def answer(%Conn{} = conn, answer) do
-    if conn.assigns.has_journey? do
-      with_journey(conn, answer)
+  def answer(
+        %Conn{
+          body_params: %{
+            "state" => state,
+            "answer" => answer
+          }
+        } = conn,
+        _params
+      ) do
+    if conn.assigns.has_session? do
+      conn |> with_session(state, answer)
     else
-      without_journey(conn)
+      conn |> without_session()
     end
   end
 
@@ -24,19 +33,36 @@ defmodule Api.ChatController do
     {:error, 400, "Badly formed request"}
   end
 
-  defp with_journey(conn, answer) do
-    user = conn.assigns.user
-    state = conn.assigns.state
-    context = {Chat.scenarios(), Chat.databases()}
+  def session(%Conn{} = conn, _params) do
+    code = if conn.assigns.has_session?, do: :ok, else: :not_found
 
-    state = state |> Driver.next(context, answer)
-
-    user |> Journeys.progress(state)
-
-    conn |> render("answer.json", state: state, fresh: false)
+    conn
+    |> send_resp(code, "")
+    |> halt()
   end
 
-  defp without_journey(conn) do
+  defp with_session(conn, state, answer) do
+    %Session{
+      user: user,
+      states: states
+    } = conn.assigns.session
+
+    case Map.fetch(states, state) do
+      {:ok, state} ->
+        context = {Chat.scenarios(), Chat.databases()}
+
+        state = state |> Driver.next(context, answer)
+
+        user |> Sessions.add(state)
+
+        conn |> render("answer.json", state: state, fresh: false)
+
+      :error ->
+        {:error, 400, "bad request"}
+    end
+  end
+
+  defp without_session(conn) do
     state = Driver.initial({Chat.scenarios(), Chat.databases()})
 
     user_id = User.generate_id()
@@ -45,7 +71,7 @@ defmodule Api.ChatController do
 
     token = Token.sign(user_id)
 
-    user |> Journeys.progress(state)
+    user |> Sessions.add(state)
 
     conn
     |> put_session(:user_token, token)

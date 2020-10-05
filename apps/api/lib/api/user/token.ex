@@ -1,6 +1,6 @@
 defmodule Api.User.Token do
   alias Phoenix.Token
-  alias Api.User.Journeys
+  alias Api.User.Sessions
 
   @salt "user_auth_" <> "hIgeRWHc"
 
@@ -11,6 +11,6 @@ defmodule Api.User.Token do
   def verify(nil), do: nil
 
   def verify(token) do
-    Token.verify(Api.Endpoint, @salt, token, max_age: Journeys.ttl())
+    Token.verify(Api.Endpoint, @salt, token, max_age: Sessions.ttl())
   end
 end

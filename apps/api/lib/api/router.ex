@@ -13,6 +13,7 @@ defmodule Api.Router do
   scope "/chat", Api do
     pipe_through(:api)
 
+    get("/session", ChatController, :session)
     post("/answer", ChatController, :answer)
   end
 
