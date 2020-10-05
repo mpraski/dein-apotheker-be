@@ -1,1 +1,1 @@
-# Dein Apotheker Chat Service
+# Dein Apotheker Backend
