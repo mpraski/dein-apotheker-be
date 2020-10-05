@@ -9,18 +9,7 @@
 # move said applications out of the umbrella.
 import Config
 
-config :domain, ecto_repos: [Domain.Repo]
-
-# Configure your database
-config :domain, Domain.Repo,
-  username: "eat_user",
-  password: "qwerty123",
-  database: "eat_db",
-  hostname: "localhost",
-  show_sensitive_data_on_connection_error: true,
-  pool_size: 10
-
-config :domain,
+config :chat,
   scenario_path: "local-scenarios",
   database_path: "local-databases"
 

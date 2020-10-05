@@ -55,22 +55,6 @@ defmodule Api.HealthCheck do
 
   # Common checks
 
-  def repo?(repo) do
-    fn ->
-      result =
-        try do
-          Ecto.Adapters.SQL.query(repo, "SELECT 1")
-        rescue
-          e in DBConnection.ConnectionError -> e
-        end
-
-      case result do
-        {:ok, _} -> true
-        _ -> false
-      end
-    end
-  end
-
   def alive?(pid_fun) do
     fn ->
       Process.alive?(pid_fun.())

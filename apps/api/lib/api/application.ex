@@ -9,7 +9,7 @@ defmodule Api.Application do
   alias Api.User.Sessions
 
   def start(_type, _args) do
-    {:ok, _} = Application.ensure_all_started(:domain)
+    {:ok, _} = Application.ensure_all_started(:chat)
 
     children = [
       Sessions.spec(),

@@ -22,7 +22,7 @@ WORKDIR /$APP
 COPY mix.* ./
 COPY config ./config
 COPY apps/api/mix.exs ./apps/api/
-COPY apps/domain/mix.exs ./apps/domain/
+COPY apps/chat/mix.exs ./apps/chat/
 
 # Install hex, rebar and dependencies
 RUN mix do \

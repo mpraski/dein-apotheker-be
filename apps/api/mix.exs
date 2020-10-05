@@ -44,7 +44,7 @@ defmodule Api.MixProject do
       {:elixir_uuid, "~> 1.2"},
       {:corsica, "~> 1.1"},
       {:con_cache, "~> 0.14.0"},
-      {:domain, in_umbrella: true}
+      {:chat, in_umbrella: true}
     ]
   end
 

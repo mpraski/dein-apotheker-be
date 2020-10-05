@@ -1,8 +1,8 @@
 defmodule Chat do
   use Agent
 
-  @scenario_path Application.get_env(:domain, :scenario_path)
-  @database_path Application.get_env(:domain, :database_path)
+  @scenario_path Application.get_env(:chat, :scenario_path)
+  @database_path Application.get_env(:chat, :database_path)
 
   alias Chat.Scenario.Loader, as: ScenarioLoader
   alias Chat.Scenario.Parser, as: ScenarioParser

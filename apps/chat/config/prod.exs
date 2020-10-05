@@ -1,6 +1,6 @@
 import Config
 
-config :domain, scenario_path: "../../dein-apotheker-scenarios"
+config :chat, scenario_path: "../../dein-apotheker-scenarios"
 
 # Configures Elixir's Logger
 config :logger, :console,

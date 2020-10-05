@@ -1,9 +1,9 @@
-defmodule Domain.MixProject do
+defmodule Chat.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :domain,
+      app: :chat,
       version: "0.1.0",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
@@ -13,7 +13,7 @@ defmodule Domain.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       erlc_paths: [
-        "lib/domain/chat/language/compiler"
+        "lib/chat/language/compiler"
       ],
       test_pattern: test_pattern(),
       test_paths: if(Mix.env() == :test, do: test_paths(), else: [])
@@ -24,18 +24,13 @@ defmodule Domain.MixProject do
   def application do
     [
       extra_applications: [:logger, :xlsxir],
-      mod: {Domain.Application, []}
+      mod: {Chat.Application, []}
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
-      # {:sibling_app_in_umbrella, in_umbrella: true}
-      {:ecto_sql, "~> 3.0"},
-      {:postgrex, ">= 0.0.0"},
       {:xlsxir, "~> 1.6.4"},
       {:benchee, "~> 1.0", only: :dev}
     ]
