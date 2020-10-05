@@ -1,4 +1,4 @@
-defmodule Api.Chat.Presenter do
+defmodule Api.Views.Chat do
   alias Chat.State
   alias Chat.State.Process, as: StateProcess
   alias Chat.Scenario
@@ -6,8 +6,8 @@ defmodule Api.Chat.Presenter do
   alias Chat.Database
   alias Chat.Language.Context
 
-  alias Api.Chat.Message
-  alias Api.Chat.State, as: Representation
+  alias Api.Views.Chat.Message
+  alias Api.Views.Chat.State, as: Representation
 
   def present(
         state = %State{

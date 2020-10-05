@@ -1,7 +1,7 @@
-defmodule Api.Chat.State do
+defmodule Api.Views.Chat.State do
   use TypedStruct
 
-  alias Api.Chat.{Message, Product}
+  alias Api.Views.Chat.{Message, Product}
 
   @derive Jason.Encoder
 

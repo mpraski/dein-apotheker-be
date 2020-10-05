@@ -1,4 +1,4 @@
-defmodule Api.Chat.Message do
+defmodule Api.Views.Chat.Message do
   use TypedStruct
 
   @derive Jason.Encoder

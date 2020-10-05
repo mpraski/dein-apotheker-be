@@ -1,12 +1,12 @@
 defmodule Api.ChatView do
   use Api, :view
 
-  alias Api.Chat.Presenter
+  alias Api.Views.Chat, as: View
 
   def render("answer.json", %{state: state, fresh: fresh}) do
     context = {Chat.scenarios(), Chat.databases()}
 
-    Presenter.present(state, context)
+    View.present(state, context)
     |> in_envelope(fresh_error(fresh))
   end
 
