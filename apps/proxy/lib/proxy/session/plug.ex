@@ -15,9 +15,9 @@ defmodule Proxy.Session.Plug do
 
     state = fn -> Driver.initial({Chat.scenarios(), Chat.databases()}) end
 
-    case Guardian.decode_and_verify(__MODULE__, token) do
-      {:ok, claims} ->
-        {:ok, session} = Store.fetch_or_store(claims["sub"], state)
+    case Issuer.user_id(token) do
+      {:ok, id} ->
+        {:ok, session} = Store.fetch_or_store(id, state)
 
         conn |> assign(:session, session)
 

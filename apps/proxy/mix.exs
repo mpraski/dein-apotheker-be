@@ -41,10 +41,8 @@ defmodule Proxy.MixProject do
       {:phoenix, "~> 1.5"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.1"},
-      {:elixir_uuid, "~> 1.2"},
       {:corsica, "~> 1.1"},
       {:con_cache, "~> 0.14.0"},
-      {:guardian, "~> 2.0"},
       {:chat, in_umbrella: true},
       {:account, in_umbrella: true}
     ]
