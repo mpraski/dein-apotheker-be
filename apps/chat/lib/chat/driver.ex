@@ -20,8 +20,8 @@ defmodule Chat.Driver do
     {:ok, question = %Question{}} = Process.question(process, question)
 
     state
-    |> answer(data, question, answer)
     |> State.generate_id()
+    |> answer(data, question, answer)
   end
 
   defp answer(

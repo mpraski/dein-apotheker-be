@@ -11,7 +11,7 @@ defmodule DeinApotheker.MixProject do
         dein_apotheker: [
           include_executables_for: [:unix],
           applications: [
-            api: :permanent,
+            proxy: :permanent,
             chat: :permanent
           ]
         ]

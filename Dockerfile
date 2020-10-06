@@ -21,7 +21,7 @@ WORKDIR /$APP
 # is unlikely to change oftern
 COPY mix.* ./
 COPY config ./config
-COPY apps/api/mix.exs ./apps/api/
+COPY apps/proxy/mix.exs ./apps/proxy/
 COPY apps/chat/mix.exs ./apps/chat/
 
 # Install hex, rebar and dependencies
