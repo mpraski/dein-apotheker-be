@@ -1,6 +1,5 @@
 defmodule Proxy.Session.Store do
   alias Proxy.Session
-  alias Chat.State
 
   @cache :user_cache
 
@@ -13,17 +12,18 @@ defmodule Proxy.Session.Store do
      ]}
   end
 
-  def fetch_or_store(user_id, state) do
-    new_session = fn -> {:ok, Session.new(user_id, state.())} end
+  def new_or_fetch(user_id) do
+    new_session = fn -> {:ok, Session.new(user_id)} end
 
-    ConCache.fetch_or_store(@cache, user_id, new_session)
+    {:ok, session} = ConCache.fetch_or_store(@cache, user_id, new_session)
+
+    session
   end
 
-  def add(user_id, %State{} = s) do
-    ConCache.update(@cache, user_id, fn
-      nil -> {:ok, Session.new(user_id, s)}
-      session -> {:ok, session |> Session.add(s)}
-    end)
+  def put(%Session{user_id: user_id} = session) do
+    :ok = ConCache.put(@cache, user_id, session)
+
+    session
   end
 
   def ttl do

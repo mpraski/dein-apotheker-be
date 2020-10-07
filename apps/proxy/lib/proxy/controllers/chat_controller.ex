@@ -18,33 +18,43 @@ defmodule Proxy.ChatController do
         } = conn,
         _params
       ) do
-    session = conn.assigns.session
+    %Session{
+      states: states
+    } = session = conn.assigns.session
 
-    if Session.fresh(session) do
-      conn |> render("answer.json", state: Session.current_state(session), fresh: true)
-    else
-      %Session{
-        user_id: user_id,
-        states: states
-      } = session
+    case Map.fetch(states, state) do
+      {:ok, state} ->
+        context = {Chat.scenarios(), Chat.databases()}
 
-      case Map.fetch(states, state) do
-        {:ok, state} ->
-          context = {Chat.scenarios(), Chat.databases()}
+        state = state |> Driver.next(context, answer)
 
-          state = state |> Driver.next(context, answer)
+        Store.put(Session.add(session, state))
 
-          user_id |> Store.add(state)
+        conn |> render("answer.json", state: state, fresh: false)
 
-          conn |> render("answer.json", state: state, fresh: false)
-
-        :error ->
-          {:error, 400, "bad request"}
-      end
+      :error ->
+        {:error, 400, "bad request"}
     end
   end
 
+  def answer(
+        %Conn{
+          body_params: %{
+            "state" => "new"
+          }
+        } = conn,
+        _params
+      ) do
+    session = conn.assigns.session
+
+    state = Driver.initial({Chat.scenarios(), Chat.databases()})
+
+    Store.put(Session.add(session, state))
+
+    conn |> render("answer.json", state: state, fresh: true)
+  end
+
   def answer(_conn, _params) do
-    {:error, 400, "Badly formed request"}
+    {:error, 400, "bad request"}
   end
 end

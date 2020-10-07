@@ -21,13 +21,6 @@ defmodule Auth.Issuer do
     {:ok, token}
   end
 
-  def user_id(token) do
-    case Guardian.decode_and_verify(token) do
-      {:ok, claims} -> {:ok, claims["sub"]}
-      {:error, reason} -> {:error, reason}
-    end
-  end
-
   defp for_user(%User{} = user, claim) do
     {:ok, token, _} = Guardian.encode_and_sign(user, claim, ttl: ttl())
     {:ok, token, user}
