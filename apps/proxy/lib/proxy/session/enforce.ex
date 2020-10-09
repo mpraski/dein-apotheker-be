@@ -3,19 +3,20 @@ defmodule Proxy.Session.Enforce do
 
   alias Plug.Conn
   alias Proxy.Session.Store
+  alias Account.User
 
   def init(_params) do
   end
 
   def call(%Conn{} = conn, _params) do
-    case conn.assigns.user do
+    case conn.assigns |> Map.get(:user) do
       nil ->
         conn
         |> send_resp(:unauthorized, "")
         |> halt()
 
-      user ->
-        session = Store.new_or_fetch(user)
+      %User{id: id} ->
+        session = Store.new_or_fetch(id)
 
         conn |> assign(:session, session)
     end

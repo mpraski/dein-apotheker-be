@@ -18,4 +18,8 @@ defmodule Proxy.Session do
   def add(%__MODULE__{states: ss} = j, %State{id: id} = s) do
     %__MODULE__{j | states: Map.put(ss, id, s)}
   end
+
+  def fetch(%__MODULE__{states: ss}, state_id) do
+    Map.fetch(ss, state_id)
+  end
 end

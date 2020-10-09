@@ -22,7 +22,9 @@ defmodule Proxy.Session.Verify do
         |> assign(:user, user)
 
       {:error, _reason} ->
-        conn |> assign(:user, nil)
+        conn
+        |> delete_session(:token)
+        |> assign(:user, nil)
     end
   end
 end

@@ -18,11 +18,9 @@ defmodule Proxy.ChatController do
         } = conn,
         _params
       ) do
-    %Session{
-      states: states
-    } = session = conn.assigns.session
+    session = conn.assigns.session
 
-    case Map.fetch(states, state) do
+    case Session.fetch(session, state) do
       {:ok, state} ->
         context = {Chat.scenarios(), Chat.databases()}
 
@@ -30,7 +28,7 @@ defmodule Proxy.ChatController do
 
         Store.put(Session.add(session, state))
 
-        conn |> render("answer.json", state: state, fresh: false)
+        conn |> render("answer.json", state: state)
 
       :error ->
         {:error, 400, "bad request"}
@@ -51,7 +49,7 @@ defmodule Proxy.ChatController do
 
     Store.put(Session.add(session, state))
 
-    conn |> render("answer.json", state: state, fresh: true)
+    conn |> render("answer.json", state: state)
   end
 
   def answer(_conn, _params) do

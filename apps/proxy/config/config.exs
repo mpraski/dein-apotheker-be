@@ -18,5 +18,9 @@ config :proxy, Proxy.Endpoint,
   secret_key_base: "SkhLSEBG7hcIRVGRQMhMAHYtlVwbHH7LHlWTUUCj6mIhlXgxkVbW2YlSnRutaTzq",
   render_errors: [view: Proxy.ErrorView, accepts: ~w(json)]
 
+config :proxy,
+  cache_ttl: :timer.hours(2),
+  cache_check: :timer.minutes(30)
+
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason

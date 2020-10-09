@@ -3,6 +3,8 @@ defmodule Proxy.Endpoint do
 
   alias Proxy.Session.Store
 
+  @allowed_content ~w[application/json]
+
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
@@ -26,14 +28,11 @@ defmodule Proxy.Endpoint do
 
   plug(Plug.Parsers,
     parsers: [:json],
+    pass: @allowed_content,
     json_decoder: Phoenix.json_library()
   )
 
-  plug(Proxy.HealthCheck.Plug)
-  plug(Plug.MethodOverride)
-  plug(Plug.Head)
   plug(Plug.Session, @session_options)
-  plug(:fetch_session)
   plug(Corsica, origins: "*", allow_headers: :all)
   plug(Proxy.Router)
 end

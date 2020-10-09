@@ -3,38 +3,55 @@ defmodule Proxy.Router do
 
   use Plug.ErrorHandler
 
-  alias Proxy.ErrorView
-  alias Phoenix.Controller
+  alias Proxy.Session.{Verify, Enforce}
 
   pipeline :api do
     plug(:accepts, ["json"])
+    plug(:fetch_session)
   end
 
-  pipeline :auth do
-    plug(Proxy.Session.Verify)
+  # Just verify if we have a valid session
+  # defined by the JWT token in the cookie
+  pipeline :verify_auth do
+    plug(Verify)
   end
 
+  # Enfore the CSRF + JWT presence in the cookie
   pipeline :ensure_auth do
-    plug(Proxy.Session.Enforce)
+    plug(Plug.CSRFProtection)
+    plug(Verify)
+    plug(Enforce)
   end
 
   scope "/chat", Proxy do
-    pipe_through([:api, :auth, :ensure_auth])
+    pipe_through([:api, :ensure_auth])
 
     post("/answer", ChatController, :answer)
   end
 
   scope "/session", Proxy do
-    pipe_through([:api, :auth])
+    pipe_through([:api, :verify_auth])
 
     get("/", SessionController, :has)
     post("/", SessionController, :new)
+    delete("/", SessionController, :delete)
+  end
+
+  def handle_errors(conn, %{
+        kind: _kind,
+        reason: %Plug.CSRFProtection.InvalidCSRFTokenError{},
+        stack: _stack
+      }) do
+    conn |> render_error(:unauthorized)
   end
 
   def handle_errors(conn, %{kind: _kind, reason: _reason, stack: _stack}) do
+    conn |> render_error(:internal_server_error)
+  end
+
+  defp render_error(conn, status) do
     conn
-    |> put_status(500)
-    |> Controller.put_view(ErrorView)
-    |> Controller.render("server.json")
+    |> send_resp(status, "")
+    |> halt()
   end
 end

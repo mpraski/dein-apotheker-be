@@ -9,7 +9,7 @@ defmodule Account do
     {:ok, User.new(id)}
   end
 
-  def login(email, password) do
+  def login(_email, _password) do
     {:ok, User.new()}
   end
 end

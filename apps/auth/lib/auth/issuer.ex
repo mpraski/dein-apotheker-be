@@ -4,6 +4,7 @@ defmodule Auth.Issuer do
 
   @user_claim %{kind: "user"}
   @guest_claim %{kind: "guest"}
+  @ttl Application.get_env(:auth, :ttl)
 
   def guest do
     for_user(User.new(), @guest_claim)
@@ -22,9 +23,7 @@ defmodule Auth.Issuer do
   end
 
   defp for_user(%User{} = user, claim) do
-    {:ok, token, _} = Guardian.encode_and_sign(user, claim, ttl: ttl())
+    {:ok, token, _} = Guardian.encode_and_sign(user, claim, ttl: @ttl)
     {:ok, token, user}
   end
-
-  defp ttl, do: {1, :hour}
 end

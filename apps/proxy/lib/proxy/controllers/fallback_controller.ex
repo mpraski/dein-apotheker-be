@@ -10,6 +10,6 @@ defmodule Proxy.FallbackController do
     conn
     |> put_status(code)
     |> put_view(Proxy.ErrorView)
-    |> render("Proxy.json", error: error)
+    |> render("error.json", error: error)
   end
 end
