@@ -9,10 +9,6 @@
 # move said applications out of the umbrella.
 import Config
 
-config :chat,
-  scenario_path: "local-scenarios",
-  database_path: "local-databases"
-
 # Configures Elixir's Logger
 config :logger, :console,
   level: :debug,
