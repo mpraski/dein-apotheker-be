@@ -3,9 +3,9 @@ defmodule Auth do
   Documentation for `Auth`.
   """
 
-  @grace 600
-
   alias Auth.Guardian
+
+  @grace Application.get_env(:auth, :grace, 600)
 
   def authenticate(nil), do: {:error, :missing}
 
@@ -14,16 +14,21 @@ defmodule Auth do
       {:ok, claims} ->
         sub = claims["sub"]
 
-        now = DateTime.utc_now() |> DateTime.add(@grace)
+        now = DateTime.utc_now()
 
-        exp =
-          claims
-          |> Map.get("exp")
-          |> DateTime.from_unix!(:second)
+        grace = now |> DateTime.add(@grace)
+
+        exp = claims["exp"] |> DateTime.from_unix!(:second)
 
         case DateTime.compare(now, exp) do
-          :gt -> {:expiring, sub}
-          _ -> {:ok, sub}
+          r when r in [:gt, :eq] ->
+            {:error, :expired}
+
+          _ ->
+            case DateTime.compare(grace, exp) do
+              r when r in [:gt, :eq] -> {:expiring, sub}
+              _ -> {:ok, sub}
+            end
         end
 
       {:error, reason} ->
