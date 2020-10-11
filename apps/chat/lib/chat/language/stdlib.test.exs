@@ -29,6 +29,10 @@ defmodule Chat.Language.StdLib.Test do
       program: "TO_TEXT(LIST(a, b, c, LIST(d, e, LIST(f))))",
       expected: "a b c d e f"
     ],
+    list_1: [
+      program: "a = 1, b = 2, LIST([a], [b], c)",
+      expected: [1, 2, :c]
+    ],
     size_1: [
       program: "SIZE(LIST(a, 'b', 3))",
       expected: 3
@@ -39,6 +43,10 @@ defmodule Chat.Language.StdLib.Test do
     ],
     rows_1: [
       program: "ROWS(SELECT * FROM Products)",
+      expected: 3
+    ],
+    add_1: [
+      program: "a = 1, b = 2, ADD([a], [b])",
       expected: 3
     ],
     go_1: [
