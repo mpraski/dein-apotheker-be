@@ -127,10 +127,7 @@ defmodule Chat.Language.StdLib do
 
   defp to_text(%Call{args: [_ | args]}) do
     args
-    |> Enum.flat_map(fn
-      l when is_list(l) -> l
-      o -> [o]
-    end)
+    |> deep_flat_map()
     |> Enum.map(&to_string/1)
     |> Enum.join(" ")
   end
@@ -159,5 +156,12 @@ defmodule Chat.Language.StdLib do
          context: %Context{databases: databases}
        }) do
     {:ok, products} = databases |> Map.fetch(:Products)
+  end
+
+  defp deep_flat_map(m) do
+    Enum.flat_map(m, fn
+      l when is_list(l) -> deep_flat_map(l)
+      o -> [o]
+    end)
   end
 end

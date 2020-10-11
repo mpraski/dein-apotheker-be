@@ -206,6 +206,26 @@ defmodule Chat.Language.Interpreter.Test do
         ]
       }
     ],
+    select_columns_products_where_select_single_col: [
+      program: "SELECT name FROM Products WHERE id == '2'",
+      expected: %Chat.Database{
+        headers: [:name],
+        id: :Products,
+        rows: [
+          ["Product 2"]
+        ]
+      }
+    ],
+    select_columns_products_where_select_diff_cols: [
+      program: "SELECT name, price FROM Products WHERE id == '2'",
+      expected: %Chat.Database{
+        headers: [:name, :price],
+        id: :Products,
+        rows: [
+          ["Product 2", "13 dollars"]
+        ]
+      }
+    ],
     select_columns_products_where_or: [
       program: "SELECT id, name FROM Products WHERE (id == '2' OR id == '3')",
       expected: %Chat.Database{

@@ -25,6 +25,10 @@ defmodule Chat.Language.StdLib.Test do
       program: "c = 3, TO_TEXT(a, 'b', [c])",
       expected: "a b 3"
     ],
+    to_text_5: [
+      program: "TO_TEXT(LIST(a, b, c, LIST(d, e, LIST(f))))",
+      expected: "a b c d e f"
+    ],
     size_1: [
       program: "SIZE(LIST(a, 'b', 3))",
       expected: 3
