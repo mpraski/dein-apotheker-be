@@ -1,6 +1,7 @@
 # ignore .git and .cache folders
 .git
 .cache
+.elixir_ls
 
 # Elixir intermediate directories
 _build

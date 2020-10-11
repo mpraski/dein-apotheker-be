@@ -17,7 +17,7 @@ defmodule Chat.Scenario.Answer do
   def new(id, text, action, output) do
     %__MODULE__{
       id: id,
-      text: Text.new(text),
+      text: Text.new(text || ""),
       action: action,
       output: output
     }

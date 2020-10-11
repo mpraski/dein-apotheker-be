@@ -160,13 +160,14 @@ defmodule Chat.Language.StdLib.Test do
         |> Memory.store(State.cart(), [:prod_1, :prod_2, :prod_3])
     ],
     jump_1: [
-      program: "JUMP(SomeProcess)",
+      program: "JUMP(ExampleProcess)",
       expected:
         quote(
           do: fn %State{
+                   question: :time,
                    processes: [
                      %StateProcess{
-                       id: :SomeProcess
+                       id: :ExampleProcess
                      }
                    ]
                  } ->

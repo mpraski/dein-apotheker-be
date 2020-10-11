@@ -12,6 +12,7 @@ defmodule Chat.Scenario do
     field(:processes, map(), enforce: true, default: Map.new())
   end
 
+  @spec new(any, any, any, any) :: Chat.Scenario.t()
   def new(id, entry, actions \\ %{}, processes \\ %{}) do
     %__MODULE__{
       id: id,

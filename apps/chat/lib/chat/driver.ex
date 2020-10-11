@@ -44,10 +44,22 @@ defmodule Chat.Driver do
     )
   end
 
-  defp answer(%State{} = state, _, %Question{type: :C}, "ok") do
+  defp answer(%State{} = state, _, %Question{type: :C, action: nil}, "ok") do
     {:ok, previous} = Memory.load(state, :previous_question)
 
     %State{state | question: previous}
+  end
+
+  defp answer(
+         %State{} = state,
+         {scenarios, databases},
+         %Question{type: :C, action: action},
+         "ok"
+       ) do
+    action.(
+      Context.new(scenarios, databases),
+      state
+    )
   end
 
   defp answer(
