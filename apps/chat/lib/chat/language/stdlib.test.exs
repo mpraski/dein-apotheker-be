@@ -6,6 +6,7 @@ defmodule Chat.Language.StdLib.Test do
   alias Chat.State.Process, as: StateProcess
   alias Chat.Language.Parser
   alias Chat.Language.Context
+  alias Chat.Language.Memory
   alias Chat.Driver
 
   tests = [
@@ -125,6 +126,38 @@ defmodule Chat.Language.StdLib.Test do
           end
         ),
       register: Driver.initial({Chat.scenarios(), Chat.databases()})
+    ],
+    load_with_3: [
+      program: """
+        FOR item IN [cart] DO
+          LOAD_WITH(Explain, item)
+      """,
+      expected:
+        quote(
+          do: fn %State{
+                   processes: [
+                     _,
+                     %StateProcess{
+                       id: :Explain,
+                       variables: %{item: :prod_1}
+                     },
+                     %StateProcess{
+                       id: :Explain,
+                       variables: %{item: :prod_2}
+                     },
+                     %StateProcess{
+                       id: :Explain,
+                       variables: %{item: :prod_3}
+                     }
+                   ]
+                 } ->
+            true
+          end
+        ),
+      register:
+        {Chat.scenarios(), Chat.databases()}
+        |> Driver.initial()
+        |> Memory.store(State.cart(), [:prod_1, :prod_2, :prod_3])
     ],
     jump_1: [
       program: "JUMP(SomeProcess)",
