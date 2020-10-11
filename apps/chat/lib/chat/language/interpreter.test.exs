@@ -121,6 +121,34 @@ defmodule Chat.Language.Interpreter.Test do
       """,
       expected: 3
     ],
+    if_expression_7: [
+      program: """
+        var1 = 'val',
+        var2 = 'val3',
+        IF [var1] THEN 1
+          ELIF [var2] THEN 2
+          ELSE 3
+      """,
+      expected: 1
+    ],
+    if_expression_8: [
+      program: """
+        var1 = 'val',
+        var2 = 'val3',
+        IF [var1] THEN (a = 5, ADD([a], 1))
+          ELIF [var2] THEN 2
+          ELSE 3
+      """,
+      expected: 6
+    ],
+    if_expression_9: [
+      program: """
+        IF [var1] THEN (a = 5, ADD([a], 1))
+          ELIF [var2] THEN 2
+          ELSE (a = 1, ADD([a], 1))
+      """,
+      expected: 2
+    ],
     for_expr_1: [
       program: """
       j = 0,

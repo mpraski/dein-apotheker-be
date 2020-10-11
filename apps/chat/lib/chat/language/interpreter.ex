@@ -7,11 +7,11 @@ defmodule Chat.Language.Interpreter do
 
   def interpret(program) do
     fn %Context{} = c, r ->
-      {c, r} |> interpret_exprs(program) |> elem(1)
+      {c, r} |> interpret_expr(program) |> elem(1)
     end
   end
 
-  defp interpret_exprs(data, exprs) do
+  defp interpret_expr(data, exprs) when is_list(exprs) do
     Enum.reduce(exprs, data, &interpret_expr(&2, &1))
   end
 
@@ -39,7 +39,7 @@ defmodule Chat.Language.Interpreter do
 
     {c, s} =
       Enum.reduce(e, data, fn a, {c, s} ->
-        {Memory.store(c, i, a), s} |> interpret_exprs(exprs)
+        {Memory.store(c, i, a), s} |> interpret_expr(exprs)
       end)
 
     {Memory.delete(c, i), s}

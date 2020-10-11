@@ -43,11 +43,11 @@ function_expr -> identifier left_paren expr_list right_paren : {call, '$1', '$3'
 
 decl_expr -> identifier assign expr : {action('$2'), '$1', '$3'}.
 
-if_expr -> lif expr then expr           else expr : {lif, [{'$2', '$4'}       ], '$6'}.
-if_expr -> lif expr then expr elif_expr else expr : {lif, [{'$2', '$4'} | '$5'], '$7'}.
+if_expr -> lif expr then exprs_paren           else exprs_paren : {lif, [{'$2', '$4'}       ], '$6'}.
+if_expr -> lif expr then exprs_paren elif_expr else exprs_paren : {lif, [{'$2', '$4'} | '$5'], '$7'}.
 
-elif_expr -> elif expr then expr           : [{'$2', '$4'}     ].
-elif_expr -> elif expr then expr elif_expr : [{'$2', '$4'} | $5].
+elif_expr -> elif expr then exprs_paren           : [{'$2', '$4'}     ].
+elif_expr -> elif expr then exprs_paren elif_expr : [{'$2', '$4'} | $5].
 
 for_expr -> for identifier in expr do exprs_paren : {action('$1'), '$2', '$4', '$6'}.
 
