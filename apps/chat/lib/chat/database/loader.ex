@@ -1,4 +1,8 @@
 defmodule Chat.Database.Loader do
+  @moduledoc """
+  Loader loads the databases
+  """
+
   alias Chat.Excel
   alias Chat.Database
 

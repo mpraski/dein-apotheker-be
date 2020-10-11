@@ -1,4 +1,8 @@
 defmodule Auth.Issuer do
+  @moduledoc """
+  Issuer issues JWT tokens for grants
+  """
+
   alias Auth.Guardian
   alias Account.User
 

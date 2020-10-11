@@ -1,4 +1,8 @@
 defmodule Chat.Excel do
+  @moduledoc """
+  Excel encapsulates some excel-specific logic
+  """
+
   @excel Xlsxir
 
   def ext, do: ".xlsx"

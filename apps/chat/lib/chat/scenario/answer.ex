@@ -1,4 +1,8 @@
 defmodule Chat.Scenario.Answer do
+  @moduledoc """
+  Answer for a question
+  """
+
   alias Chat.Scenario.Text
 
   use TypedStruct

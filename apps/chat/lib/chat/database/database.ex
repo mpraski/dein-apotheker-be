@@ -1,4 +1,8 @@
 defmodule Chat.Database do
+  @moduledoc """
+  Database represents an in-memory tabular data store
+  """
+
   use TypedStruct
 
   typedstruct do

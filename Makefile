@@ -21,13 +21,13 @@ run:
 	@echo "$(OK_COLOR)==> Running $(SERVICE_NAME)... $(NO_COLOR)"
 	@mix do deps.get, compile --force, phx.server
 
-test: lint
+test:
 	@echo "$(OK_COLOR)==> Running tests$(NO_COLOR)..."
-	@MIX_ENV=test mix do deps.get, test
+	@MIX_ENV=test mix do deps.get, test_all
 
 lint:
 	@echo "$(OK_COLOR)==> Checking code style with 'credo' tool$(NO_COLOR)..."
-	@mix do deps.get, credo --strict
+	@mix do deps.get, credo
 
 clean:
 	@echo "$(OK_COLOR)==> Cleaning unused deps$(NO_COLOR)..."

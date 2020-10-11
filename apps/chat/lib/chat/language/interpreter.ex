@@ -1,4 +1,8 @@
 defmodule Chat.Language.Interpreter do
+  @moduledoc """
+  Interpreter interprets the programs
+  """
+
   alias Chat.Database
   alias Chat.Language.Memory
   alias Chat.Language.Context

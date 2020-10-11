@@ -1,4 +1,9 @@
 defmodule Proxy.Views.Chat.Message do
+  @moduledoc """
+  Message holds information required to render
+  the current message
+  """
+
   use TypedStruct
 
   @derive Jason.Encoder

@@ -1,4 +1,8 @@
 defmodule Chat.Scenario.Process do
+  @moduledoc """
+  Scenario process
+  """
+
   use TypedStruct
 
   typedstruct do

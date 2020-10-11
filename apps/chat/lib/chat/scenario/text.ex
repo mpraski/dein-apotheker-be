@@ -1,4 +1,8 @@
 defmodule Chat.Scenario.Text do
+  @moduledoc """
+  Text with dynamic program snippets
+  """
+
   alias Chat.Language.Parser
   alias Chat.Language.Context
 

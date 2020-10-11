@@ -1,4 +1,9 @@
 defmodule Auth.Guardian do
+  @moduledoc """
+  Guardian defines how to convert a user into a token
+  and vice-versa
+  """
+
   use Guardian, otp_app: :auth
 
   alias Account.User

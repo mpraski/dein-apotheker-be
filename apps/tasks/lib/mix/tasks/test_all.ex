@@ -1,8 +1,13 @@
 defmodule Mix.Tasks.TestAll do
+  @moduledoc """
+  TestAll defines the test_all command used
+  to run all tests along with their source files
+  """
+
   use Mix.Task
 
   @test "test"
-  @test_file ~r/^.*\.test\.exs$/
+  @test_file ~r/^.+\.test\.exs$/
   @test_helper "test_helper.exs"
   @test_helper_contents "ExUnit.start()"
 

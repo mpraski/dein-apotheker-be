@@ -1,4 +1,8 @@
 defmodule Chat.Scenario.Loader do
+  @moduledoc """
+  Loaded of the scenarios
+  """
+
   alias Chat.Excel
 
   @scenario_file "Scenario#{Excel.ext()}"

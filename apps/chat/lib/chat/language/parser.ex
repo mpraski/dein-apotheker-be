@@ -1,4 +1,8 @@
 defmodule Chat.Language.Parser do
+  @moduledoc """
+  Parser is a convenience module for parsing programs
+  """
+
   alias Chat.Language.Interpreter
 
   def parse(source) do

@@ -1,4 +1,8 @@
 defmodule Chat.Scenario.Parser do
+  @moduledoc """
+  Parser of the scenarios
+  """
+
   alias Chat.Scenario
   alias Chat.Scenario.{Process, Question, Answer}
   alias Chat.Language.Parser, as: ProcessParser

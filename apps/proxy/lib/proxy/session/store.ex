@@ -1,4 +1,8 @@
 defmodule Proxy.Session.Store do
+  @moduledoc """
+  Store keeps track of session data per user
+  """
+
   alias Proxy.Session
 
   @cache :user_cache

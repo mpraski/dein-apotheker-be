@@ -6,10 +6,9 @@ defmodule Proxy.FallbackController do
   """
   use Proxy, :controller
 
-  def call(conn, {:error, code, error}) do
+  def call(conn, {:error, code}) do
     conn
-    |> put_status(code)
-    |> put_view(Proxy.ErrorView)
-    |> render("error.json", error: error)
+    |> send_resp(code, "")
+    |> halt()
   end
 end

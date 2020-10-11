@@ -1,4 +1,8 @@
 defmodule Proxy.Views.Chat.State do
+  @moduledoc """
+  State is the representation of chat state
+  """
+
   use TypedStruct
 
   alias Proxy.Views.Chat.{Message, Product}

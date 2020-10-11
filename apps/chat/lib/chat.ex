@@ -1,4 +1,8 @@
 defmodule Chat do
+  @moduledoc """
+  Chat consolidates commonnly used data and function
+  """
+
   use Agent
 
   @scenario_path Application.get_env(:chat, :scenario_path)

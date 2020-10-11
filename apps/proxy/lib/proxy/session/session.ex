@@ -1,4 +1,8 @@
 defmodule Proxy.Session do
+  @moduledoc """
+  Session represents a user's session
+  """
+
   use TypedStruct
 
   alias Chat.State

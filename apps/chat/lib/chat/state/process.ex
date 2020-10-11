@@ -1,4 +1,8 @@
 defmodule Chat.State.Process do
+  @moduledoc """
+  Process to be queued in state
+  """
+
   use TypedStruct
 
   typedstruct do

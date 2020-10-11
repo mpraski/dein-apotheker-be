@@ -1,4 +1,8 @@
 defmodule Chat.Language.StdLib do
+  @moduledoc """
+  StdLib of the language
+  """
+
   alias Chat.State
   alias Chat.State.Process
   alias Chat.Scenario
@@ -7,6 +11,10 @@ defmodule Chat.Language.StdLib do
   alias Chat.Language.Context
 
   defmodule Call do
+    @moduledoc """
+    Call represents a function call runtime context
+    """
+
     use TypedStruct
 
     typedstruct do

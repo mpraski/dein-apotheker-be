@@ -1,4 +1,9 @@
 defmodule Proxy.Session.Verify do
+  @moduledoc """
+  Verify if the session token is present
+  and attempt to load corresponding user id
+  """
+
   import Plug.Conn
 
   alias Plug.Conn

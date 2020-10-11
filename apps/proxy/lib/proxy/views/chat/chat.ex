@@ -1,4 +1,8 @@
 defmodule Proxy.Views.Chat do
+  @moduledoc """
+  Chat presents the chat data structures to the frontend
+  """
+
   alias Chat.State
   alias Chat.State.Process, as: StateProcess
   alias Chat.Scenario
@@ -10,12 +14,12 @@ defmodule Proxy.Views.Chat do
   alias Proxy.Views.Chat.State, as: Representation
 
   def present(
-        state = %State{
+        %State{
           id: id,
           question: question,
           scenarios: [scenario | _],
           processes: [%StateProcess{id: process} | _]
-        },
+        } = state,
         {scenarios, databases}
       ) do
     {:ok, scenario = %Scenario{}} = Map.fetch(scenarios, scenario)

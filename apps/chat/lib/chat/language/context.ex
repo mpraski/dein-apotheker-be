@@ -1,4 +1,9 @@
 defmodule Chat.Language.Context do
+  @moduledoc """
+  Context carries certain information needed
+  to execute programs
+  """
+
   use TypedStruct
 
   typedstruct do

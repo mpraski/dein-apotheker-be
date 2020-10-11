@@ -17,7 +17,7 @@ defmodule Chat.Language.Interpreter.Test do
     ],
     number: [
       program: "12321",
-      expected: 12321
+      expected: 12_321
     ],
     nil_variable: [
       program: "[undefined]",

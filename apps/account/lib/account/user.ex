@@ -1,4 +1,8 @@
 defmodule Account.User do
+  @moduledoc """
+  User represents a single user
+  """
+
   use TypedStruct
 
   typedstruct do

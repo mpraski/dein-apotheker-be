@@ -1,4 +1,8 @@
 defmodule Chat.Driver do
+  @moduledoc """
+  Driver performs the chat state transition
+  """
+
   alias Chat.State
   alias Chat.Scenario
   alias Chat.Scenario.{Process, Question, Answer}
@@ -40,7 +44,7 @@ defmodule Chat.Driver do
     )
   end
 
-  defp answer(state = %State{}, _, %Question{type: :C}, "ok") do
+  defp answer(%State{} = state, _, %Question{type: :C}, "ok") do
     {:ok, previous} = Memory.load(state, :previous_question)
 
     %State{state | question: previous}

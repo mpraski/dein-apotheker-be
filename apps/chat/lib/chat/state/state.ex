@@ -1,4 +1,8 @@
 defmodule Chat.State do
+  @moduledoc """
+  State describes user's progress within the chat
+  """
+
   alias Chat.State.Process
 
   use TypedStruct

@@ -1,4 +1,8 @@
 defmodule Proxy.Session.Enforce do
+  @moduledoc """
+  Enforce presence of user's session
+  """
+
   import Plug.Conn
 
   alias Plug.Conn

@@ -20,18 +20,18 @@ defmodule Proxy.ChatController do
       ) do
     session = conn.assigns.session
 
-    case Session.fetch(session, state) do
+    case session |> Session.fetch(state) do
       {:ok, state} ->
         context = {Chat.scenarios(), Chat.databases()}
 
         state = state |> Driver.next(context, answer)
 
-        Store.put(Session.add(session, state))
+        session |> Session.add(state) |> Store.put()
 
         conn |> render("answer.json", state: state)
 
       :error ->
-        {:error, 400, "bad request"}
+        {:error, 400}
     end
   end
 
@@ -47,12 +47,12 @@ defmodule Proxy.ChatController do
 
     state = Driver.initial({Chat.scenarios(), Chat.databases()})
 
-    Store.put(Session.add(session, state))
+    session |> Session.add(state) |> Store.put()
 
     conn |> render("answer.json", state: state)
   end
 
   def answer(_conn, _params) do
-    {:error, 400, "bad request"}
+    {:error, 400}
   end
 end

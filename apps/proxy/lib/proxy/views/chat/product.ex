@@ -1,4 +1,8 @@
 defmodule Proxy.Views.Chat.Product do
+  @moduledoc """
+  Product holds information required to render a product
+  """
+
   use TypedStruct
 
   @derive Jason.Encoder
