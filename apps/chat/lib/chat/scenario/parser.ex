@@ -23,14 +23,14 @@ defmodule Chat.Scenario.Parser do
     actions =
       [{entry, _} | _] =
       scenario_table
-      |> validate_table(@scenario_header)
+      |> extract_table(@scenario_header)
       |> Enum.map(&parse_actions/1)
 
     actions = actions |> Enum.into(Map.new())
 
     processes =
       process_tables
-      |> Stream.map(fn {p, r} -> {p, validate_table(r, @process_header)} end)
+      |> Stream.map(fn {p, r} -> {p, extract_table(r, @process_header)} end)
       |> Stream.map(&parse_process/1)
       |> Stream.map(fn %Process{id: id} = p -> {id, p} end)
       |> Enum.into(Map.new())
@@ -44,7 +44,7 @@ defmodule Chat.Scenario.Parser do
 
   defp parse_process({p, rows}) do
     reducer = fn
-      [nil | _] = row, {qs, as} ->
+      [id | _] = row, {qs, as} when id in [nil, ""] ->
         {qs, [parse_answer(row) | as]}
 
       row, {qs, []} ->
@@ -125,7 +125,19 @@ defmodule Chat.Scenario.Parser do
     String.to_atom(output)
   end
 
-  defp validate_table([h | r], header) when h == header, do: r
+  defp extract_table([h | r], expected) do
+    h = h |> Enum.map(&String.trim/1)
+
+    indices = expected |> Enum.map(&header_index(h, &1))
+
+    Enum.map(r, fn row ->
+      indices |> Enum.map(&Enum.at(row, &1))
+    end)
+  end
+
+  defp header_index(h, n) do
+    h |> Enum.find_index(&(&1 == n)) || raise "column #{n} does not exist"
+  end
 
   defp fit(list, length, base \\ nil) do
     delta = length - length(list)

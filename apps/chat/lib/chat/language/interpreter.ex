@@ -139,8 +139,8 @@ defmodule Chat.Language.Interpreter do
     data
     |> dump_register()
     |> interpret_from(database)
-    |> interpret_select(columns)
     |> interpret_where(where)
+    |> interpret_select(columns)
   end
 
   defp interpret_expr(data, {:select, columns, database, joins, nil}) do

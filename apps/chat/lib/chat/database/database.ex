@@ -137,23 +137,24 @@ end
 defimpl Collectable, for: Chat.Database do
   alias Chat.Database
 
-  def into(db) do
-    {db,
-     fn
-       %Database{headers: []} = db, {:cont, row} ->
-         {headers, row} = Database.from_list(row)
-         %Database{db | headers: headers, rows: [row]}
+  def into(original) do
+    collector_fun = fn
+      %Database{headers: []} = db, {:cont, row} ->
+        {headers, row} = Database.from_list(row)
+        %Database{db | headers: headers, rows: [row]}
 
-       %Database{rows: rows} = db, {:cont, row} ->
-         {_, row} = Database.from_list(row)
-         %Database{db | rows: rows ++ [row]}
+      %Database{rows: rows} = db, {:cont, row} ->
+        {_, row} = Database.from_list(row)
+        %Database{db | rows: rows ++ [row]}
 
-       db, :done ->
-         db
+      db, :done ->
+        db
 
-       _, :halt ->
-         nil
-     end}
+      _, :halt ->
+        :ok
+    end
+
+    {original, collector_fun}
   end
 end
 

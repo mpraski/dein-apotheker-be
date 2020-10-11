@@ -20,7 +20,7 @@ defmodule Chat.Scenario.Question do
       id: id,
       type: type,
       query: query,
-      text: Text.new(text),
+      text: Text.new(text || ""),
       action: action,
       output: output,
       answers: []
