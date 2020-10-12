@@ -27,6 +27,10 @@ defmodule Chat.Database do
     }
   end
 
+  def select(%__MODULE__{} = db, []) do
+    %__MODULE__{db | headers: [], rows: []}
+  end
+
   def select(%__MODULE__{id: id} = db, columns) do
     indices = columns |> Enum.map(&header_index(db, &1))
 

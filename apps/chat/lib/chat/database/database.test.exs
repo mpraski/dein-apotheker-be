@@ -17,7 +17,7 @@ defmodule Chat.Database.Test do
     assert Database.select(prods, [:id]) == expected
   end
 
-  test "select two column" do
+  test "select two columns" do
     {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
 
     expected = %Chat.Database{
@@ -30,7 +30,7 @@ defmodule Chat.Database.Test do
       ]
     }
 
-    assert Database.select(prods, [:id]) == expected
+    assert Database.select(prods, [:id, :price]) == expected
   end
 
   test "select no column" do
@@ -39,11 +39,7 @@ defmodule Chat.Database.Test do
     expected = %Chat.Database{
       headers: [],
       id: :Products,
-      rows: [
-        [],
-        [],
-        []
-      ]
+      rows: []
     }
 
     assert Database.select(prods, []) == expected
