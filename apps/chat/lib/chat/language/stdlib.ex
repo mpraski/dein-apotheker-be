@@ -36,6 +36,7 @@ defmodule Chat.Language.StdLib do
     %{
       LOAD: &load/1,
       LOAD_WITH: &load_with/1,
+      INJECT_WITH: &inject_with/1,
       JUMP: &jump/1,
       GO: &go/1,
       FINISH: &finish/1,
@@ -58,13 +59,15 @@ defmodule Chat.Language.StdLib do
   end
 
   defp load_with(%Call{args: [%State{processes: p} = s, proc | vars], context: c}) do
-    captured =
-      Map.merge(
-        Memory.load_many(s, vars),
-        Memory.load_many(c, vars)
-      )
+    captured = capture(s, c, vars)
 
     %State{s | processes: p ++ [Process.new(proc, captured)]}
+  end
+
+  defp inject_with(%Call{args: [%State{processes: [p | r]} = s, proc | vars], context: c}) do
+    captured = capture(s, c, vars)
+
+    %State{s | processes: [p | [Process.new(proc, captured) | r]]}
   end
 
   defp jump(%Call{
@@ -214,5 +217,12 @@ defmodule Chat.Language.StdLib do
       l when is_list(l) -> deep_flat_map(l)
       o -> [o]
     end)
+  end
+
+  defp capture(m1, m2, vars) do
+    Map.merge(
+      Memory.load_many(m1, vars),
+      Memory.load_many(m2, vars)
+    )
   end
 end

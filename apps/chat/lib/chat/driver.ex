@@ -26,6 +26,33 @@ defmodule Chat.Driver do
     state
     |> State.generate_id()
     |> answer(data, question, answer)
+    |> advance(data)
+  end
+
+  defp advance(
+         %State{
+           question: question,
+           scenarios: [scenario | _],
+           processes: [%StateProcess{id: process} | _]
+         } = state,
+         {scenarios, databases} = data
+       ) do
+    {:ok, scenario = %Scenario{}} = Map.fetch(scenarios, scenario)
+    {:ok, process = %Process{}} = Scenario.process(scenario, process)
+
+    {:ok,
+     %Question{
+       type: type,
+       action: action
+     }} = Process.question(process, question)
+
+    if type == :CODE do
+      Context.new(scenarios, databases)
+      |> action.(state)
+      |> advance(data)
+    else
+      state
+    end
   end
 
   defp answer(
@@ -56,10 +83,7 @@ defmodule Chat.Driver do
          %Question{type: :C, action: action},
          "ok"
        ) do
-    action.(
-      Context.new(scenarios, databases),
-      state
-    )
+    Context.new(scenarios, databases) |> action.(state)
   end
 
   defp answer(
