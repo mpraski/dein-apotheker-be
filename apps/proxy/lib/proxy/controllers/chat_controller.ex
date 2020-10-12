@@ -22,9 +22,7 @@ defmodule Proxy.ChatController do
 
     case session |> Session.fetch(state) do
       {:ok, state} ->
-        context = {Chat.scenarios(), Chat.databases()}
-
-        state = state |> Driver.next(context, answer)
+        state = state |> Driver.next(Chat.data(), answer)
 
         session |> Session.add(state) |> Store.put()
 
@@ -45,7 +43,7 @@ defmodule Proxy.ChatController do
       ) do
     session = conn.assigns.session
 
-    state = Driver.initial({Chat.scenarios(), Chat.databases()})
+    state = Driver.initial(Chat.data())
 
     session |> Session.add(state) |> Store.put()
 

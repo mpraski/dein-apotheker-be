@@ -19,9 +19,9 @@ defmodule Chat.Driver do
         {scenarios, _} = data,
         answer
       ) do
-    {:ok, scenario = %Scenario{}} = Map.fetch(scenarios, scenario)
-    {:ok, process = %Process{}} = Scenario.process(scenario, process)
-    {:ok, question = %Question{}} = Process.question(process, question)
+    {:ok, scenario} = Map.fetch(scenarios, scenario)
+    {:ok, process} = Scenario.process(scenario, process)
+    {:ok, question} = Process.question(process, question)
 
     state
     |> State.generate_id()
@@ -37,8 +37,8 @@ defmodule Chat.Driver do
          } = state,
          {scenarios, databases} = data
        ) do
-    {:ok, scenario = %Scenario{}} = Map.fetch(scenarios, scenario)
-    {:ok, process = %Process{}} = Scenario.process(scenario, process)
+    {:ok, scenario} = Map.fetch(scenarios, scenario)
+    {:ok, process} = Scenario.process(scenario, process)
 
     {:ok,
      %Question{
@@ -62,8 +62,9 @@ defmodule Chat.Driver do
          answer
        )
        when is_binary(answer) do
-    {:ok, %Answer{action: a, output: o}} =
-      Question.answer(question, String.to_existing_atom(answer))
+    answer = String.to_existing_atom(answer)
+
+    {:ok, %Answer{action: a, output: o}} = Question.answer(question, answer)
 
     a.(
       Context.new(scenarios, databases),

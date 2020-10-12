@@ -74,22 +74,18 @@ defmodule Chat.Language.StdLib do
          args: [%State{processes: [_ | rest], scenarios: [n | _]} = s, proc],
          context: %Context{scenarios: scenarios}
        }) do
-    {:ok, scenario} = Map.fetch(scenarios, n)
-    {:ok, process} = scenario |> Scenario.process(proc)
-    {:ok, %Question{id: qid}} = ScenarioProcess.entry(process)
+    question_id = Chat.question_id(scenarios, proc, n)
 
-    %State{s | question: qid, processes: [Process.new(proc) | rest]}
+    %State{s | question: question_id, processes: [Process.new(proc) | rest]}
   end
 
   defp jump(%Call{
          args: [%State{processes: [], scenarios: [n | _]} = s, proc],
          context: %Context{scenarios: scenarios}
        }) do
-    {:ok, scenario} = Map.fetch(scenarios, n)
-    {:ok, process} = scenario |> Scenario.process(proc)
-    {:ok, %Question{id: qid}} = ScenarioProcess.entry(process)
+    question_id = Chat.question_id(scenarios, proc, n)
 
-    %State{s | question: qid, processes: [Process.new(proc)]}
+    %State{s | question: question_id, processes: [Process.new(proc)]}
   end
 
   defp jump(%Call{args: [%State{processes: []} = s, proc]}) do
