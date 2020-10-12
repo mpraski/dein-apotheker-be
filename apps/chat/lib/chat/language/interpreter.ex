@@ -172,16 +172,10 @@ defmodule Chat.Language.Interpreter do
 
   defp interpret_select({c, %Database{} = db}, :all), do: {c, db}
 
-  defp interpret_select({c, %Database{id: id} = db} = d, cols) do
-    indices =
-      d
-      |> evaluate_exprs(cols)
-      |> Enum.map(&normalize_column/1)
-      |> Enum.map(&Database.header_index(db, &1))
+  defp interpret_select({c, %Database{} = db} = d, cols) do
+    columns = d |> evaluate_exprs(cols) |> Enum.map(&normalize_column/1)
 
-    reducer = &Enum.reduce(indices, [], fn i, acc -> acc ++ [Enum.at(&1, i)] end)
-
-    {c, db |> Enum.map(reducer) |> Enum.into(Database.new(id))}
+    {c, Database.select(db, columns)}
   end
 
   defp interpret_from({%Context{databases: dbs} = c, _} = d, name) do

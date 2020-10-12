@@ -5,6 +5,50 @@ defmodule Chat.Database.Test do
   alias Chat.Database
   alias Chat.Language.Memory
 
+  test "select one column" do
+    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+
+    expected = %Chat.Database{
+      headers: [:id],
+      id: :Products,
+      rows: [["1"], ["2"], ["3"]]
+    }
+
+    assert Database.select(prods, [:id]) == expected
+  end
+
+  test "select two column" do
+    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+
+    expected = %Chat.Database{
+      headers: [:id, :price],
+      id: :Products,
+      rows: [
+        ["1", "12 dollars"],
+        ["2", "13 dollars"],
+        ["3", "14 dollars"]
+      ]
+    }
+
+    assert Database.select(prods, [:id]) == expected
+  end
+
+  test "select no column" do
+    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+
+    expected = %Chat.Database{
+      headers: [],
+      id: :Products,
+      rows: [
+        [],
+        [],
+        []
+      ]
+    }
+
+    assert Database.select(prods, []) == expected
+  end
+
   test "where column exists" do
     {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
 
@@ -231,6 +275,19 @@ defmodule Chat.Database.Test do
     ]
 
     assert list |> Enum.into(Database.new(:Products)) == prods
+  end
+
+  test "database to single column rows" do
+    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+
+    ids =
+      prods
+      |> Database.select([:id])
+      |> Database.single_column_rows()
+
+    list = ["1", "2", "3"]
+
+    assert ids == list
   end
 
   test "database to string" do

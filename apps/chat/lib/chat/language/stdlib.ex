@@ -11,6 +11,7 @@ defmodule Chat.Language.StdLib do
   alias Chat.Database
   alias Chat.Language.Memory
   alias Chat.Language.Context
+  alias Chat.Language.Parser
 
   defmodule Call do
     @moduledoc """
@@ -204,16 +205,52 @@ defmodule Chat.Language.StdLib do
 
   defp match(%Call{
          args: [
-           %State{} = s,
+           _,
            api,
            water,
            swallow,
            transport,
+           fly,
            single
          ],
-         context: %Context{databases: databases}
+         context: %Context{databases: databases} = ctx
        }) do
+    query = """
+      SELECT ID FROM MedForm WHERE (
+        (
+            (
+                WithoutWater == [water]
+                AND
+                SwallowingProblems == [swallow]
+            )
+            AND
+            (
+                Portable == [transport]
+                AND
+                GoodForFlight == [fly]
+            )
+        )
+        AND
+            DosedIndividually == [single]
+        )
+    """
+
+    args = %{
+      api: api,
+      water: water,
+      swallow: swallow,
+      transport: transport,
+      fly: fly,
+      single: single
+    }
+
     {:ok, products} = databases |> Map.fetch(:Products)
+
+    forms = Parser.parse(query).(ctx, args) |> Database.single_column_rows()
+
+    products
+    |> Database.where(:API, api)
+    |> Database.where_in(:MedForm, forms)
   end
 
   defp deep_flat_map(m) do

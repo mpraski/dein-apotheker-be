@@ -27,10 +27,26 @@ defmodule Chat.Database do
     }
   end
 
+  def select(%__MODULE__{id: id} = db, columns) do
+    indices = columns |> Enum.map(&header_index(db, &1))
+
+    reducer = &Enum.reduce(indices, [], fn i, acc -> acc ++ [Enum.at(&1, i)] end)
+
+    db |> Enum.map(reducer) |> Enum.into(new(id))
+  end
+
   def where(%__MODULE__{id: id, headers: hs} = db, column, value) do
     idx = header_index(db, column)
 
     predicate = &(Enum.at(&1, idx) |> elem(1) == value)
+
+    db |> Enum.filter(predicate) |> Enum.into(__MODULE__.new(id, [hs]))
+  end
+
+  def where_in(%__MODULE__{id: id, headers: hs} = db, column, values) do
+    idx = header_index(db, column)
+
+    predicate = &((Enum.at(&1, idx) |> elem(1)) in values)
 
     db |> Enum.filter(predicate) |> Enum.into(__MODULE__.new(id, [hs]))
   end
@@ -97,6 +113,10 @@ defmodule Chat.Database do
 
   def from_list(list) do
     Enum.unzip(list)
+  end
+
+  def single_column_rows(%__MODULE__{rows: rows}) do
+    rows |> Enum.flat_map(& &1)
   end
 
   defp to_atom(a) when is_atom(a), do: a
