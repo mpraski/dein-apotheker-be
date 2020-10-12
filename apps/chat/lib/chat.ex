@@ -21,7 +21,7 @@ defmodule Chat do
   end
 
   def data() do
-    Agent.get(__MODULE__, &(&1))
+    Agent.get(__MODULE__, & &1)
   end
 
   def scenarios() do

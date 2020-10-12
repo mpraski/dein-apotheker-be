@@ -54,65 +54,75 @@ defmodule Chat.Language.StdLib do
     }
   end
 
-  defp load(%Call{args: [%State{processes: p} = s, proc]}) do
-    %State{s | processes: p ++ [Process.new(proc)]}
+  defp load(%Call{args: [%State{processes: p} = state, proc]}) do
+    %State{state | processes: p ++ [Process.new(proc)]}
   end
 
-  defp load_with(%Call{args: [%State{processes: p} = s, proc | vars], context: c}) do
-    captured = capture(s, c, vars)
+  defp load_with(%Call{
+         args: [
+           %State{processes: p} = state,
+           proc | vars
+         ],
+         context: ctx
+       }) do
+    captured = capture(state, ctx, vars)
 
-    %State{s | processes: p ++ [Process.new(proc, captured)]}
+    %State{state | processes: p ++ [Process.new(proc, captured)]}
   end
 
-  defp inject_with(%Call{args: [%State{processes: [p | r]} = s, proc | vars], context: c}) do
-    captured = capture(s, c, vars)
+  defp inject_with(%Call{
+         args: [
+           %State{processes: [p | r]} = state,
+           proc | vars
+         ],
+         context: ctx
+       }) do
+    captured = capture(state, ctx, vars)
 
-    %State{s | processes: [p | [Process.new(proc, captured) | r]]}
+    %State{state | processes: [p | [Process.new(proc, captured) | r]]}
   end
 
   defp jump(%Call{
-         args: [%State{processes: [_ | rest], scenarios: [n | _]} = s, proc],
+         args: [%State{processes: [_ | rest], scenarios: [n | _]} = state, proc],
          context: %Context{scenarios: scenarios}
        }) do
     question_id = Chat.question_id(scenarios, proc, n)
 
-    %State{s | question: question_id, processes: [Process.new(proc) | rest]}
+    %State{state | question: question_id, processes: [Process.new(proc) | rest]}
   end
 
   defp jump(%Call{
-         args: [%State{processes: [], scenarios: [n | _]} = s, proc],
+         args: [%State{processes: [], scenarios: [n | _]} = state, proc],
          context: %Context{scenarios: scenarios}
        }) do
     question_id = Chat.question_id(scenarios, proc, n)
 
-    %State{s | question: question_id, processes: [Process.new(proc)]}
+    %State{state | question: question_id, processes: [Process.new(proc)]}
   end
 
-  defp jump(%Call{args: [%State{processes: []} = s, proc]}) do
-    %State{s | processes: [Process.new(proc)]}
+  defp jump(%Call{args: [%State{processes: []} = state, proc]}) do
+    %State{state | processes: [Process.new(proc)]}
   end
 
-  defp go(%Call{args: [%State{} = s, question]}) do
-    %State{s | question: question}
+  defp go(%Call{args: [%State{} = state, question]}) do
+    %State{state | question: question}
   end
 
-  defp finish(
-         %Call{
-           args: [
-             %State{
-               processes: [%Process{id: id} | rest],
-               scenarios: [n | _]
-             } = s
-           ],
-           context: %Context{scenarios: scenarios}
-         } = c
-       ) do
+  defp finish(%Call{
+         args: [
+           %State{
+             processes: [%Process{id: id} | rest],
+             scenarios: [n | _]
+           } = state
+         ],
+         context: %Context{scenarios: scenarios} = ctx
+       }) do
     {:ok, scenario} = Map.fetch(scenarios, n)
     {:ok, action} = Scenario.action(scenario, id)
 
     %State{
       processes: [%Process{id: id} | _]
-    } = state = action.(%Call{c | args: [%State{s | processes: rest}]})
+    } = state = action.(ctx, %State{state | processes: rest})
 
     {:ok, process} = scenario |> Scenario.process(id)
     {:ok, %Question{id: qid}} = ScenarioProcess.entry(process)
@@ -120,21 +130,19 @@ defmodule Chat.Language.StdLib do
     %State{state | question: qid}
   end
 
-  defp finish(
-         %Call{
-           args: [
-             %State{
-               processes: [%Process{id: id}],
-               scenarios: [c, n | r]
-             } = s
-           ],
-           context: %Context{scenarios: scenarios}
-         } = c
-       ) do
+  defp finish(%Call{
+         args: [
+           %State{
+             processes: [%Process{id: id}],
+             scenarios: [c, n | r]
+           } = state
+         ],
+         context: %Context{scenarios: scenarios} = ctx
+       }) do
     {:ok, scenario} = Map.fetch(scenarios, c)
     {:ok, action} = Scenario.action(scenario, id)
 
-    state = action.(%Call{c | args: [%State{s | processes: []}]})
+    state = action.(ctx, %State{state | processes: []})
 
     {:ok, scenario} = Map.fetch(scenarios, n)
     {:ok, process} = Scenario.entry(scenario)
@@ -168,10 +176,10 @@ defmodule Chat.Language.StdLib do
     false
   end
 
-  defp defer(%Call{args: [%State{} = s]}), do: s
+  defp defer(%Call{args: [%State{} = state]}), do: state
 
-  defp save(%Call{args: [m, n], context: c}) do
-    {:ok, v} = Memory.load(c, n)
+  defp save(%Call{args: [m, n], context: ctx}) do
+    {:ok, v} = Memory.load(ctx, n)
     Memory.store(m, n, v)
   end
 

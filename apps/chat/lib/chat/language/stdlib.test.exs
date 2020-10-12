@@ -159,8 +159,9 @@ defmodule Chat.Language.StdLib.Test do
         |> Driver.initial()
         |> Memory.store(State.cart(), [:prod_1, :prod_2, :prod_3])
     ],
-    inject_with: [
+    inject_with_1: [
       program: """
+        LOAD(ExampleProcess),
         FOR item IN [cart] DO
           INJECT_WITH(Explain, item)
       """,
@@ -180,6 +181,9 @@ defmodule Chat.Language.StdLib.Test do
                      %StateProcess{
                        id: :Explain,
                        variables: %{item: :prod_1}
+                     },
+                     %StateProcess{
+                       id: :ExampleProcess
                      }
                    ]
                  } ->
@@ -208,6 +212,26 @@ defmodule Chat.Language.StdLib.Test do
         ),
       register: Driver.initial(Chat.data())
     ],
+    jump_2: [
+      program: "LOAD(ExampleProcess), JUMP(ExampleProcess)",
+      expected:
+        quote(
+          do: fn %State{
+                   question: :time,
+                   processes: [
+                     %StateProcess{
+                       id: :ExampleProcess
+                     },
+                     %StateProcess{
+                       id: :ExampleProcess
+                     }
+                   ]
+                 } ->
+            true
+          end
+        ),
+      register: Driver.initial(Chat.data())
+    ],
     save_1: [
       program: """
         a = 4,
@@ -225,6 +249,26 @@ defmodule Chat.Language.StdLib.Test do
             Map.get(v, :a) == 4 and
               Map.get(v, :b) == "val" and
               Map.get(v, :c) == [:a, "val", :c]
+          end
+        ),
+      register: Driver.initial(Chat.data())
+    ],
+    finish_1: [
+      program: """
+        LOAD(ExampleProcess),
+        FINISH()
+      """,
+      expected:
+        quote(
+          do: fn %State{
+                   question: :time,
+                   processes: [
+                     %StateProcess{
+                       id: :ExampleProcess
+                     }
+                   ]
+                 } ->
+            true
           end
         ),
       register: Driver.initial(Chat.data())
