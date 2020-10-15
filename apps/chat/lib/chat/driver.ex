@@ -72,6 +72,30 @@ defmodule Chat.Driver do
     )
   end
 
+  defp answer(
+         state = %State{},
+         {scenarios, databases},
+         %Question{type: :P, action: action},
+         nil
+       ) do
+    Context.new(scenarios, databases) |> action.(state)
+  end
+
+  defp answer(
+         state = %State{},
+         {scenarios, databases},
+         %Question{type: :P, action: action},
+         product
+       ) do
+    {:ok, items} = state |> Memory.load(State.cart())
+
+    items = (items ++ [product]) |> Enum.uniq()
+
+    state = state |> Memory.store(State.cart(), items)
+
+    Context.new(scenarios, databases) |> action.(state)
+  end
+
   defp answer(%State{} = state, _, %Question{type: :C, action: nil}, "ok") do
     {:ok, previous} = Memory.load(state, :previous_question)
 
@@ -82,7 +106,7 @@ defmodule Chat.Driver do
          %State{} = state,
          {scenarios, databases},
          %Question{type: :C, action: action},
-         "ok"
+         _
        ) do
     Context.new(scenarios, databases) |> action.(state)
   end
@@ -128,12 +152,12 @@ defmodule Chat.Driver do
            type: :NP,
            action: action
          },
-         cart
+         selection
        )
-       when is_list(cart) do
+       when is_list(selection) do
     {:ok, items} = state |> Memory.load(State.cart())
 
-    items = (items ++ cart) |> Enum.uniq()
+    items = (items ++ selection) |> Enum.uniq()
 
     state = state |> Memory.store(State.cart(), items)
 
