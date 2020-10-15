@@ -7,7 +7,6 @@ defmodule Proxy.Session.Enforce.Test do
   alias Proxy.Session
   alias Proxy.Session.Store
   alias Proxy.Session.Enforce
-  alias Account.User
 
   setup do
     start_supervised(Store.spec(), [])
@@ -23,7 +22,7 @@ defmodule Proxy.Session.Enforce.Test do
   end
 
   test "present user" do
-    user = User.new("uid")
+    user = "uid"
 
     conn =
       conn(:post, "/route")

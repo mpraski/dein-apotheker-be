@@ -3,7 +3,7 @@ defmodule Proxy.Router do
 
   use Plug.ErrorHandler
 
-  alias Proxy.Session.{Verify, Enforce}
+  alias Proxy.Session.{Verify, Enforce, ProtectCSRF}
 
   pipeline :api do
     plug(:accepts, ["json"])
@@ -18,7 +18,7 @@ defmodule Proxy.Router do
 
   # Enfore the CSRF + JWT presence in the cookie
   pipeline :ensure_auth do
-    plug(Plug.CSRFProtection)
+    plug(ProtectCSRF)
     plug(Verify)
     plug(Enforce)
   end
@@ -39,13 +39,13 @@ defmodule Proxy.Router do
 
   def handle_errors(conn, %{
         kind: _kind,
-        reason: %Plug.CSRFProtection.InvalidCSRFTokenError{},
+        reason: s = %Plug.CSRFProtection.InvalidCSRFTokenError{},
         stack: _stack
       }) do
     conn |> render_error(:unauthorized)
   end
 
-  def handle_errors(conn, %{kind: _kind, reason: _reason, stack: _stack}) do
+  def handle_errors(conn, s = %{kind: _kind, reason: _reason, stack: _stack}) do
     conn |> render_error(:internal_server_error)
   end
 
