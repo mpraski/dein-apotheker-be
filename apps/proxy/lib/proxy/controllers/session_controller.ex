@@ -18,7 +18,7 @@ defmodule Proxy.SessionController do
   end
 
   def has(conn, _params) do
-    code = if conn.assigns.user, do: :ok, else: :not_found
+    code = if conn.assigns.user, do: :ok, else: :no_content
 
     conn
     |> send_resp(code, "")
@@ -26,8 +26,6 @@ defmodule Proxy.SessionController do
   end
 
   def delete(conn, _params) do
-    delete_csrf_token()
-
     conn
     |> delete_session(:token)
     |> delete_session(:csrf_token)

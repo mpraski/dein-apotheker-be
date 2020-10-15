@@ -5,13 +5,12 @@ defmodule Proxy.Endpoint do
 
   @allowed_content ~w[application/json]
 
-  # Code reloading can be explicitly enabled under the
-  # :code_reloader configuration of your endpoint.
   if code_reloading? do
     plug(Phoenix.CodeReloader)
   end
 
   plug(Plug.RequestId)
+
   plug(Plug.Telemetry, event_prefix: [:phoenix, :endpoint])
 
   plug(Plug.Parsers,

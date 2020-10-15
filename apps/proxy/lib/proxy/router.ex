@@ -39,13 +39,13 @@ defmodule Proxy.Router do
 
   def handle_errors(conn, %{
         kind: _kind,
-        reason: s = %Plug.CSRFProtection.InvalidCSRFTokenError{},
+        reason: %Plug.CSRFProtection.InvalidCSRFTokenError{},
         stack: _stack
       }) do
     conn |> render_error(:unauthorized)
   end
 
-  def handle_errors(conn, s = %{kind: _kind, reason: _reason, stack: _stack}) do
+  def handle_errors(conn, %{kind: _kind, reason: _reason, stack: _stack}) do
     conn |> render_error(:internal_server_error)
   end
 

@@ -9,7 +9,24 @@ defmodule Proxy.ChatController do
 
   action_fallback(FallbackController)
 
-  @spec answer(any, any) :: {:error, 400} | Plug.Conn.t()
+  def answer(
+        %Conn{
+          body_params: %{
+            "state" => "new",
+            "answer" => nil
+          }
+        } = conn,
+        _params
+      ) do
+    session = conn.assigns.session
+
+    state = Driver.initial(Chat.data())
+
+    session |> Session.add(state) |> Store.put()
+
+    conn |> render("answer.json", state: state)
+  end
+
   def answer(
         %Conn{
           body_params: %{
@@ -32,23 +49,6 @@ defmodule Proxy.ChatController do
       :error ->
         {:error, 400}
     end
-  end
-
-  def answer(
-        %Conn{
-          body_params: %{
-            "state" => "new"
-          }
-        } = conn,
-        _params
-      ) do
-    session = conn.assigns.session
-
-    state = Driver.initial(Chat.data())
-
-    session |> Session.add(state) |> Store.put()
-
-    conn |> render("answer.json", state: state)
   end
 
   def answer(_conn, _params) do
