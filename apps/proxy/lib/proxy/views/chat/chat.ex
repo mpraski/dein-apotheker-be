@@ -10,9 +10,10 @@ defmodule Proxy.Views.Chat do
   alias Chat.Database
   alias Chat.Language.Context
 
-  alias Proxy.Views.Chat.Message
+  alias Proxy.Views.Chat.{Product, Brand, API, Message}
   alias Proxy.Views.Chat.State, as: Representation
 
+  @spec present(Chat.State.t(), {map, any}) :: Proxy.Views.Chat.State.t()
   def present(
         %State{
           id: id,
@@ -109,7 +110,33 @@ defmodule Proxy.Views.Chat do
   defp database_input(%Database{id: id} = db) do
     %{
       database: id,
-      rows: Enum.to_list(db)
+      rows: db |> Enum.map(&map_row(id, &1))
     }
+  end
+
+  defp map_row(:Products, row) do
+    {id, name, image} = common_fields(row)
+
+    Product.new(id, name, image)
+  end
+
+  defp map_row(:Brands, row) do
+    {id, name, image} = common_fields(row)
+
+    Brand.new(id, name, image)
+  end
+
+  defp map_row(:API, row) do
+    {id, name, image} = common_fields(row)
+
+    API.new(id, name, image)
+  end
+
+  defp common_fields(row) do
+    {:ok, id} = row |> Map.fetch(:ID)
+    {:ok, name} = row |> Map.fetch(:Name)
+    {:ok, image} = row |> Map.fetch(:Image)
+
+    {id, name, image}
   end
 end

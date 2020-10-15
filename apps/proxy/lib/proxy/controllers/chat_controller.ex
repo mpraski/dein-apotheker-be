@@ -9,6 +9,7 @@ defmodule Proxy.ChatController do
 
   action_fallback(FallbackController)
 
+  @spec answer(any, any) :: {:error, 400} | Plug.Conn.t()
   def answer(
         %Conn{
           body_params: %{
