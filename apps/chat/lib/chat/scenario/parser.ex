@@ -10,6 +10,7 @@ defmodule Chat.Scenario.Parser do
   @scenario_header ~w[Process Action]
   @process_header ~w[ID Type Query Text Action Output]
   @process_columns length(@process_header)
+  @empties [nil, ""]
 
   def parse(scenarios) do
     scenarios
@@ -55,7 +56,7 @@ defmodule Chat.Scenario.Parser do
     end
 
     reducer = fn
-      [nil | [nil | _]], acc ->
+      [id | [type | _]], acc when id in @empties or type in @empties ->
         acc
 
       [_ | ["A" | _]] = row, {qs, as} ->
