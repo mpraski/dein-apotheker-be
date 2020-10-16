@@ -76,7 +76,7 @@ defmodule Chat.Driver do
          state = %State{},
          {scenarios, databases},
          %Question{type: :P, action: action},
-         nil
+         "skip"
        ) do
     Context.new(scenarios, databases) |> action.(state)
   end

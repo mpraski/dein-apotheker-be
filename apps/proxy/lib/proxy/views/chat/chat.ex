@@ -82,19 +82,29 @@ defmodule Proxy.Views.Chat do
 
     text = Text.render(text, data)
 
-    Message.new(id, :P, text, product)
+    Message.new(id, :P, text, map_row(:Products, product))
   end
 
   defp create_message(
          %Question{
            id: id,
-           type: type,
+           type: :C,
            text: text
          },
          data
-       )
-       when type in ~w[C F]a do
-    Message.new(id, type, Text.render(text, data))
+       ) do
+    Message.new(id, :C, Text.render(text, data), comment_input())
+  end
+
+  defp create_message(
+         %Question{
+           id: id,
+           type: :F,
+           text: text
+         },
+         data
+       ) do
+    Message.new(id, :F, Text.render(text, data))
   end
 
   defp answers_input(answers, data) do
@@ -105,6 +115,15 @@ defmodule Proxy.Views.Chat do
         text: Text.render(text, data)
       }
     end)
+  end
+
+  defp comment_input do
+    [
+      %{
+        id: "ok",
+        text: "OK"
+      }
+    ]
   end
 
   defp database_input(%Database{id: id} = db) do
@@ -133,9 +152,9 @@ defmodule Proxy.Views.Chat do
   end
 
   defp common_fields(row) do
-    {:ok, id} = row |> Map.fetch(:ID)
-    {:ok, name} = row |> Map.fetch(:Name)
-    {:ok, image} = row |> Map.fetch(:Image)
+    {:ok, id} = row |> Keyword.fetch(:ID)
+    {:ok, name} = row |> Keyword.fetch(:Name)
+    {:ok, image} = row |> Keyword.fetch(:Image)
 
     {id, name, image}
   end

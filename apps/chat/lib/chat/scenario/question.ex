@@ -39,7 +39,7 @@ defmodule Chat.Scenario.Question do
   end
 
   def add_answer(%Answer{} = a, %__MODULE__{answers: as} = q) do
-    %__MODULE__{q | answers: as ++ [a]}
+    %__MODULE__{q | answers: [a | as]}
   end
 end
 

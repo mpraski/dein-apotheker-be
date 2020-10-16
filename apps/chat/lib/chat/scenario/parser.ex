@@ -47,30 +47,42 @@ defmodule Chat.Scenario.Parser do
   end
 
   defp parse_process({p, rows}) do
+    mapper = fn question, answers ->
+      answers
+      |> Enum.with_index()
+      |> Enum.map(fn {a, i} -> %Answer{a | id: :"#{question.id}_#{i}"} end)
+      |> Enum.reduce(question, &Question.add_answer/2)
+    end
+
     reducer = fn
-      [id | _] = row, {qs, as} when id in [nil, ""] ->
+      [nil | [nil | _]], acc ->
+        acc
+
+      [_ | ["A" | _]] = row, {qs, as} ->
         {qs, [parse_answer(row) | as]}
 
       row, {qs, []} ->
         {[parse_question(row) | qs], []}
 
       row, {[q | qs], as} ->
-        q =
-          as
-          |> Enum.with_index()
-          |> Enum.map(fn {a, i} -> %Answer{a | id: :"#{q.id}_#{i}"} end)
-          |> Enum.reduce(q, &Question.add_answer/2)
-
-        {[parse_question(row) | [q | qs]], []}
+        {[parse_question(row) | [mapper.(q, as) | qs]], []}
     end
 
-    questions =
-      [entry | _] =
+    {questions, answers} =
       rows
       |> Enum.map(&fit(&1, @process_columns))
       |> Enum.reduce({[], []}, reducer)
-      |> elem(0)
-      |> Enum.reverse()
+
+    questions =
+      if length(answers) > 0 do
+        [q | r] = questions
+
+        [mapper.(q, answers) | r]
+      else
+        questions
+      end
+
+    questions = [entry | _] = questions |> Enum.reverse()
 
     questions =
       questions
