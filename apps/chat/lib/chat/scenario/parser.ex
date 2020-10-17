@@ -56,7 +56,7 @@ defmodule Chat.Scenario.Parser do
     end
 
     reducer = fn
-      [id | [type | _]], acc when id in @empties or type in @empties ->
+      [id | [type | _]], acc when id in @empties and type in @empties ->
         acc
 
       [_ | ["A" | _]] = row, {qs, as} ->
@@ -71,7 +71,8 @@ defmodule Chat.Scenario.Parser do
 
     {questions, answers} =
       rows
-      |> Enum.map(&fit(&1, @process_columns))
+      |> Stream.map(&fit(&1, @process_columns))
+      |> Stream.map(&trim_row/1)
       |> Enum.reduce({[], []}, reducer)
 
     questions =
@@ -179,5 +180,14 @@ defmodule Chat.Scenario.Parser do
     end
 
     fitter.(delta)
+  end
+
+  defp trim_row(row) do
+    trimmer = fn
+      nil -> nil
+      b when is_binary(b) -> String.trim(b)
+    end
+
+    row |> Enum.map(trimmer)
   end
 end

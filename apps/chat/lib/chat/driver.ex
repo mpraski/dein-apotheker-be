@@ -40,6 +40,10 @@ defmodule Chat.Driver do
     {:ok, scenario} = Map.fetch(scenarios, scenario)
     {:ok, process} = Scenario.process(scenario, process)
 
+    IO.inspect state
+    IO.inspect process
+    IO.inspect question
+
     {:ok,
      %Question{
        type: type,
@@ -137,8 +141,7 @@ defmodule Chat.Driver do
            output: output
          },
          selection
-       )
-       when is_list(selection) do
+       ) do
     action.(
       Context.new(scenarios, databases),
       Memory.store(state, output, selection)
