@@ -85,19 +85,17 @@ defmodule Chat.Language.StdLib do
   end
 
   defp jump(%Call{
-         args: [%State{processes: [_ | rest], scenarios: [n | _]} = state, proc],
-         context: %Context{scenarios: scenarios}
+         args: [%State{processes: [_ | rest], scenarios: [n | _]} = state, proc]
        }) do
-    question_id = Chat.question_id(scenarios, proc, n)
+    question_id = Chat.question_id(proc, n)
 
     %State{state | question: question_id, processes: [Process.new(proc) | rest]}
   end
 
   defp jump(%Call{
-         args: [%State{processes: [], scenarios: [n | _]} = state, proc],
-         context: %Context{scenarios: scenarios}
+         args: [%State{processes: [], scenarios: [n | _]} = state, proc]
        }) do
-    question_id = Chat.question_id(scenarios, proc, n)
+    question_id = Chat.question_id(proc, n)
 
     %State{state | question: question_id, processes: [Process.new(proc)]}
   end
@@ -117,9 +115,9 @@ defmodule Chat.Language.StdLib do
              scenarios: [n | _]
            } = state
          ],
-         context: %Context{scenarios: scenarios} = ctx
+         context: ctx
        }) do
-    {:ok, scenario} = Map.fetch(scenarios, n)
+    scenario = Context.scenario(n)
     {:ok, action} = Scenario.action(scenario, id)
 
     %State{
@@ -139,15 +137,13 @@ defmodule Chat.Language.StdLib do
              scenarios: [c, n | r]
            } = state
          ],
-         context: %Context{scenarios: scenarios} = ctx
+         context: ctx
        }) do
-    {:ok, scenario} = Map.fetch(scenarios, c)
-    {:ok, action} = Scenario.action(scenario, id)
+    {:ok, action} = Context.scenario(c) |> Scenario.action(id)
 
     state = action.(ctx, %State{state | processes: []})
 
-    {:ok, scenario} = Map.fetch(scenarios, n)
-    {:ok, process} = Scenario.entry(scenario)
+    {:ok, process} = Context.scenario(n) |> Scenario.entry()
     {:ok, %Question{id: qid}} = ScenarioProcess.entry(process)
 
     %State{state | question: qid, processes: [Process.new(process.id)], scenarios: [n | r]}
@@ -214,7 +210,7 @@ defmodule Chat.Language.StdLib do
            fly,
            single
          ],
-         context: %Context{databases: databases} = ctx
+         context: ctx
        }) do
     query = """
       SELECT ID FROM MedForm WHERE (
@@ -245,7 +241,7 @@ defmodule Chat.Language.StdLib do
       single: single
     }
 
-    {:ok, products} = databases |> Map.fetch(:Products)
+    products = Context.database(:Products)
 
     prog = Parser.parse(query) |> Interpreter.interpret()
 

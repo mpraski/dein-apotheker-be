@@ -7,17 +7,18 @@ defmodule Chat.Language.Context do
   use TypedStruct
 
   typedstruct do
-    field(:scenarios, map(), enforce: true)
-    field(:databases, map(), enforce: true)
     field(:memory, map(), default: Map.new())
   end
 
-  def new({scenarios, databases}) do
+  def new() do
     %__MODULE__{
-      scenarios: scenarios,
-      databases: databases
+      memory: Map.new()
     }
   end
+
+  defdelegate scenario(id), to: Chat
+
+  defdelegate database(id), to: Chat
 end
 
 defimpl Chat.Language.Memory, for: Chat.Language.Context do

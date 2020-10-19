@@ -171,15 +171,15 @@ defmodule Chat.Language.Interpreter.Test do
     ],
     select_all_products: [
       program: "SELECT * FROM Products",
-      expected: Map.get(Chat.databases(), :Products)
+      expected: Chat.database(:Products)
     ],
     select_all_brands: [
       program: "SELECT * FROM Brands",
-      expected: Map.get(Chat.databases(), :Brands)
+      expected: Chat.database(:Brands)
     ],
     select_all_fav_products: [
       program: "SELECT * FROM FavProducts",
-      expected: Map.get(Chat.databases(), :FavProducts)
+      expected: Chat.database(:FavProducts)
     ],
     select_id_products: [
       program: "SELECT id FROM Products",
@@ -219,11 +219,11 @@ defmodule Chat.Language.Interpreter.Test do
     ],
     select_all_products_where: [
       program: "SELECT * FROM Products WHERE id == '2'",
-      expected: Map.get(Chat.databases(), :Products) |> Database.where(:id, "2")
+      expected: Chat.database(:Products) |> Database.where(:id, "2")
     ],
     select_all_brands_where: [
       program: "SELECT * FROM Brands WHERE id == '2'",
-      expected: Map.get(Chat.databases(), :Brands) |> Database.where(:id, "2")
+      expected: Chat.database(:Brands) |> Database.where(:id, "2")
     ],
     select_columns_products_where: [
       program: "SELECT id, name FROM Products WHERE id == '2'",
@@ -424,7 +424,7 @@ defmodule Chat.Language.Interpreter.Test do
     @expected Keyword.get(data, :expected)
 
     test "#{name} language test" do
-      ctx = Context.new(Chat.data())
+      ctx = Context.new()
       prog = Parser.parse(@program) |> Interpreter.interpret()
       assert prog.(ctx, @register) == @expected
     end

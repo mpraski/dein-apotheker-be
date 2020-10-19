@@ -5,8 +5,7 @@ defmodule Proxy.Views.Chat do
 
   alias Chat.State
   alias Chat.State.Process, as: StateProcess
-  alias Chat.Scenario
-  alias Chat.Scenario.{Process, Question, Answer, Text}
+  alias Chat.Scenario.{Question, Answer, Text}
   alias Chat.Database
   alias Chat.Language.Context
   alias Chat.Language.Interpreter
@@ -14,21 +13,17 @@ defmodule Proxy.Views.Chat do
   alias Proxy.Views.Chat.{Product, Brand, API, Message}
   alias Proxy.Views.Chat.State, as: Representation
 
-  @spec present(Chat.State.t(), {map, any}) :: Proxy.Views.Chat.State.t()
   def present(
         %State{
           id: id,
           question: question,
           scenarios: [scenario | _],
           processes: [%StateProcess{id: process} | _]
-        } = state,
-        {scenarios, _} = data
+        } = state
       ) do
-    {:ok, scenario = %Scenario{}} = Map.fetch(scenarios, scenario)
-    {:ok, process = %Process{}} = Scenario.process(scenario, process)
-    {:ok, question = %Question{}} = Process.question(process, question)
+    question = Chat.question(scenario, process, question)
 
-    message = question |> create_message(state, data)
+    message = question |> create_message(state)
 
     Representation.new(id, message)
   end
@@ -40,12 +35,11 @@ defmodule Proxy.Views.Chat do
            text: text,
            answers: answers
          },
-         _,
-         data
+         _
        ) do
-    text = Text.render(text, data)
+    text = Text.render(text)
 
-    Message.new(id, :Q, text, answers_input(answers, data))
+    Message.new(id, :Q, text, answers_input(answers))
   end
 
   defp create_message(
@@ -55,16 +49,15 @@ defmodule Proxy.Views.Chat do
            text: text,
            query: query
          },
-         state,
-         data
+         state
        )
        when type in ~w[PN N]a do
     input =
-      Context.new(data)
+      Context.new()
       |> Interpreter.interpret(query).(state)
       |> database_input()
 
-    text = Text.render(text, data)
+    text = Text.render(text)
 
     Message.new(id, type, text, input)
   end
@@ -76,15 +69,14 @@ defmodule Proxy.Views.Chat do
            text: text,
            query: query
          },
-         state,
-         data
+         state
        ) do
     [product] =
-      Context.new(data)
+      Context.new()
       |> Interpreter.interpret(query).(state)
       |> Enum.to_list()
 
-    text = Text.render(text, data)
+    text = Text.render(text)
 
     Message.new(id, :P, text, map_row(:Products, product))
   end
@@ -95,10 +87,9 @@ defmodule Proxy.Views.Chat do
            type: :C,
            text: text
          },
-         _,
-         data
+         _
        ) do
-    Message.new(id, :C, Text.render(text, data), comment_input())
+    Message.new(id, :C, Text.render(text), comment_input())
   end
 
   defp create_message(
@@ -107,18 +98,17 @@ defmodule Proxy.Views.Chat do
            type: :F,
            text: text
          },
-         _,
-         data
+         _
        ) do
-    Message.new(id, :F, Text.render(text, data))
+    Message.new(id, :F, Text.render(text))
   end
 
-  defp answers_input(answers, data) do
+  defp answers_input(answers) do
     answers
     |> Enum.map(fn %Answer{id: id, text: text} ->
       %{
         id: id,
-        text: Text.render(text, data)
+        text: Text.render(text)
       }
     end)
   end

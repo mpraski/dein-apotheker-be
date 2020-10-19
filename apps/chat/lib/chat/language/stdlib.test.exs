@@ -54,7 +54,7 @@ defmodule Chat.Language.StdLib.Test do
     go_1: [
       program: "GO(PreviousMedBrand)",
       expected: quote(do: fn %State{question: q} -> q == :PreviousMedBrand end),
-      register: Driver.initial(Chat.data())
+      register: Driver.initial()
     ],
     load_1: [
       program: "LOAD(SomeProcess)",
@@ -71,7 +71,7 @@ defmodule Chat.Language.StdLib.Test do
             true
           end
         ),
-      register: Driver.initial(Chat.data())
+      register: Driver.initial()
     ],
     load_with_1: [
       program: """
@@ -96,7 +96,7 @@ defmodule Chat.Language.StdLib.Test do
             true
           end
         ),
-      register: Driver.initial(Chat.data())
+      register: Driver.initial()
     ],
     load_with_2: [
       program: """
@@ -126,7 +126,7 @@ defmodule Chat.Language.StdLib.Test do
             true
           end
         ),
-      register: Driver.initial(Chat.data())
+      register: Driver.initial()
     ],
     load_with_3: [
       program: """
@@ -155,10 +155,7 @@ defmodule Chat.Language.StdLib.Test do
             true
           end
         ),
-      register:
-        Chat.data()
-        |> Driver.initial()
-        |> Memory.store(State.cart(), [:prod_1, :prod_2, :prod_3])
+      register: Driver.initial() |> Memory.store(State.cart(), [:prod_1, :prod_2, :prod_3])
     ],
     inject_with_1: [
       program: """
@@ -191,10 +188,7 @@ defmodule Chat.Language.StdLib.Test do
             true
           end
         ),
-      register:
-        Chat.data()
-        |> Driver.initial()
-        |> Memory.store(State.cart(), [:prod_1, :prod_2, :prod_3])
+      register: Driver.initial() |> Memory.store(State.cart(), [:prod_1, :prod_2, :prod_3])
     ],
     jump_1: [
       program: "JUMP(ExampleProcess)",
@@ -211,7 +205,7 @@ defmodule Chat.Language.StdLib.Test do
             true
           end
         ),
-      register: Driver.initial(Chat.data())
+      register: Driver.initial()
     ],
     jump_2: [
       program: "LOAD(ExampleProcess), JUMP(ExampleProcess)",
@@ -231,7 +225,7 @@ defmodule Chat.Language.StdLib.Test do
             true
           end
         ),
-      register: Driver.initial(Chat.data())
+      register: Driver.initial()
     ],
     save_1: [
       program: """
@@ -252,7 +246,7 @@ defmodule Chat.Language.StdLib.Test do
               Map.get(v, :c) == [:a, "val", :c]
           end
         ),
-      register: Driver.initial(Chat.data())
+      register: Driver.initial()
     ],
     finish_1: [
       program: """
@@ -272,7 +266,7 @@ defmodule Chat.Language.StdLib.Test do
             true
           end
         ),
-      register: Driver.initial(Chat.data())
+      register: Driver.initial()
     ]
   ]
 
@@ -282,7 +276,7 @@ defmodule Chat.Language.StdLib.Test do
     @expected Keyword.get(data, :expected)
 
     test "#{name} stdlib test" do
-      ctx = Context.new(Chat.data())
+      ctx = Context.new()
       prog = Parser.parse(@program) |> Interpreter.interpret()
       result = prog.(ctx, @register)
       expected = unquote(@expected)

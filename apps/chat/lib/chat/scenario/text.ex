@@ -23,6 +23,8 @@ defmodule Chat.Scenario.Text do
     }
   end
 
+  def render(module, input \\ nil)
+
   def render(%__MODULE__{substitutes: [], text: text}, _), do: text
 
   def render(
@@ -30,11 +32,10 @@ defmodule Chat.Scenario.Text do
           substitutes: subs,
           text: text
         },
-        input,
-        data
+        input
       ) do
     subs
-    |> Enum.map(&execute(&1, input, data))
+    |> Enum.map(&execute(&1, input))
     |> Enum.reduce(
       text,
       &Regex.replace(
@@ -46,10 +47,10 @@ defmodule Chat.Scenario.Text do
     )
   end
 
-  defp execute(program, input, data) do
+  defp execute(program, input) do
     program = Interpreter.interpret(program)
 
-    Context.new(data)
+    Context.new()
     |> program.(input)
     |> to_string()
   end

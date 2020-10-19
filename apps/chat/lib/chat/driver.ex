@@ -17,17 +17,14 @@ defmodule Chat.Driver do
           scenarios: [scenario | _],
           processes: [%StateProcess{id: process} | _]
         } = state,
-        {scenarios, _} = data,
         answer
       ) do
-    {:ok, scenario} = Map.fetch(scenarios, scenario)
-    {:ok, process} = Scenario.process(scenario, process)
-    {:ok, question} = Process.question(process, question)
+    question = Chat.question(scenario, process, question)
 
     state
     |> State.generate_id()
-    |> answer(data, question, answer)
-    |> advance(data)
+    |> answer(question, answer)
+    |> advance()
   end
 
   defp advance(
@@ -35,70 +32,62 @@ defmodule Chat.Driver do
            question: question,
            scenarios: [scenario | _],
            processes: [%StateProcess{id: process} | _]
-         } = state,
-         {scenarios, _} = data
+         } = state
        ) do
-    {:ok, scenario} = Map.fetch(scenarios, scenario)
-    {:ok, process} = Scenario.process(scenario, process)
-
     IO.inspect(state)
-    IO.inspect(process)
-    IO.inspect(question)
 
-    {:ok,
-     %Question{
-       type: type,
-       action: action
-     }} = Process.question(process, question)
+    %Question{
+      type: type,
+      action: action
+    } = Chat.question(scenario, process, question)
 
     if type == :CODE do
-      Context.new(data)
+      Context.new()
       |> Interpreter.interpret(action).(state)
-      |> advance(data)
+      |> advance()
     else
       state
     end
   end
 
-  defp answer(state, data, question = %Question{type: :Q, output: name_output}, answer)
+  defp answer(state, question = %Question{type: :Q, output: name_output}, answer)
        when is_binary(answer) do
     answer = String.to_existing_atom(answer)
 
     {:ok, %Answer{action: a, output: o}} = Question.answer(question, answer)
 
     Interpreter.interpret(a).(
-      Context.new(data),
+      Context.new(),
       Memory.store(state, name_output, o)
     )
   end
 
-  defp answer(state, data, %Question{type: :P, action: action}, "skip") do
-    Context.new(data) |> Interpreter.interpret(action).(state)
+  defp answer(state, %Question{type: :P, action: action}, "skip") do
+    Context.new() |> Interpreter.interpret(action).(state)
   end
 
-  defp answer(state, data, %Question{type: :P, action: action}, product) do
+  defp answer(state, %Question{type: :P, action: action}, product) do
     {:ok, items} = state |> Memory.load(State.cart())
 
     items = (items ++ [product]) |> Enum.uniq()
 
     state = state |> Memory.store(State.cart(), items)
 
-    Context.new(data) |> Interpreter.interpret(action).(state)
+    Context.new() |> Interpreter.interpret(action).(state)
   end
 
-  defp answer(state, _, %Question{type: :C, action: nil}, "ok") do
+  defp answer(state, %Question{type: :C, action: nil}, "ok") do
     {:ok, previous} = Memory.load(state, :previous_question)
 
     %State{state | question: previous}
   end
 
-  defp answer(state, data, %Question{type: :C, action: action}, _) do
-    Context.new(data) |> Interpreter.interpret(action).(state)
+  defp answer(state, %Question{type: :C, action: action}, _) do
+    Context.new() |> Interpreter.interpret(action).(state)
   end
 
   defp answer(
          state,
-         data,
          %Question{
            type: :F,
            action: action,
@@ -108,14 +97,13 @@ defmodule Chat.Driver do
        )
        when is_binary(text) do
     Interpreter.interpret(action).(
-      Context.new(data),
+      Context.new(),
       Memory.store(state, output, text)
     )
   end
 
   defp answer(
          state,
-         data,
          %Question{
            type: :N,
            action: action,
@@ -124,14 +112,13 @@ defmodule Chat.Driver do
          selection
        ) do
     Interpreter.interpret(action).(
-      Context.new(data),
+      Context.new(),
       Memory.store(state, output, selection)
     )
   end
 
   defp answer(
          state,
-         data,
          %Question{
            type: :NP,
            action: action
@@ -145,14 +132,13 @@ defmodule Chat.Driver do
 
     state = state |> Memory.store(State.cart(), items)
 
-    Context.new(data) |> Interpreter.interpret(action).(state)
+    Context.new() |> Interpreter.interpret(action).(state)
   end
 
   @cough :cough
 
-  def initial({scenarios, _}) do
-    {:ok, cough} = Map.fetch(scenarios, @cough)
-    {:ok, %Process{id: pid} = p} = Scenario.entry(cough)
+  def initial() do
+    {:ok, %Process{id: pid} = p} = Chat.scenario(@cough) |> Scenario.entry()
     {:ok, %Question{id: qid}} = Process.entry(p)
 
     State.new(

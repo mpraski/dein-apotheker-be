@@ -6,7 +6,7 @@ defmodule Chat.Database.Test do
   alias Chat.Language.Memory
 
   test "select one column" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
 
     expected = %Chat.Database{
       headers: [:id],
@@ -18,7 +18,7 @@ defmodule Chat.Database.Test do
   end
 
   test "select two columns" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
 
     expected = %Chat.Database{
       headers: [:id, :price],
@@ -34,7 +34,7 @@ defmodule Chat.Database.Test do
   end
 
   test "select no column" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
 
     expected = %Chat.Database{
       headers: [],
@@ -46,7 +46,7 @@ defmodule Chat.Database.Test do
   end
 
   test "where column exists" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
 
     expected = %Chat.Database{
       headers: [:id, :name, :price, :brand_id, :api],
@@ -58,13 +58,13 @@ defmodule Chat.Database.Test do
   end
 
   test "where column doesn't exists" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
 
     catch_error(Database.where(prods, :ids, "2"))
   end
 
   test "union of two databases" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
     db1 = Database.where(prods, :id, "2")
     db2 = Database.where(prods, :id, "3")
 
@@ -81,7 +81,7 @@ defmodule Chat.Database.Test do
   end
 
   test "union of two databases, one empty" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
     db1 = Database.where(prods, :id, "2")
     db2 = Database.where(prods, :id, "30")
 
@@ -97,7 +97,7 @@ defmodule Chat.Database.Test do
   end
 
   test "union of two databases, other empty" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
     db1 = Database.where(prods, :id, "20")
     db2 = Database.where(prods, :id, "3")
 
@@ -113,7 +113,7 @@ defmodule Chat.Database.Test do
   end
 
   test "union of two databases, both empty" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
     db1 = Database.where(prods, :id, "20")
     db2 = Database.where(prods, :id, "30")
 
@@ -127,7 +127,7 @@ defmodule Chat.Database.Test do
   end
 
   test "intersection of two databases" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
     db1 = Database.where(prods, :id, "2")
 
     expected = %Chat.Database{
@@ -142,7 +142,7 @@ defmodule Chat.Database.Test do
   end
 
   test "intersection of two databases, other case" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
     db1 = Database.where(prods, :id, "3")
 
     expected = %Chat.Database{
@@ -157,7 +157,7 @@ defmodule Chat.Database.Test do
   end
 
   test "intersection of two databases, one empty" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
     db1 = Database.where(prods, :id, "20")
 
     expected = %Chat.Database{
@@ -170,7 +170,7 @@ defmodule Chat.Database.Test do
   end
 
   test "intersection of two databases, other empty" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
     db1 = Database.where(prods, :id, "30")
 
     expected = %Chat.Database{
@@ -183,8 +183,8 @@ defmodule Chat.Database.Test do
   end
 
   test "join of two databases" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
-    {:ok, brands} = Chat.databases() |> Map.fetch(:Brands)
+    prods = Chat.database(:Products)
+    brands = Chat.database(:Brands)
 
     expected = %Chat.Database{
       headers: [:id, :name, :price, :brand_id, :api, :"b.name"],
@@ -200,8 +200,8 @@ defmodule Chat.Database.Test do
   end
 
   test "join of two databases, not equals" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
-    {:ok, brands} = Chat.databases() |> Map.fetch(:Brands)
+    prods = Chat.database(:Products)
+    brands = Chat.database(:Brands)
 
     expected = %Chat.Database{
       headers: [:id, :name, :price, :brand_id, :api, :"b.name"],
@@ -217,8 +217,8 @@ defmodule Chat.Database.Test do
   end
 
   test "failed join of two databases" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
-    {:ok, brands} = Chat.databases() |> Map.fetch(:Brands)
+    prods = Chat.database(:Products)
+    brands = Chat.database(:Brands)
 
     expected = %Chat.Database{
       headers: [:id, :name, :price, :brand_id, :api, :"b.id"],
@@ -230,19 +230,19 @@ defmodule Chat.Database.Test do
   end
 
   test "width of a database" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
 
     assert Database.width(prods) == 5
   end
 
   test "height of a database" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
 
     assert Database.height(prods) == 3
   end
 
   test "header index of a database" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
 
     assert Database.header_index(prods, :id) == 0
     assert Database.header_index(prods, :name) == 1
@@ -250,7 +250,7 @@ defmodule Chat.Database.Test do
   end
 
   test "database to list" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
 
     list = [
       [id: "1", name: "Product 1", price: "12 dollars", brand_id: "1", api: "acc"],
@@ -262,7 +262,7 @@ defmodule Chat.Database.Test do
   end
 
   test "database from list" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
 
     list = [
       [id: "1", name: "Product 1", price: "12 dollars", brand_id: "1", api: "acc"],
@@ -274,7 +274,7 @@ defmodule Chat.Database.Test do
   end
 
   test "database to single column rows" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
 
     ids =
       prods
@@ -287,7 +287,7 @@ defmodule Chat.Database.Test do
   end
 
   test "database to string" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
     db1 = Database.where(prods, :id, "1")
 
     expected = "1, Product 1, 12 dollars, 1, acc"
@@ -296,7 +296,7 @@ defmodule Chat.Database.Test do
   end
 
   test "database as memory" do
-    {:ok, prods} = Chat.databases() |> Map.fetch(:Products)
+    prods = Chat.database(:Products)
     {:ok, rows} = Memory.load(prods, :id)
 
     expected = ["1", "2", "3"]

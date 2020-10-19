@@ -41,6 +41,6 @@ defmodule Chat.Scenario.Text.Test do
   end
 
   defp render(t, i \\ nil) do
-    Text.render(t, i, Chat.data())
+    Text.render(t, i)
   end
 end

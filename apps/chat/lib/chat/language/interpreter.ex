@@ -178,17 +178,15 @@ defmodule Chat.Language.Interpreter do
     {c, Database.select(db, columns)}
   end
 
-  defp interpret_from({%Context{databases: dbs} = c, _} = d, name) do
+  defp interpret_from({c, _} = d, name) do
     {_, name} = d |> interpret_expr(name)
 
     case name do
       {:qualified_db, name, aliaz} ->
-        {:ok, db} = Map.fetch(dbs, name)
-        {Memory.store(c, qualified_db_alias(aliaz), name), db}
+        {Memory.store(c, qualified_db_alias(aliaz), name), Context.database(name)}
 
       name ->
-        {:ok, db} = Map.fetch(dbs, name)
-        {c, db}
+        {c, Context.database(name)}
     end
   end
 
@@ -264,7 +262,7 @@ defmodule Chat.Language.Interpreter do
     Database.join(db1, db2, col1, col2, n, &Kernel.!=/2)
   end
 
-  defp prepare_join({%Context{databases: dbs} = c, n, db}, v, i) do
+  defp prepare_join({c, n, db}, v, i) do
     {_, {:qualified_ident, n1, col1}} = {c, nil} |> interpret_expr(v)
     {_, {:qualified_ident, n2, col2}} = {c, nil} |> interpret_expr(i)
 
@@ -279,9 +277,8 @@ defmodule Chat.Language.Interpreter do
       end
 
     {:ok, target} = Memory.load(c, qualified_db_alias(target))
-    {:ok, target} = Map.fetch(dbs, target)
 
-    {db, target, col1, col2, n}
+    {db, Context.database(target), col1, col2, n}
   end
 
   defp normalize_column(v) when is_atom(v), do: v

@@ -20,7 +20,7 @@ defmodule Proxy.ChatController do
       ) do
     session = conn.assigns.session
 
-    state = Driver.initial(Chat.data())
+    state = Driver.initial()
 
     session |> Session.add(state) |> Store.put()
 
@@ -42,11 +42,9 @@ defmodule Proxy.ChatController do
 
     case session |> Session.fetch(state) do
       {:ok, state} ->
-        state = state |> Driver.next(Chat.data(), answer)
+        state = state |> Driver.next(answer)
 
         session |> Session.add(state) |> Store.put()
-
-        IO.inspect(state)
 
         conn |> render("answer.json", state: state)
 
