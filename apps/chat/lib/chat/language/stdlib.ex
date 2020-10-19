@@ -87,7 +87,7 @@ defmodule Chat.Language.StdLib do
   defp jump(%Call{
          args: [%State{processes: [_ | rest], scenarios: [n | _]} = state, proc]
        }) do
-    question_id = Chat.question_id(proc, n)
+    question_id = Chat.question_id(n, proc)
 
     %State{state | question: question_id, processes: [Process.new(proc) | rest]}
   end
@@ -95,7 +95,7 @@ defmodule Chat.Language.StdLib do
   defp jump(%Call{
          args: [%State{processes: [], scenarios: [n | _]} = state, proc]
        }) do
-    question_id = Chat.question_id(proc, n)
+    question_id = Chat.question_id(n, proc)
 
     %State{state | question: question_id, processes: [Process.new(proc)]}
   end

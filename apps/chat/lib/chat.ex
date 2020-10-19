@@ -4,7 +4,6 @@ defmodule Chat do
   """
 
   alias Chat.Loader
-  alias Chat.Scenario
   alias Chat.Scenario.Process
   alias Chat.Scenario.Question
 
@@ -29,9 +28,8 @@ defmodule Chat do
     def database(unquote(k)), do: unquote(Macro.escape(v))
   end)
 
-  def question_id(process, scenario_id) do
-    {:ok, process} = scenario(scenario_id) |> Scenario.process(process)
-    {:ok, %Question{id: question_id}} = Process.entry(process)
+  def question_id(scenario_id, process_id) do
+    {:ok, %Question{id: question_id}} = process(scenario_id, process_id) |> Process.entry()
 
     question_id
   end
