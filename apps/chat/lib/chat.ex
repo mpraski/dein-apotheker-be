@@ -3,14 +3,15 @@ defmodule Chat do
   Chat consolidates commonnly used data and function
   """
 
-  @scenario_path Application.get_env(:chat, :scenario_path)
-  @database_path Application.get_env(:chat, :database_path)
-
-  @data Chat.Loader.load(@scenario_path, @database_path)
-
+  alias Chat.Loader
   alias Chat.Scenario
   alias Chat.Scenario.Process
   alias Chat.Scenario.Question
+
+  @scenario_path Application.get_env(:chat, :scenario_path)
+  @database_path Application.get_env(:chat, :database_path)
+
+  @data Loader.load(@scenario_path, @database_path)
 
   Enum.each(elem(@data, 0), fn {k, v} ->
     def scenario(unquote(k)), do: unquote(Macro.escape(v))
