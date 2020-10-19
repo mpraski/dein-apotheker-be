@@ -12,6 +12,7 @@ defmodule Chat.Language.StdLib do
   alias Chat.Language.Memory
   alias Chat.Language.Context
   alias Chat.Language.Parser
+  alias Chat.Language.Interpreter
 
   defmodule Call do
     @moduledoc """
@@ -123,7 +124,7 @@ defmodule Chat.Language.StdLib do
 
     %State{
       processes: [%Process{id: id} | _]
-    } = state = action.(ctx, %State{state | processes: rest})
+    } = state = Interpreter.interpret(action).(ctx, %State{state | processes: rest})
 
     {:ok, process} = scenario |> Scenario.process(id)
     {:ok, %Question{id: qid}} = ScenarioProcess.entry(process)
@@ -246,7 +247,9 @@ defmodule Chat.Language.StdLib do
 
     {:ok, products} = databases |> Map.fetch(:Products)
 
-    forms = Parser.parse(query).(ctx, args) |> Database.single_column_rows()
+    prog = Parser.parse(query) |> Interpreter.interpret()
+
+    forms = prog.(ctx, args) |> Database.single_column_rows()
 
     products
     |> Database.where(:API, api)

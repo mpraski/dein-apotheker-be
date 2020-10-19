@@ -5,6 +5,7 @@ defmodule Chat.Language.Interpreter.Test do
   alias Chat.Database
   alias Chat.Language.Parser
   alias Chat.Language.Context
+  alias Chat.Language.Interpreter
 
   tests = [
     identifier: [
@@ -424,7 +425,8 @@ defmodule Chat.Language.Interpreter.Test do
 
     test "#{name} language test" do
       ctx = Context.new(Chat.scenarios(), Chat.databases())
-      assert Parser.parse(@program).(ctx, @register) == @expected
+      prog = Parser.parse(@program) |> Interpreter.interpret()
+      assert prog.(ctx, @register) == @expected
     end
   end)
 end

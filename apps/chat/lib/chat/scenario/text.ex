@@ -5,6 +5,7 @@ defmodule Chat.Scenario.Text do
 
   alias Chat.Language.Parser
   alias Chat.Language.Context
+  alias Chat.Language.Interpreter
 
   use TypedStruct
 
@@ -45,6 +46,8 @@ defmodule Chat.Scenario.Text do
   end
 
   defp execute(program, input, scenarios, databases) do
+    program = Interpreter.interpret(program)
+
     Context.new(scenarios, databases)
     |> program.(input)
     |> to_string()

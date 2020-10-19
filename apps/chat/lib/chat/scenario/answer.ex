@@ -10,7 +10,7 @@ defmodule Chat.Scenario.Answer do
   typedstruct do
     field(:id, atom(), enforce: true)
     field(:text, Text.t(), enforce: true)
-    field(:action, (any(), any() -> any()), enforce: true)
+    field(:action, any(), enforce: true)
     field(:output, atom())
   end
 

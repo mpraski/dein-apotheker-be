@@ -7,6 +7,7 @@ defmodule Chat.Language.StdLib.Test do
   alias Chat.Language.Parser
   alias Chat.Language.Context
   alias Chat.Language.Memory
+  alias Chat.Language.Interpreter
   alias Chat.Driver
 
   tests = [
@@ -282,7 +283,8 @@ defmodule Chat.Language.StdLib.Test do
 
     test "#{name} stdlib test" do
       ctx = Context.new(Chat.scenarios(), Chat.databases())
-      result = Parser.parse(@program).(ctx, @register)
+      prog = Parser.parse(@program) |> Interpreter.interpret()
+      result = prog.(ctx, @register)
       expected = unquote(@expected)
 
       if is_function(expected) do

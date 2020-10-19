@@ -9,6 +9,7 @@ defmodule Chat.Driver do
   alias Chat.State.Process, as: StateProcess
   alias Chat.Language.Memory
   alias Chat.Language.Context
+  alias Chat.Language.Interpreter
 
   def next(
         %State{
@@ -40,9 +41,9 @@ defmodule Chat.Driver do
     {:ok, scenario} = Map.fetch(scenarios, scenario)
     {:ok, process} = Scenario.process(scenario, process)
 
-    IO.inspect state
-    IO.inspect process
-    IO.inspect question
+    IO.inspect(state)
+    IO.inspect(process)
+    IO.inspect(question)
 
     {:ok,
      %Question{
@@ -52,7 +53,7 @@ defmodule Chat.Driver do
 
     if type == :CODE do
       Context.new(scenarios, databases)
-      |> action.(state)
+      |> Interpreter.interpret(action).(state)
       |> advance(data)
     else
       state
@@ -70,7 +71,7 @@ defmodule Chat.Driver do
 
     {:ok, %Answer{action: a, output: o}} = Question.answer(question, answer)
 
-    a.(
+    Interpreter.interpret(a).(
       Context.new(scenarios, databases),
       Memory.store(state, name_output, o)
     )
@@ -82,7 +83,7 @@ defmodule Chat.Driver do
          %Question{type: :P, action: action},
          "skip"
        ) do
-    Context.new(scenarios, databases) |> action.(state)
+    Context.new(scenarios, databases) |> Interpreter.interpret(action).(state)
   end
 
   defp answer(
@@ -97,7 +98,7 @@ defmodule Chat.Driver do
 
     state = state |> Memory.store(State.cart(), items)
 
-    Context.new(scenarios, databases) |> action.(state)
+    Context.new(scenarios, databases) |> Interpreter.interpret(action).(state)
   end
 
   defp answer(%State{} = state, _, %Question{type: :C, action: nil}, "ok") do
@@ -112,7 +113,7 @@ defmodule Chat.Driver do
          %Question{type: :C, action: action},
          _
        ) do
-    Context.new(scenarios, databases) |> action.(state)
+    Context.new(scenarios, databases) |> Interpreter.interpret(action).(state)
   end
 
   defp answer(
@@ -126,7 +127,7 @@ defmodule Chat.Driver do
          text
        )
        when is_binary(text) do
-    action.(
+    Interpreter.interpret(action).(
       Context.new(scenarios, databases),
       Memory.store(state, output, text)
     )
@@ -142,7 +143,7 @@ defmodule Chat.Driver do
          },
          selection
        ) do
-    action.(
+    Interpreter.interpret(action).(
       Context.new(scenarios, databases),
       Memory.store(state, output, selection)
     )
@@ -164,7 +165,7 @@ defmodule Chat.Driver do
 
     state = state |> Memory.store(State.cart(), items)
 
-    Context.new(scenarios, databases) |> action.(state)
+    Context.new(scenarios, databases) |> Interpreter.interpret(action).(state)
   end
 
   @cough :cough

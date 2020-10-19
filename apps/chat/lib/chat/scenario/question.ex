@@ -11,7 +11,7 @@ defmodule Chat.Scenario.Question do
     field(:id, atom(), enforce: true)
     field(:type, atom(), enforce: true)
     field(:text, Text.t(), enforce: true)
-    field(:action, (any(), any() -> any()), enforce: true)
+    field(:action, any(), enforce: true)
     field(:answers, list(Answer.t()), enforce: true, default: [])
     field(:query, (any(), any() -> any()))
     field(:output, atom())

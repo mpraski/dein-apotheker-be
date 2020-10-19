@@ -4,6 +4,7 @@ defmodule Chat.Language.Parser.Test do
 
   alias Chat.Language.Parser
   alias Chat.Language.Context
+  alias Chat.Language.Interpreter
 
   test "parse nil program" do
     catch_error(Parser.parse(nil))
@@ -15,6 +16,7 @@ defmodule Chat.Language.Parser.Test do
 
   test "parse valid program" do
     prog = Parser.parse("'hello there'")
+    prog = Interpreter.interpret(prog)
     ctx = Context.new(Chat.scenarios(), Chat.databases())
 
     assert is_function(prog)
