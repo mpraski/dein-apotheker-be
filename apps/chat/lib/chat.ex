@@ -17,13 +17,11 @@ defmodule Chat do
   end
 
   def scenarios() do
-    {a, _} = @data
-    a
+    elem(@data, 0)
   end
 
   def databases() do
-    {_, b} = @data
-    b
+    elem(@data, 1)
   end
 
   def question_id(scenarios, process, scenario) do
