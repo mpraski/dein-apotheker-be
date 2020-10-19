@@ -6,20 +6,20 @@ defmodule Chat.Language.Context.Test do
   alias Chat.Language.Memory
 
   test "load and store in context" do
-    ctx = Context.new(Chat.scenarios(), Chat.databases())
+    ctx = Context.new(Chat.data())
 
     assert ctx |> Memory.store(:a, 5) |> Memory.load(:a) == {:ok, 5}
   end
 
   test "load and delete from context" do
-    ctx = Context.new(Chat.scenarios(), Chat.databases())
+    ctx = Context.new(Chat.data())
 
     assert ctx |> Memory.store(:a, 5) |> Memory.delete(:a) == ctx
   end
 
   test "load many from context" do
     ctx =
-      Context.new(Chat.scenarios(), Chat.databases())
+      Context.new(Chat.data())
       |> Memory.store(:a, 1)
       |> Memory.store(:b, 2)
       |> Memory.store(:c, 3)
@@ -31,7 +31,7 @@ defmodule Chat.Language.Context.Test do
 
   test "load all from context" do
     ctx =
-      Context.new(Chat.scenarios(), Chat.databases())
+      Context.new(Chat.data())
       |> Memory.store(:a, 1)
       |> Memory.store(:b, 2)
       |> Memory.store(:c, 3)

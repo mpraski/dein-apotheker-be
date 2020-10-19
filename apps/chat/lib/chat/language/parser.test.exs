@@ -17,7 +17,7 @@ defmodule Chat.Language.Parser.Test do
   test "parse valid program" do
     prog = Parser.parse("'hello there'")
     prog = Interpreter.interpret(prog)
-    ctx = Context.new(Chat.scenarios(), Chat.databases())
+    ctx = Context.new(Chat.data())
 
     assert is_function(prog)
     assert prog.(ctx, nil) == "hello there"

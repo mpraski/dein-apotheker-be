@@ -36,7 +36,7 @@ defmodule Chat.Driver do
            scenarios: [scenario | _],
            processes: [%StateProcess{id: process} | _]
          } = state,
-         {scenarios, databases} = data
+         {scenarios, _} = data
        ) do
     {:ok, scenario} = Map.fetch(scenarios, scenario)
     {:ok, process} = Scenario.process(scenario, process)
@@ -52,7 +52,7 @@ defmodule Chat.Driver do
      }} = Process.question(process, question)
 
     if type == :CODE do
-      Context.new(scenarios, databases)
+      Context.new(data)
       |> Interpreter.interpret(action).(state)
       |> advance(data)
     else
@@ -60,65 +60,45 @@ defmodule Chat.Driver do
     end
   end
 
-  defp answer(
-         state = %State{},
-         {scenarios, databases},
-         question = %Question{type: :Q, output: name_output},
-         answer
-       )
+  defp answer(state, data, question = %Question{type: :Q, output: name_output}, answer)
        when is_binary(answer) do
     answer = String.to_existing_atom(answer)
 
     {:ok, %Answer{action: a, output: o}} = Question.answer(question, answer)
 
     Interpreter.interpret(a).(
-      Context.new(scenarios, databases),
+      Context.new(data),
       Memory.store(state, name_output, o)
     )
   end
 
-  defp answer(
-         state = %State{},
-         {scenarios, databases},
-         %Question{type: :P, action: action},
-         "skip"
-       ) do
-    Context.new(scenarios, databases) |> Interpreter.interpret(action).(state)
+  defp answer(state, data, %Question{type: :P, action: action}, "skip") do
+    Context.new(data) |> Interpreter.interpret(action).(state)
   end
 
-  defp answer(
-         state = %State{},
-         {scenarios, databases},
-         %Question{type: :P, action: action},
-         product
-       ) do
+  defp answer(state, data, %Question{type: :P, action: action}, product) do
     {:ok, items} = state |> Memory.load(State.cart())
 
     items = (items ++ [product]) |> Enum.uniq()
 
     state = state |> Memory.store(State.cart(), items)
 
-    Context.new(scenarios, databases) |> Interpreter.interpret(action).(state)
+    Context.new(data) |> Interpreter.interpret(action).(state)
   end
 
-  defp answer(%State{} = state, _, %Question{type: :C, action: nil}, "ok") do
+  defp answer(state, _, %Question{type: :C, action: nil}, "ok") do
     {:ok, previous} = Memory.load(state, :previous_question)
 
     %State{state | question: previous}
   end
 
-  defp answer(
-         %State{} = state,
-         {scenarios, databases},
-         %Question{type: :C, action: action},
-         _
-       ) do
-    Context.new(scenarios, databases) |> Interpreter.interpret(action).(state)
+  defp answer(state, data, %Question{type: :C, action: action}, _) do
+    Context.new(data) |> Interpreter.interpret(action).(state)
   end
 
   defp answer(
-         state = %State{},
-         {scenarios, databases},
+         state,
+         data,
          %Question{
            type: :F,
            action: action,
@@ -128,14 +108,14 @@ defmodule Chat.Driver do
        )
        when is_binary(text) do
     Interpreter.interpret(action).(
-      Context.new(scenarios, databases),
+      Context.new(data),
       Memory.store(state, output, text)
     )
   end
 
   defp answer(
-         state = %State{},
-         {scenarios, databases},
+         state,
+         data,
          %Question{
            type: :N,
            action: action,
@@ -144,14 +124,14 @@ defmodule Chat.Driver do
          selection
        ) do
     Interpreter.interpret(action).(
-      Context.new(scenarios, databases),
+      Context.new(data),
       Memory.store(state, output, selection)
     )
   end
 
   defp answer(
-         state = %State{},
-         {scenarios, databases},
+         state,
+         data,
          %Question{
            type: :NP,
            action: action
@@ -165,7 +145,7 @@ defmodule Chat.Driver do
 
     state = state |> Memory.store(State.cart(), items)
 
-    Context.new(scenarios, databases) |> Interpreter.interpret(action).(state)
+    Context.new(data) |> Interpreter.interpret(action).(state)
   end
 
   @cough :cough

@@ -12,7 +12,7 @@ defmodule Chat.Language.Context do
     field(:memory, map(), default: Map.new())
   end
 
-  def new(scenarios, databases) do
+  def new({scenarios, databases}) do
     %__MODULE__{
       scenarios: scenarios,
       databases: databases

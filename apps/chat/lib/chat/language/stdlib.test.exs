@@ -282,7 +282,7 @@ defmodule Chat.Language.StdLib.Test do
     @expected Keyword.get(data, :expected)
 
     test "#{name} stdlib test" do
-      ctx = Context.new(Chat.scenarios(), Chat.databases())
+      ctx = Context.new(Chat.data())
       prog = Parser.parse(@program) |> Interpreter.interpret()
       result = prog.(ctx, @register)
       expected = unquote(@expected)

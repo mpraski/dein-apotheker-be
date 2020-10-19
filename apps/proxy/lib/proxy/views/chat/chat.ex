@@ -22,13 +22,13 @@ defmodule Proxy.Views.Chat do
           scenarios: [scenario | _],
           processes: [%StateProcess{id: process} | _]
         } = state,
-        {scenarios, databases}
+        {scenarios, _} = data
       ) do
     {:ok, scenario = %Scenario{}} = Map.fetch(scenarios, scenario)
     {:ok, process = %Process{}} = Scenario.process(scenario, process)
     {:ok, question = %Question{}} = Process.question(process, question)
 
-    message = question |> create_message({state, scenarios, databases})
+    message = question |> create_message(state, data)
 
     Representation.new(id, message)
   end
@@ -40,6 +40,7 @@ defmodule Proxy.Views.Chat do
            text: text,
            answers: answers
          },
+         _,
          data
        ) do
     text = Text.render(text, data)
@@ -54,11 +55,12 @@ defmodule Proxy.Views.Chat do
            text: text,
            query: query
          },
-         {state, scenarios, databases} = data
+         state,
+         data
        )
        when type in ~w[PN N]a do
     input =
-      Context.new(scenarios, databases)
+      Context.new(data)
       |> Interpreter.interpret(query).(state)
       |> database_input()
 
@@ -74,10 +76,11 @@ defmodule Proxy.Views.Chat do
            text: text,
            query: query
          },
-         {state, scenarios, databases} = data
+         state,
+         data
        ) do
     [product] =
-      Context.new(scenarios, databases)
+      Context.new(data)
       |> Interpreter.interpret(query).(state)
       |> Enum.to_list()
 
@@ -92,6 +95,7 @@ defmodule Proxy.Views.Chat do
            type: :C,
            text: text
          },
+         _,
          data
        ) do
     Message.new(id, :C, Text.render(text, data), comment_input())
@@ -103,6 +107,7 @@ defmodule Proxy.Views.Chat do
            type: :F,
            text: text
          },
+         _,
          data
        ) do
     Message.new(id, :F, Text.render(text, data))

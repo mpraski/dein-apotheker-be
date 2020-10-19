@@ -30,10 +30,11 @@ defmodule Chat.Scenario.Text do
           substitutes: subs,
           text: text
         },
-        {input, scenarios, databases}
+        input,
+        data
       ) do
     subs
-    |> Enum.map(&execute(&1, input, scenarios, databases))
+    |> Enum.map(&execute(&1, input, data))
     |> Enum.reduce(
       text,
       &Regex.replace(
@@ -45,10 +46,10 @@ defmodule Chat.Scenario.Text do
     )
   end
 
-  defp execute(program, input, scenarios, databases) do
+  defp execute(program, input, data) do
     program = Interpreter.interpret(program)
 
-    Context.new(scenarios, databases)
+    Context.new(data)
     |> program.(input)
     |> to_string()
   end

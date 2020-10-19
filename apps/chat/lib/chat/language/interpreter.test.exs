@@ -424,7 +424,7 @@ defmodule Chat.Language.Interpreter.Test do
     @expected Keyword.get(data, :expected)
 
     test "#{name} language test" do
-      ctx = Context.new(Chat.scenarios(), Chat.databases())
+      ctx = Context.new(Chat.data())
       prog = Parser.parse(@program) |> Interpreter.interpret()
       assert prog.(ctx, @register) == @expected
     end

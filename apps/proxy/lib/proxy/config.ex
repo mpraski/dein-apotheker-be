@@ -27,7 +27,7 @@ defmodule Proxy.Config do
   end
 
   def session_options(:prod) do
-    Keyword.merge(@corsica,
+    Keyword.merge(@session,
       secure: true,
       extra: "SameSite=Strict"
     )
