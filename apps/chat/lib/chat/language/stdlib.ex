@@ -87,7 +87,7 @@ defmodule Chat.Language.StdLib do
   defp jump(%Call{
          args: [%State{processes: [_ | rest], scenarios: [n | _]} = state, proc]
        }) do
-    question_id = Chat.question_id(n, proc)
+    question_id = question_id(n, proc)
 
     %State{state | question: question_id, processes: [Process.new(proc) | rest]}
   end
@@ -95,7 +95,7 @@ defmodule Chat.Language.StdLib do
   defp jump(%Call{
          args: [%State{processes: [], scenarios: [n | _]} = state, proc]
        }) do
-    question_id = Chat.question_id(n, proc)
+    question_id = question_id(n, proc)
 
     %State{state | question: question_id, processes: [Process.new(proc)]}
   end
@@ -248,8 +248,8 @@ defmodule Chat.Language.StdLib do
     forms = prog.(ctx, args) |> Database.single_column_rows()
 
     products
-    |> Database.where(:API, api)
-    |> Database.where_in(:MedForm, forms)
+    |> Database.where(:APIID, api)
+    |> Database.where_in(:MedFormID, forms)
   end
 
   defp deep_flat_map(m) do
@@ -264,5 +264,13 @@ defmodule Chat.Language.StdLib do
       Memory.load_many(m1, vars),
       Memory.load_many(m2, vars)
     )
+  end
+
+  defp question_id(scenario_id, process_id) do
+    process = Chat.process(scenario_id, process_id)
+
+    {:ok, %Question{id: question_id}} = ScenarioProcess.entry(process)
+
+    question_id
   end
 end

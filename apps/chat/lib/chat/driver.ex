@@ -41,12 +41,17 @@ defmodule Chat.Driver do
       action: action
     } = Chat.question(scenario, process, question)
 
-    if type == :CODE do
-      Context.new()
-      |> Interpreter.interpret(action).(state)
-      |> advance()
-    else
-      state
+    case type do
+      :C ->
+        state
+
+      :CODE ->
+        Context.new()
+        |> Interpreter.interpret(action).(state)
+        |> advance()
+
+      _ ->
+        state |> Memory.store(:previous_question, question)
     end
   end
 
@@ -76,7 +81,7 @@ defmodule Chat.Driver do
     Context.new() |> Interpreter.interpret(action).(state)
   end
 
-  defp answer(state, %Question{type: :C, action: nil}, "ok") do
+  defp answer(state, %Question{type: :C, action: nil}, _) do
     {:ok, previous} = Memory.load(state, :previous_question)
 
     %State{state | question: previous}
