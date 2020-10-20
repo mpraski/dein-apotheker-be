@@ -13,7 +13,7 @@ defmodule Chat.Scenario.Question do
     field(:text, Text.t(), enforce: true)
     field(:action, any(), enforce: true)
     field(:answers, list(Answer.t()), enforce: true, default: [])
-    field(:query, (any(), any() -> any()))
+    field(:query, any())
     field(:output, atom())
   end
 

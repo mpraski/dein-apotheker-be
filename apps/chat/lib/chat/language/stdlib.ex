@@ -243,7 +243,10 @@ defmodule Chat.Language.StdLib do
 
     products = Context.database(:Products)
 
-    prog = Parser.parse(query) |> Interpreter.interpret()
+    prog =
+      query
+      |> Parser.parse()
+      |> Interpreter.interpret()
 
     forms = prog.(ctx, args) |> Database.single_column_rows()
 
