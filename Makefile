@@ -4,7 +4,7 @@ ERROR_COLOR=\033[31;01m
 WARN_COLOR=\033[33;01m
 
 SERVICE_NAME=dein-apotheker-be
-MIX_ENV?=prod
+MIX_ENV?=dev
 
 .PHONY: all clean test build
 all: clean test build
@@ -19,7 +19,7 @@ deps:
 
 run:
 	@echo "$(OK_COLOR)==> Running $(SERVICE_NAME)... $(NO_COLOR)"
-	@mix do deps.get, compile --force, phx.server
+	@MIX_ENV=$(MIX_ENV) mix do deps.get, compile --force, phx.server
 
 test:
 	@echo "$(OK_COLOR)==> Running tests$(NO_COLOR)..."
@@ -35,4 +35,4 @@ clean:
 
 verify:
 	@echo "$(OK_COLOR)==> Verifying $(SERVICE_NAME)... $(NO_COLOR)"
-	@mix compile --force
+	@MIX_ENV=$(MIX_ENV) mix compile --force

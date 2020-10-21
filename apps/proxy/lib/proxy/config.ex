@@ -18,9 +18,9 @@ defmodule Proxy.Config do
   ]
 
   def corsica_options(:prod) do
-    [
+    Keyword.merge(@corsica,
       origins: "https://dein-apotheker.online"
-    ]
+    )
   end
 
   def corsica_options(_) do
