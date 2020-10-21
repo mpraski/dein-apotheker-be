@@ -10,7 +10,6 @@ defmodule Chat.Language.StdLib do
   alias Chat.Scenario.Question
   alias Chat.Database
   alias Chat.Language.Memory
-  alias Chat.Language.Context
   alias Chat.Language.Parser
   alias Chat.Language.Interpreter
 
@@ -23,13 +22,13 @@ defmodule Chat.Language.StdLib do
 
     typedstruct do
       field(:args, list(any()), enforce: true)
-      field(:context, Context.t(), enforce: true)
+      field(:memory, Memory.t(), enforce: true)
     end
 
-    def new(args, context) do
+    def new(args, memory) do
       %__MODULE__{
         args: args,
-        context: context
+        memory: memory
       }
     end
   end
@@ -65,9 +64,9 @@ defmodule Chat.Language.StdLib do
            %State{processes: p} = state,
            proc | vars
          ],
-         context: ctx
+         memory: mem
        }) do
-    captured = capture(state, ctx, vars)
+    captured = capture(state, mem, vars)
 
     %State{state | processes: p ++ [Process.new(proc, captured)]}
   end
@@ -77,9 +76,9 @@ defmodule Chat.Language.StdLib do
            %State{processes: [p | r]} = state,
            proc | vars
          ],
-         context: ctx
+         memory: mem
        }) do
-    captured = capture(state, ctx, vars)
+    captured = capture(state, mem, vars)
 
     %State{state | processes: [p | [Process.new(proc, captured) | r]]}
   end
@@ -115,16 +114,16 @@ defmodule Chat.Language.StdLib do
              scenarios: [n | _]
            } = state
          ],
-         context: ctx
+         memory: mem
        }) do
-    scenario = Context.scenario(n)
+    scenario = Chat.scenario(n)
     {:ok, action} = Scenario.action(scenario, id)
 
     %State{
       processes: [%Process{id: id} | _]
     } =
       state =
-      Interpreter.interpret(action, ctx).(%State{
+      Interpreter.interpret(action, mem).(%State{
         state
         | processes: rest
       })
@@ -142,13 +141,15 @@ defmodule Chat.Language.StdLib do
              scenarios: [c, n | r]
            } = state
          ],
-         context: ctx
+         memory: mem
        }) do
-    {:ok, action} = Context.scenario(c) |> Scenario.action(id)
+    {:ok, action} = Chat.scenario(c) |> Scenario.action(id)
 
-    state = action.(ctx, %State{state | processes: []})
+    action = action |> Interpreter.interpret(mem)
 
-    {:ok, process} = Context.scenario(n) |> Scenario.entry()
+    state = action.(%State{state | processes: []})
+
+    {:ok, process} = Chat.scenario(n) |> Scenario.entry()
     {:ok, %Question{id: qid}} = ScenarioProcess.entry(process)
 
     %State{state | question: qid, processes: [Process.new(process.id)], scenarios: [n | r]}
@@ -181,8 +182,8 @@ defmodule Chat.Language.StdLib do
 
   defp defer(%Call{args: [%State{} = state]}), do: state
 
-  defp save(%Call{args: [m, n], context: ctx}) do
-    {:ok, v} = Memory.load(ctx, n)
+  defp save(%Call{args: [m, n], memory: mem}) do
+    {:ok, v} = Memory.load(mem, n)
     Memory.store(m, n, v)
   end
 
@@ -215,7 +216,7 @@ defmodule Chat.Language.StdLib do
            fly,
            single
          ],
-         context: ctx
+         memory: mem
        }) do
     query = """
       SELECT ID FROM MedForm WHERE (
@@ -246,12 +247,12 @@ defmodule Chat.Language.StdLib do
       single: single
     }
 
-    products = Context.database(:Products)
+    products = Chat.database(:Products)
 
     prog =
       query
       |> Parser.parse()
-      |> Interpreter.interpret(ctx)
+      |> Interpreter.interpret(mem)
 
     forms = prog.(args) |> Database.single_column_rows()
 

@@ -1,3 +1,3 @@
-alias Chat.Language.{Parser, Context}
+alias Chat.Language.{Parser, Interpreter}
 alias Chat.State
 alias Chat.Database

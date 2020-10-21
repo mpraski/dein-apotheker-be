@@ -7,12 +7,13 @@ defmodule Chat.Language.Interpreter do
 
   alias Chat.Database
   alias Chat.Language.Memory
-  alias Chat.Language.Context
   alias Chat.Language.StdLib
   alias Chat.Language.StdLib.Call
 
-  def interpret(program, c \\ Context.new()) do
-    &({c, &1} |> interpret_expr(program) |> elem(1))
+  def interpret(program, tape \\ Map.new()) do
+    fn input ->
+      {tape, input} |> interpret_expr(program) |> elem(1)
+    end
   end
 
   defp interpret_expr(data, exprs) when is_list(exprs) do
@@ -183,10 +184,10 @@ defmodule Chat.Language.Interpreter do
 
     case name do
       {:qualified_db, name, aliaz} ->
-        {Memory.store(c, qualified_db_alias(aliaz), name), Context.database(name)}
+        {Memory.store(c, qualified_db_alias(aliaz), name), Chat.database(name)}
 
       name ->
-        {c, Context.database(name)}
+        {c, Chat.database(name)}
     end
   end
 
@@ -278,7 +279,7 @@ defmodule Chat.Language.Interpreter do
 
     {:ok, target} = Memory.load(c, qualified_db_alias(target))
 
-    {db, Context.database(target), col1, col2, n}
+    {db, Chat.database(target), col1, col2, n}
   end
 
   defp normalize_column(v) when is_atom(v), do: v

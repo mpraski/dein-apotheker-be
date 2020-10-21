@@ -8,8 +8,9 @@ defmodule Chat.Driver do
   alias Chat.Scenario.{Process, Question, Answer}
   alias Chat.State.Process, as: StateProcess
   alias Chat.Language.Memory
-  alias Chat.Language.Context
   alias Chat.Language.Interpreter
+
+  @prev_question :previous_question
 
   def next(
         %State{
@@ -22,10 +23,12 @@ defmodule Chat.Driver do
     question = Chat.question(scenario, process, question)
 
     state
-    |> State.generate_id()
+    |> stamp()
     |> answer(question, answer)
     |> advance()
   end
+
+  defp stamp(state), do: State.generate_id(state)
 
   defp advance(
          %State{
@@ -47,17 +50,16 @@ defmodule Chat.Driver do
         state |> Interpreter.interpret(action).() |> advance()
 
       _ ->
-        state |> Memory.store(:previous_question, question)
+        state |> Memory.store(@prev_question, question)
     end
   end
 
-  defp answer(state, question = %Question{type: :Q, output: name_output}, answer)
-       when is_binary(answer) do
+  defp answer(state, %Question{type: :Q, output: output} = question, answer) do
     answer = String.to_existing_atom(answer)
 
     {:ok, %Answer{action: a, output: o}} = Question.answer(question, answer)
 
-    Memory.store(state, name_output, o) |> Interpreter.interpret(a).()
+    Memory.store(state, output, o) |> Interpreter.interpret(a).()
   end
 
   defp answer(state, %Question{type: :P, action: action}, "skip") do
@@ -75,7 +77,7 @@ defmodule Chat.Driver do
   end
 
   defp answer(state, %Question{type: :C, action: nil}, _) do
-    {:ok, previous} = Memory.load(state, :previous_question)
+    {:ok, previous} = Memory.load(state, @prev_question)
 
     %State{state | question: previous}
   end
@@ -92,8 +94,7 @@ defmodule Chat.Driver do
            output: output
          },
          text
-       )
-       when is_binary(text) do
+       ) do
     Memory.store(state, output, text) |> Interpreter.interpret(action).()
   end
 

@@ -66,6 +66,7 @@ defmodule Chat.Scenario.Loader do
     }
 
     Excel.close_table(scenario_ref)
+
     process_refs |> Enum.each(fn {_, r} -> Excel.close_table(r) end)
 
     tables

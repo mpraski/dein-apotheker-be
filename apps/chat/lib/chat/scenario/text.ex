@@ -4,7 +4,6 @@ defmodule Chat.Scenario.Text do
   """
 
   alias Chat.Language.Parser
-  alias Chat.Language.Context
   alias Chat.Language.Interpreter
 
   use TypedStruct
