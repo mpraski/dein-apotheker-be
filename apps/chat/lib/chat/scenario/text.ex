@@ -47,9 +47,7 @@ defmodule Chat.Scenario.Text do
   end
 
   defp execute(program, input) do
-    program = Interpreter.interpret(program)
-
-    program.(input) |> to_string()
+    Interpreter.interpret(program).(input) |> to_string()
   end
 
   defp make_substitutes(text) do
