@@ -7,7 +7,6 @@ defmodule Proxy.Views.Chat do
   alias Chat.State.Process, as: StateProcess
   alias Chat.Scenario.{Question, Answer, Text}
   alias Chat.Database
-  alias Chat.Language.Context
   alias Chat.Language.Interpreter
 
   alias Proxy.Views.Chat.{Product, Brand, API, Message}
@@ -53,8 +52,8 @@ defmodule Proxy.Views.Chat do
        )
        when type in ~w[PN N]a do
     input =
-      Context.new()
-      |> Interpreter.interpret(query).(state)
+      state
+      |> Interpreter.interpret(query).()
       |> database_input()
 
     text = Text.render(text)
@@ -72,8 +71,8 @@ defmodule Proxy.Views.Chat do
          state
        ) do
     [product] =
-      Context.new()
-      |> Interpreter.interpret(query).(state)
+      state
+      |> Interpreter.interpret(query).()
       |> Enum.to_list()
 
     text = Text.render(text)

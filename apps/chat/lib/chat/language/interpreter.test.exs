@@ -4,7 +4,6 @@ defmodule Chat.Language.Interpreter.Test do
 
   alias Chat.Database
   alias Chat.Language.Parser
-  alias Chat.Language.Context
   alias Chat.Language.Interpreter
 
   tests = [
@@ -424,9 +423,8 @@ defmodule Chat.Language.Interpreter.Test do
     @expected Keyword.get(data, :expected)
 
     test "#{name} language test" do
-      ctx = Context.new()
       prog = Parser.parse(@program) |> Interpreter.interpret()
-      assert prog.(ctx, @register) == @expected
+      assert prog.(@register) == @expected
     end
   end)
 end

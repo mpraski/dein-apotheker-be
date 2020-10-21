@@ -11,8 +11,8 @@ defmodule Chat.Language.Interpreter do
   alias Chat.Language.StdLib
   alias Chat.Language.StdLib.Call
 
-  def interpret(program) do
-    fn %Context{} = c, r ->
+  def interpret(program, c \\ Context.new()) do
+    fn r ->
       {c, r} |> interpret_expr(program) |> elem(1)
     end
   end

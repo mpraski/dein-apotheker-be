@@ -122,7 +122,12 @@ defmodule Chat.Language.StdLib do
 
     %State{
       processes: [%Process{id: id} | _]
-    } = state = Interpreter.interpret(action).(ctx, %State{state | processes: rest})
+    } =
+      state =
+      Interpreter.interpret(action, ctx).(%State{
+        state
+        | processes: rest
+      })
 
     {:ok, process} = scenario |> Scenario.process(id)
     {:ok, %Question{id: qid}} = ScenarioProcess.entry(process)
@@ -246,9 +251,9 @@ defmodule Chat.Language.StdLib do
     prog =
       query
       |> Parser.parse()
-      |> Interpreter.interpret()
+      |> Interpreter.interpret(ctx)
 
-    forms = prog.(ctx, args) |> Database.single_column_rows()
+    forms = prog.(args) |> Database.single_column_rows()
 
     products
     |> Database.where(:APIID, api)

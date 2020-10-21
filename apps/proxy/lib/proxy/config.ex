@@ -1,4 +1,8 @@
 defmodule Proxy.Config do
+  @moduledoc """
+  Config holds env-dependent endpoint config
+  """
+
   alias Proxy.Session.Store
 
   @session [

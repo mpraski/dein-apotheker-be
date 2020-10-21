@@ -44,6 +44,8 @@ defmodule Proxy.ChatController do
 
         session |> Session.add(state) |> Store.put()
 
+        IO.inspect state
+
         conn |> render("answer.json", state: state)
 
       :error ->

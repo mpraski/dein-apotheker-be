@@ -5,7 +5,6 @@ defmodule Chat.Language.StdLib.Test do
   alias Chat.State
   alias Chat.State.Process, as: StateProcess
   alias Chat.Language.Parser
-  alias Chat.Language.Context
   alias Chat.Language.Memory
   alias Chat.Language.Interpreter
   alias Chat.Driver
@@ -276,9 +275,8 @@ defmodule Chat.Language.StdLib.Test do
     @expected Keyword.get(data, :expected)
 
     test "#{name} stdlib test" do
-      ctx = Context.new()
       prog = Parser.parse(@program) |> Interpreter.interpret()
-      result = prog.(ctx, @register)
+      result = prog.(@register)
       expected = unquote(@expected)
 
       if is_function(expected) do

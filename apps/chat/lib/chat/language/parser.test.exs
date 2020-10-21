@@ -3,7 +3,6 @@ defmodule Chat.Language.Parser.Test do
   doctest Chat.Language.Parser
 
   alias Chat.Language.Parser
-  alias Chat.Language.Context
   alias Chat.Language.Interpreter
 
   test "parse nil program" do
@@ -17,9 +16,8 @@ defmodule Chat.Language.Parser.Test do
   test "parse valid program" do
     prog = Parser.parse("'hello there'")
     prog = Interpreter.interpret(prog)
-    ctx = Context.new()
 
     assert is_function(prog)
-    assert prog.(ctx, nil) == "hello there"
+    assert prog.(nil) == "hello there"
   end
 end

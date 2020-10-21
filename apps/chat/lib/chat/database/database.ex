@@ -34,9 +34,13 @@ defmodule Chat.Database do
   def select(%__MODULE__{id: id} = db, columns) do
     indices = columns |> Enum.map(&header_index(db, &1))
 
-    reducer = &Enum.reduce(indices, [], fn i, acc -> acc ++ [Enum.at(&1, i)] end)
+    mapper = fn r ->
+      indices
+      |> Enum.reduce([], &[Enum.at(r, &1) | &2])
+      |> Enum.reverse()
+    end
 
-    db |> Enum.map(reducer) |> Enum.into(new(id))
+    db |> Stream.map(mapper) |> Enum.into(new(id))
   end
 
   def where(%__MODULE__{id: id, headers: hs} = db, column, value) do
@@ -44,7 +48,7 @@ defmodule Chat.Database do
 
     predicate = &(Enum.at(&1, idx) |> elem(1) == value)
 
-    db |> Enum.filter(predicate) |> Enum.into(__MODULE__.new(id, [hs]))
+    db |> Stream.filter(predicate) |> Enum.into(new(id, [hs]))
   end
 
   def where_in(%__MODULE__{id: id, headers: hs} = db, column, values) do
@@ -52,25 +56,25 @@ defmodule Chat.Database do
 
     predicate = &((Enum.at(&1, idx) |> elem(1)) in values)
 
-    db |> Enum.filter(predicate) |> Enum.into(__MODULE__.new(id, [hs]))
+    db |> Stream.filter(predicate) |> Enum.into(new(id, [hs]))
   end
 
   def union(
         %__MODULE__{id: id, headers: h, rows: r1},
         %__MODULE__{id: id, headers: h, rows: r2}
       ) do
-    __MODULE__.new(id, [h | r1 ++ r2])
+    new(id, [h | r1 ++ r2])
   end
 
   def intersection(
         %__MODULE__{id: id, headers: h, rows: r1},
         %__MODULE__{id: id, headers: h, rows: r2}
       ) do
-    __MODULE__.new(id, [h | r1 -- r1 -- r2])
+    new(id, [h | r1 -- r1 -- r2])
   end
 
   def join(
-        %__MODULE__{id: id, headers: hs1} = db1,
+        %__MODULE__{headers: hs1, id: id} = db1,
         %__MODULE__{headers: hs2} = db2,
         col1,
         col2,
@@ -80,10 +84,10 @@ defmodule Chat.Database do
     prefixer = &:"#{prefix}.#{&1}"
     namer = fn {k, v} -> {prefixer.(k), v} end
 
-    h1 = __MODULE__.header_index(db1, col1)
-    h2 = __MODULE__.header_index(db2, col2)
+    h1 = header_index(db1, col1)
+    h2 = header_index(db2, col2)
 
-    del_idx = __MODULE__.width(db1) + h2
+    del_idx = width(db1) + h2
 
     hs = (hs1 ++ Enum.map(hs2, prefixer)) |> List.delete_at(del_idx)
 
@@ -100,7 +104,7 @@ defmodule Chat.Database do
       end)
     end)
     |> Stream.map(&List.delete_at(&1, del_idx))
-    |> Enum.into(__MODULE__.new(id, [hs]))
+    |> Enum.into(new(id, [hs]))
   end
 
   def width(%__MODULE__{headers: headers}), do: length(headers)

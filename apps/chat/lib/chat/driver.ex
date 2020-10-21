@@ -44,9 +44,7 @@ defmodule Chat.Driver do
         state
 
       :CODE ->
-        Context.new()
-        |> Interpreter.interpret(action).(state)
-        |> advance()
+        state |> Interpreter.interpret(action).() |> advance()
 
       _ ->
         state |> Memory.store(:previous_question, question)
@@ -59,14 +57,11 @@ defmodule Chat.Driver do
 
     {:ok, %Answer{action: a, output: o}} = Question.answer(question, answer)
 
-    Interpreter.interpret(a).(
-      Context.new(),
-      Memory.store(state, name_output, o)
-    )
+    Memory.store(state, name_output, o) |> Interpreter.interpret(a).()
   end
 
   defp answer(state, %Question{type: :P, action: action}, "skip") do
-    Context.new() |> Interpreter.interpret(action).(state)
+    Interpreter.interpret(action).(state)
   end
 
   defp answer(state, %Question{type: :P, action: action}, product) do
@@ -76,7 +71,7 @@ defmodule Chat.Driver do
 
     state = state |> Memory.store(State.cart(), items)
 
-    Context.new() |> Interpreter.interpret(action).(state)
+    Interpreter.interpret(action).(state)
   end
 
   defp answer(state, %Question{type: :C, action: nil}, _) do
@@ -86,7 +81,7 @@ defmodule Chat.Driver do
   end
 
   defp answer(state, %Question{type: :C, action: action}, _) do
-    Context.new() |> Interpreter.interpret(action).(state)
+    Interpreter.interpret(action).(state)
   end
 
   defp answer(
@@ -99,10 +94,7 @@ defmodule Chat.Driver do
          text
        )
        when is_binary(text) do
-    Interpreter.interpret(action).(
-      Context.new(),
-      Memory.store(state, output, text)
-    )
+    Memory.store(state, output, text) |> Interpreter.interpret(action).()
   end
 
   defp answer(
@@ -114,10 +106,7 @@ defmodule Chat.Driver do
          },
          selection
        ) do
-    Interpreter.interpret(action).(
-      Context.new(),
-      Memory.store(state, output, selection)
-    )
+    Memory.store(state, output, selection) |> Interpreter.interpret(action).()
   end
 
   defp answer(
@@ -135,7 +124,7 @@ defmodule Chat.Driver do
 
     state = state |> Memory.store(State.cart(), items)
 
-    Context.new() |> Interpreter.interpret(action).(state)
+    Interpreter.interpret(action).(state)
   end
 
   @cough :cough

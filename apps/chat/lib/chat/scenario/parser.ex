@@ -50,8 +50,8 @@ defmodule Chat.Scenario.Parser do
   defp parse_process({p, rows}) do
     mapper = fn question, answers ->
       answers
-      |> Enum.with_index()
-      |> Enum.map(fn {a, i} -> %Answer{a | id: :"#{question.id}_#{i}"} end)
+      |> Stream.with_index()
+      |> Stream.map(fn {a, i} -> %Answer{a | id: :"#{question.id}_#{i}"} end)
       |> Enum.reduce(question, &Question.add_answer/2)
     end
 
@@ -95,32 +95,29 @@ defmodule Chat.Scenario.Parser do
   end
 
   defp parse_question([id, type, query, text, action, output]) do
-    with action <- parse_program(action),
-         query <- parse_program(query),
-         id <- String.to_atom(id),
-         type <- String.to_atom(type),
-         output <- parse_question_output(output) do
-      Question.new(
-        id,
-        type,
-        query,
-        text,
-        action,
-        output
-      )
-    end
+    action = parse_program(action)
+    query = parse_program(query)
+    id = String.to_atom(id)
+    type = String.to_atom(type)
+    output = parse_question_output(output)
+
+    Question.new(
+      id,
+      type,
+      query,
+      text,
+      action,
+      output
+    )
   end
 
   defp parse_answer([_, _, _, text, action, output]) do
-    with action <- parse_program(action),
-         output <- parse_answer_output(output) do
-      Answer.new(
-        :unknown,
-        text,
-        action,
-        output
-      )
-    end
+    Answer.new(
+      :unknown,
+      text,
+      parse_program(action),
+      parse_answer_output(output)
+    )
   end
 
   defp parse_program(nil), do: nil
@@ -161,12 +158,12 @@ defmodule Chat.Scenario.Parser do
     delta = length - length(list)
 
     extend = fn d, l ->
-      with app <-
-             0..(d - 1)
-             |> Enum.to_list()
-             |> Enum.map(fn _ -> base end) do
-        l |> Enum.concat(app)
-      end
+      app =
+        0..(d - 1)
+        |> Enum.to_list()
+        |> Enum.map(fn _ -> base end)
+
+      l |> Enum.concat(app)
     end
 
     trim = fn d, l ->
