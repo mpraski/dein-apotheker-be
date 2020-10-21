@@ -34,8 +34,6 @@ defmodule Chat.Driver do
            processes: [%StateProcess{id: process} | _]
          } = state
        ) do
-    IO.inspect(state)
-
     %Question{
       type: type,
       action: action
