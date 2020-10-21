@@ -14,8 +14,8 @@ defmodule Chat.Database do
   def new(id, [headers | rows]) do
     %__MODULE__{
       id: id,
-      headers: headers |> Enum.map(&to_atom/1),
-      rows: rows |> sanitize_rows()
+      headers: sanitize_headers(headers),
+      rows: sanitize_rows(rows)
     }
   end
 
@@ -78,6 +78,7 @@ defmodule Chat.Database do
         pred
       ) do
     prefixer = &:"#{prefix}.#{&1}"
+    namer = fn {k, v} -> {prefixer.(k), v} end
 
     h1 = __MODULE__.header_index(db1, col1)
     h2 = __MODULE__.header_index(db2, col2)
@@ -86,20 +87,19 @@ defmodule Chat.Database do
 
     hs = (hs1 ++ Enum.map(hs2, prefixer)) |> List.delete_at(del_idx)
 
-    db1
-    |> Enum.flat_map(fn r1 ->
-      db2
-      |> Enum.map(fn r2 ->
+    Stream.flat_map(db1, fn r1 ->
+      Enum.reduce(db2, [], fn r2, acc ->
         v1 = Enum.at(r1, h1) |> elem(1)
         v2 = Enum.at(r2, h2) |> elem(1)
 
-        namer = fn {k, v} -> {prefixer.(k), v} end
-
-        if pred.(v1, v2), do: r1 ++ Enum.map(r2, namer), else: []
+        if pred.(v1, v2) do
+          [r1 ++ Enum.map(r2, namer) | acc]
+        else
+          acc
+        end
       end)
-      |> Enum.filter(&(!Enum.empty?(&1)))
     end)
-    |> Enum.map(&List.delete_at(&1, del_idx))
+    |> Stream.map(&List.delete_at(&1, del_idx))
     |> Enum.into(__MODULE__.new(id, [hs]))
   end
 
@@ -121,6 +121,10 @@ defmodule Chat.Database do
 
   def single_column_rows(%__MODULE__{rows: rows}) do
     rows |> Enum.flat_map(& &1)
+  end
+
+  defp sanitize_headers(headers) do
+    headers |> Enum.map(&to_atom/1)
   end
 
   defp sanitize_rows(rows) do
