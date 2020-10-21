@@ -123,7 +123,7 @@ defmodule Chat.Driver do
   defp answer(
          state,
          %Question{
-           type: :NP,
+           type: :PN,
            action: action
          },
          selection

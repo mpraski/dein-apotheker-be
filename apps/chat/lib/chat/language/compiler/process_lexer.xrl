@@ -44,7 +44,7 @@ IdentifierStart = [A-Za-z_]
 IdentifierRest = [A-Za-z0-9_]
 
 Number = {Digit}+
-String = '{Binary}+'
+String = '{Binary}*'
 Identifier = {IdentifierStart}{IdentifierRest}*
 Variable = {LeftBracket}{Identifier}{RightBracket}
 

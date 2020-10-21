@@ -56,6 +56,7 @@ select_expr -> select select_list from maybe_qualified_database                w
 select_expr -> select select_list from maybe_qualified_database join_expr_list                  : {action('$1'), '$2', '$4', '$5',  nil}.
 select_expr -> select select_list from maybe_qualified_database join_expr_list where where_expr : {action('$1'), '$2', '$4', '$5', '$7'}.
 
+where_expr -> maybe_qualified_identifier eq_op number                 : {'$2', '$1', '$3'}.
 where_expr -> maybe_qualified_identifier eq_op string                 : {'$2', '$1', '$3'}.
 where_expr -> maybe_qualified_identifier eq_op variable               : {'$2', '$1', '$3'}.
 where_expr -> left_paren where_expr logical_op where_expr right_paren : {'$3', '$2', '$4'}.
