@@ -12,9 +12,7 @@ defmodule Chat.Language.Interpreter do
   alias Chat.Language.StdLib.Call
 
   def interpret(program, c \\ Context.new()) do
-    fn r ->
-      {c, r} |> interpret_expr(program) |> elem(1)
-    end
+    &({c, &1} |> interpret_expr(program) |> elem(1))
   end
 
   defp interpret_expr(data, exprs) when is_list(exprs) do
