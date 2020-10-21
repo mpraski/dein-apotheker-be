@@ -15,7 +15,7 @@ defmodule Chat.Database do
     %__MODULE__{
       id: id,
       headers: headers |> Enum.map(&to_atom/1),
-      rows: rows |> Enum.map(&Enum.map(&1, fn r -> to_string(r) end))
+      rows: rows |> sanitize_rows()
     }
   end
 
@@ -121,6 +121,12 @@ defmodule Chat.Database do
 
   def single_column_rows(%__MODULE__{rows: rows}) do
     rows |> Enum.flat_map(& &1)
+  end
+
+  defp sanitize_rows(rows) do
+    rows
+    |> Enum.filter(fn r -> !Enum.all?(r, &is_nil/1) end)
+    |> Enum.map(&Enum.map(&1, fn r -> to_string(r) end))
   end
 
   defp to_atom(a) when is_atom(a), do: a
