@@ -3,8 +3,6 @@ defmodule Chat.Language.Interpreter do
   Interpreter interprets the programs
   """
 
-  require Logger
-
   alias Chat.Database
   alias Chat.Language.Memory
   alias Chat.Language.StdLib

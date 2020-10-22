@@ -28,6 +28,7 @@ defmodule Chat.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:typed_struct, "~> 0.2.1", runtime: false},
       {:xlsxir, "~> 1.6.4", runtime: false}
     ]
   end

@@ -29,6 +29,7 @@ defmodule Auth.MixProject do
     [
       {:elixir_uuid, "~> 1.2"},
       {:guardian, "~> 2.0"},
+      {:typed_struct, "~> 0.2.1", runtime: false},
       {:account, in_umbrella: true}
     ]
   end

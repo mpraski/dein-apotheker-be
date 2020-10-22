@@ -9,12 +9,5 @@ services:
       - database-data:/var/lib/postgresql
     ports:
       - 5432:5432
-  migration:
-    build: .
-    command: eval Chat.Migration.migrate
-    env_file:
-      - app.env
-    depends_on:
-      - database
 volumes:
   database-data:

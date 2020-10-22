@@ -43,6 +43,7 @@ defmodule Proxy.MixProject do
       {:plug_cowboy, "~> 2.1"},
       {:corsica, "~> 1.1"},
       {:con_cache, "~> 0.14.0"},
+      {:typed_struct, "~> 0.2.1", runtime: false},
       {:chat, in_umbrella: true},
       {:account, in_umbrella: true}
     ]

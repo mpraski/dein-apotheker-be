@@ -5,7 +5,7 @@ ARG MIX_ENV=prod
 ARG PROJECT=dein_apotheker
 
 # ---- COMPILE ----
-FROM elixir:1.10-alpine as builder
+FROM hexpm/elixir:1.11.1-erlang-23.1.1-alpine-3.12.0 as builder
 
 LABEL maintainer="marcin.praski@live.com"
 
@@ -41,7 +41,7 @@ COPY apps ./apps
 RUN MIX_ENV=$MIX_ENV mix do compile, release
 
 # ---- PACKAGE ----
-FROM alpine:3.11
+FROM alpine:3.12
 
 ARG MIX_ENV
 ARG APP
