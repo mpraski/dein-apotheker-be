@@ -37,14 +37,6 @@ defmodule Proxy.Router do
     delete("/", SessionController, :delete)
   end
 
-  def handle_errors(conn, %{
-        kind: _kind,
-        reason: %Plug.CSRFProtection.InvalidCSRFTokenError{},
-        stack: _stack
-      }) do
-    conn |> render_error(:unauthorized)
-  end
-
   def handle_errors(conn, %{kind: _kind, reason: _reason, stack: _stack}) do
     conn |> render_error(:internal_server_error)
   end
