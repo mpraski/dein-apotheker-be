@@ -15,6 +15,6 @@ config :proxy, Proxy.Endpoint,
   server: true
 
 # Configures Elixir's Logger
-config :logger, :console,
-  level: :warn,
-  compile_time_purge_level: :info
+# config :logger, :console,
+#  level: :warn,
+#  compile_time_purge_level: :info
