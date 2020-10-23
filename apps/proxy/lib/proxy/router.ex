@@ -5,8 +5,6 @@ defmodule Proxy.Router do
 
   alias Proxy.Session.{Verify, Enforce, ProtectCSRF}
 
-  require Logger
-
   pipeline :api do
     plug(:accepts, ["json"])
     plug(:fetch_session)
@@ -47,8 +45,7 @@ defmodule Proxy.Router do
     conn |> render_error(:unauthorized)
   end
 
-  def handle_errors(conn, error = %{kind: _kind, reason: _reason, stack: _stack}) do
-    Logger.error(inspect(error))
+  def handle_errors(conn, %{kind: _kind, reason: _reason, stack: _stack}) do
     conn |> render_error(:internal_server_error)
   end
 
