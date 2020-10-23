@@ -1,6 +1,8 @@
 defmodule Proxy.ChatController do
   use Proxy, :controller
 
+  require Logger
+
   alias Plug.Conn
   alias Proxy.Session
   alias Proxy.Session.Store
@@ -44,7 +46,7 @@ defmodule Proxy.ChatController do
 
         session |> Session.add(state) |> Store.put()
 
-        IO.inspect(state)
+        Logger.debug(inspect(state))
 
         conn |> render("answer.json", state: state)
 
