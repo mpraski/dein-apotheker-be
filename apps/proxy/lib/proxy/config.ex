@@ -14,7 +14,8 @@ defmodule Proxy.Config do
   ]
 
   @corsica [
-    allow_headers: ["content-type", "x-csrf-token"]
+    allow_headers: ["content-type", "x-csrf-token"],
+    allow_credentials: true
   ]
 
   def corsica_options(:prod) do
@@ -25,8 +26,7 @@ defmodule Proxy.Config do
 
   def corsica_options(_) do
     Keyword.merge(@corsica,
-      origins: ["http://127.0.0.1:8081", "http://localhost:8081"],
-      allow_credentials: true
+      origins: ["http://127.0.0.1:8081", "http://localhost:8081"]
     )
   end
 
