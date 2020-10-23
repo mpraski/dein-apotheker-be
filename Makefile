@@ -23,7 +23,7 @@ run:
 
 test:
 	@echo "$(OK_COLOR)==> Running tests$(NO_COLOR)..."
-	@MIX_ENV=test mix do deps.get, test_all
+	@MIX_ENV=test mix test_all
 
 lint:
 	@echo "$(OK_COLOR)==> Checking code style with 'credo' tool$(NO_COLOR)..."
