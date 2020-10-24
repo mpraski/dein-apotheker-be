@@ -51,7 +51,8 @@ defmodule Chat.Language.StdLib do
       SIZE: &size/1,
       LIST: &list/1,
       ADD: &add/1,
-      MATCH: &match/1
+      MATCH: &match/1,
+      CART: &cart/1
     }
   end
 
@@ -259,6 +260,15 @@ defmodule Chat.Language.StdLib do
     products
     |> Database.where(:APIID, api)
     |> Database.where_in(:MedFormID, forms)
+  end
+
+  defp cart(%Call{args: [state | _], memory: mem}) do
+    {:ok, items} = state |> Memory.load(:cart)
+    {:ok, product_id} = mem |> Memory.load(:product_id)
+
+    items = (items ++ [product_id]) |> Enum.uniq()
+
+    state |> Memory.store(:cart, items)
   end
 
   defp deep_flat_map(m) do

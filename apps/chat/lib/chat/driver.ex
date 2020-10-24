@@ -30,6 +30,81 @@ defmodule Chat.Driver do
 
   defp stamp(state), do: State.generate_id(state)
 
+  defp answer(state, %Question{type: :Q, output: output} = question, answer) do
+    answer = String.to_existing_atom(answer)
+
+    {:ok, %Answer{action: a, output: o}} = Question.answer(question, answer)
+
+    Memory.store(state, output, o) |> Interpreter.interpret(a).()
+  end
+
+  defp answer(state, %Question{type: :P, query: query} = question, answer) do
+    answer = String.to_existing_atom(answer)
+
+    {:ok, %Answer{action: action}} = Question.answer(question, answer)
+
+    [product] =
+      state
+      |> Interpreter.interpret(query).()
+      |> Enum.to_list()
+
+    tape = %{
+      product_id: Keyword.get(product, :ID)
+    }
+
+    Interpreter.interpret(action, tape).(state)
+  end
+
+  defp answer(state, %Question{type: :C, action: nil}, _) do
+    {:ok, previous} = Memory.load(state, @prev_question)
+
+    %State{state | question: previous}
+  end
+
+  defp answer(state, %Question{type: :C, action: action}, _) do
+    Interpreter.interpret(action).(state)
+  end
+
+  defp answer(
+         state,
+         %Question{
+           type: :F,
+           action: action,
+           output: output
+         },
+         text
+       ) do
+    state
+    |> Memory.store(output, text)
+    |> Interpreter.interpret(action).()
+  end
+
+  defp answer(
+         state,
+         %Question{
+           type: :N,
+           action: action,
+           output: output
+         },
+         selection
+       ) do
+    state
+    |> Memory.store(output, selection)
+    |> Interpreter.interpret(action).()
+  end
+
+  defp answer(
+         state,
+         %Question{
+           type: :PN,
+           action: action
+         },
+         selection
+       )
+       when is_list(selection) do
+    Interpreter.interpret(action).(state)
+  end
+
   defp advance(
          %State{
            question: question,
@@ -52,80 +127,6 @@ defmodule Chat.Driver do
       _ ->
         state |> Memory.store(@prev_question, question)
     end
-  end
-
-  defp answer(state, %Question{type: :Q, output: output} = question, answer) do
-    answer = String.to_existing_atom(answer)
-
-    {:ok, %Answer{action: a, output: o}} = Question.answer(question, answer)
-
-    Memory.store(state, output, o) |> Interpreter.interpret(a).()
-  end
-
-  defp answer(state, %Question{type: :P, action: action}, "skip") do
-    Interpreter.interpret(action).(state)
-  end
-
-  defp answer(state, %Question{type: :P, action: action}, product) do
-    {:ok, items} = state |> Memory.load(State.cart())
-
-    items = (items ++ [product]) |> Enum.uniq()
-
-    state = state |> Memory.store(State.cart(), items)
-
-    Interpreter.interpret(action).(state)
-  end
-
-  defp answer(state, %Question{type: :C, action: nil}, _) do
-    {:ok, previous} = Memory.load(state, @prev_question)
-
-    %State{state | question: previous}
-  end
-
-  defp answer(state, %Question{type: :C, action: action}, _) do
-    Interpreter.interpret(action).(state)
-  end
-
-  defp answer(
-         state,
-         %Question{
-           type: :F,
-           action: action,
-           output: output
-         },
-         text
-       ) do
-    Memory.store(state, output, text) |> Interpreter.interpret(action).()
-  end
-
-  defp answer(
-         state,
-         %Question{
-           type: :N,
-           action: action,
-           output: output
-         },
-         selection
-       ) do
-    Memory.store(state, output, selection) |> Interpreter.interpret(action).()
-  end
-
-  defp answer(
-         state,
-         %Question{
-           type: :PN,
-           action: action
-         },
-         selection
-       )
-       when is_list(selection) do
-    {:ok, items} = state |> Memory.load(State.cart())
-
-    items = (items ++ selection) |> Enum.uniq()
-
-    state = state |> Memory.store(State.cart(), items)
-
-    Interpreter.interpret(action).(state)
   end
 
   @cough :cough

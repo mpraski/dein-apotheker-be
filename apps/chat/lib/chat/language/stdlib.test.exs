@@ -154,7 +154,7 @@ defmodule Chat.Language.StdLib.Test do
             true
           end
         ),
-      register: Driver.initial() |> Memory.store(State.cart(), [:prod_1, :prod_2, :prod_3])
+      register: Driver.initial() |> Memory.store(:cart, [:prod_1, :prod_2, :prod_3])
     ],
     inject_with_1: [
       program: """
@@ -187,7 +187,7 @@ defmodule Chat.Language.StdLib.Test do
             true
           end
         ),
-      register: Driver.initial() |> Memory.store(State.cart(), [:prod_1, :prod_2, :prod_3])
+      register: Driver.initial() |> Memory.store(:cart, [:prod_1, :prod_2, :prod_3])
     ],
     jump_1: [
       program: "JUMP(ExampleProcess)",
@@ -263,6 +263,69 @@ defmodule Chat.Language.StdLib.Test do
                    ]
                  } ->
             true
+          end
+        ),
+      register: Driver.initial()
+    ],
+    cart_1: [
+      program: """
+        cart = LIST('1', '2', '3'),
+        SAVE(cart),
+        product_id = '4',
+        CART()
+      """,
+      expected:
+        quote(
+          do: fn %State{
+                   variables: variables
+                 } ->
+            cart_items = ["1", "2", "3", "4"]
+
+            {:ok, cart} = variables |> Memory.load(:cart)
+
+            cart == cart_items
+          end
+        ),
+      register: Driver.initial()
+    ],
+    cart_2: [
+      program: """
+        cart = LIST('1', '2', '3'),
+        SAVE(cart),
+        product_id = '2',
+        CART()
+      """,
+      expected:
+        quote(
+          do: fn %State{
+                   variables: variables
+                 } ->
+            cart_items = ["1", "2", "3"]
+
+            {:ok, cart} = variables |> Memory.load(:cart)
+
+            cart == cart_items
+          end
+        ),
+      register: Driver.initial()
+    ],
+    cart_3: [
+      program: """
+        cart = LIST(),
+        SAVE(cart),
+        product_id = '2',
+        CART()
+      """,
+      expected:
+        quote(
+          do: fn %State{
+                   variables: variables
+                 } ->
+            cart_items = ["2"]
+
+            {:ok, cart} = variables |> Memory.load(:cart)
+
+            cart == cart_items
           end
         ),
       register: Driver.initial()
