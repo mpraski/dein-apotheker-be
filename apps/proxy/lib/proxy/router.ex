@@ -35,7 +35,6 @@ defmodule Proxy.Router do
 
     get("/", SessionController, :has)
     post("/", SessionController, :new)
-    delete("/", SessionController, :delete)
   end
 
   def handle_errors(conn, %{kind: _kind, reason: _reason, stack: _stack}) do
