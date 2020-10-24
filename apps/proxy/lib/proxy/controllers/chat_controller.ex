@@ -71,7 +71,7 @@ defmodule Proxy.ChatController do
 
     case session |> Session.fetch(state) do
       {:ok, state} ->
-        conn |> render("answer.json", state: state)
+        conn |> render("revert.json", state: state)
 
       :error ->
         {:error, 400}

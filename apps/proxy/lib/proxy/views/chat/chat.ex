@@ -18,11 +18,14 @@ defmodule Proxy.Views.Chat do
           question: question,
           scenarios: [scenario | _],
           processes: [%StateProcess{id: process} | _]
-        } = state
+        } = state,
+        args \\ []
       ) do
     question = Chat.question(scenario, process, question)
 
-    message = question |> create_message(state)
+    render_text = Keyword.get(args, :render_text, true)
+
+    message = question |> create_message(state, render_text)
 
     Representation.new(id, message)
   end
@@ -34,9 +37,10 @@ defmodule Proxy.Views.Chat do
            text: text,
            answers: answers
          },
-         _
+         _,
+         render_text
        ) do
-    text = Text.render(text)
+    text = if render_text, do: Text.render(text), else: ""
 
     Message.new(id, :Q, text, answers_input(answers))
   end
@@ -48,7 +52,8 @@ defmodule Proxy.Views.Chat do
            text: text,
            query: query
          },
-         state
+         state,
+         render_text
        )
        when type in ~w[PN N]a do
     input =
@@ -56,7 +61,7 @@ defmodule Proxy.Views.Chat do
       |> Interpreter.interpret(query).()
       |> database_input()
 
-    text = Text.render(text)
+    text = if render_text, do: Text.render(text), else: ""
 
     Message.new(id, type, text, input)
   end
@@ -68,14 +73,15 @@ defmodule Proxy.Views.Chat do
            text: text,
            query: query
          },
-         state
+         state,
+         render_text
        ) do
     [product] =
       state
       |> Interpreter.interpret(query).()
       |> Enum.to_list()
 
-    text = Text.render(text)
+    text = if render_text, do: Text.render(text), else: ""
 
     Message.new(id, :P, text, map_row(:Products, product))
   end
@@ -86,9 +92,12 @@ defmodule Proxy.Views.Chat do
            type: :C,
            text: text
          },
-         _
+         _,
+         render_text
        ) do
-    Message.new(id, :C, Text.render(text), comment_input())
+    text = if render_text, do: Text.render(text), else: ""
+
+    Message.new(id, :C, text, comment_input())
   end
 
   defp create_message(
@@ -97,9 +106,12 @@ defmodule Proxy.Views.Chat do
            type: :F,
            text: text
          },
-         _
+         _,
+         render_text
        ) do
-    Message.new(id, :F, Text.render(text))
+    text = if render_text, do: Text.render(text), else: ""
+
+    Message.new(id, :F, text)
   end
 
   defp answers_input(answers) do
