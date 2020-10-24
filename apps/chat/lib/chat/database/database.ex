@@ -184,10 +184,10 @@ defimpl Collectable, for: Chat.Database do
 
       %Database{rows: rows} = db, {:cont, row} ->
         {_, row} = Database.from_list(row)
-        %Database{db | rows: rows ++ [row]}
+        %Database{db | rows: [row | rows]}
 
-      db, :done ->
-        db
+      %Database{rows: rows} = db, :done ->
+        %Database{db | rows: Enum.reverse(rows)}
 
       _, :halt ->
         :ok
