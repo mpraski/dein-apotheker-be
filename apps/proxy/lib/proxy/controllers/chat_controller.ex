@@ -58,4 +58,23 @@ defmodule Proxy.ChatController do
   def answer(_conn, _params) do
     {:error, 400}
   end
+
+  def revert(
+        %Conn{
+          body_params: %{
+            "state" => state
+          }
+        } = conn,
+        _params
+      ) do
+    session = conn.assigns.session
+
+    case session |> Session.fetch(state) do
+      {:ok, state} ->
+        conn |> render("answer.json", state: state)
+
+      :error ->
+        {:error, 400}
+    end
+  end
 end

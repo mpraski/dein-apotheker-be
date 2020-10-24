@@ -27,6 +27,7 @@ defmodule Proxy.Router do
     pipe_through([:api, :ensure_auth])
 
     post("/answer", ChatController, :answer)
+    patch("/revert", ChatController, :revert)
   end
 
   scope "/session", Proxy do
