@@ -81,15 +81,12 @@ defmodule Chat.Database do
         prefix,
         pred
       ) do
-    prefixer = &:"#{prefix}.#{&1}"
-    namer = fn {k, v} -> {prefixer.(k), v} end
-
     h1 = header_index(db1, col1)
     h2 = header_index(db2, col2)
 
     del_idx = width(db1) + h2
 
-    hs = (hs1 ++ Enum.map(hs2, prefixer)) |> List.delete_at(del_idx)
+    hs = (hs1 ++ Enum.map(hs2, &:"#{prefix}.#{&1}")) |> List.delete_at(del_idx)
 
     Stream.flat_map(db1, fn r1 ->
       Enum.reduce(db2, [], fn r2, acc ->
@@ -97,7 +94,7 @@ defmodule Chat.Database do
         v2 = Enum.at(r2, h2) |> elem(1)
 
         if pred.(v1, v2) do
-          [r1 ++ Enum.map(r2, namer) | acc]
+          [r1 ++ r2 | acc]
         else
           acc
         end
