@@ -197,11 +197,11 @@ defmodule Chat.Language.Interpreter do
     {c, {c, aliaz, r} |> evaluate_on_expr(on_expr)}
   end
 
-  defp interpret_where({c, %Database{id: id} = db}, where_expr) do
+  defp interpret_where({c, %Database{id: id, headers: hs} = db}, where_expr) do
     db =
       db
       |> Enum.filter(&evaluate_where_expr({c, &1}, where_expr))
-      |> Enum.into(Database.new(id))
+      |> Enum.into(Database.new(id, [hs]))
 
     {c, db}
   end
