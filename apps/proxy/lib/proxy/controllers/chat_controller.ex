@@ -59,19 +59,16 @@ defmodule Proxy.ChatController do
     {:error, 400}
   end
 
-  def revert(
-        %Conn{
-          body_params: %{
-            "state" => state
-          }
-        } = conn,
-        _params
-      ) do
+  def peek(%Conn{} = conn, _params) do
+    %Conn{query_params: params} = conn = conn |> Conn.fetch_query_params()
+
+    {:ok, state} = params |> Map.fetch("state")
+
     session = conn.assigns.session
 
     case session |> Session.fetch(state) do
       {:ok, state} ->
-        conn |> render("revert.json", state: state)
+        conn |> render("peek.json", state: state)
 
       :error ->
         {:error, 400}
