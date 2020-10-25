@@ -37,10 +37,10 @@ defmodule Proxy.Views.Chat do
            text: text,
            answers: answers
          },
-         _,
+         state,
          render_text
        ) do
-    text = if render_text, do: Text.render(text), else: ""
+    text = if render_text, do: Text.render(text, state), else: ""
 
     Message.new(id, :Q, text, answers_input(answers))
   end
@@ -61,7 +61,7 @@ defmodule Proxy.Views.Chat do
       |> Interpreter.interpret(query).()
       |> database_input()
 
-    text = if render_text, do: Text.render(text), else: ""
+    text = if render_text, do: Text.render(text, state), else: ""
 
     Message.new(id, type, text, input)
   end
@@ -71,7 +71,8 @@ defmodule Proxy.Views.Chat do
            id: id,
            type: :P,
            text: text,
-           query: query
+           query: query,
+           answers: answers
          },
          state,
          render_text
@@ -81,9 +82,14 @@ defmodule Proxy.Views.Chat do
       |> Interpreter.interpret(query).()
       |> Enum.to_list()
 
-    text = if render_text, do: Text.render(text), else: ""
+    text = if render_text, do: Text.render(text, state), else: ""
 
-    Message.new(id, :P, text, map_row(:Products, product))
+    input = %{
+      product: map_row(:Products, product),
+      answers: answers_input(answers)
+    }
+
+    Message.new(id, :P, text, input)
   end
 
   defp create_message(
@@ -92,10 +98,10 @@ defmodule Proxy.Views.Chat do
            type: :C,
            text: text
          },
-         _,
+         state,
          render_text
        ) do
-    text = if render_text, do: Text.render(text), else: ""
+    text = if render_text, do: Text.render(text, state), else: ""
 
     Message.new(id, :C, text, comment_input())
   end
@@ -106,10 +112,10 @@ defmodule Proxy.Views.Chat do
            type: :F,
            text: text
          },
-         _,
+         state,
          render_text
        ) do
-    text = if render_text, do: Text.render(text), else: ""
+    text = if render_text, do: Text.render(text, state), else: ""
 
     Message.new(id, :F, text)
   end
