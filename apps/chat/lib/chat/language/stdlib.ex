@@ -45,6 +45,7 @@ defmodule Chat.Language.StdLib do
       IS_NEXT: &is_next/1,
       DEFER: &defer/1,
       SAVE: &save/1,
+      DELETE: &delete/1,
       TO_TEXT: &to_text/1,
       ROWS: &rows/1,
       COLS: &cols/1,
@@ -186,6 +187,10 @@ defmodule Chat.Language.StdLib do
   defp save(%Call{args: [m, n], memory: mem}) do
     {:ok, v} = Memory.load(mem, n)
     Memory.store(m, n, v)
+  end
+
+  defp delete(%Call{args: [m, n]}) do
+    Memory.delete(m, n)
   end
 
   defp to_text(%Call{args: [_ | args]}) do

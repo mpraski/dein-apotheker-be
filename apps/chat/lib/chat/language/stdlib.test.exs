@@ -247,6 +247,20 @@ defmodule Chat.Language.StdLib.Test do
         ),
       register: Driver.initial()
     ],
+    delete_1: [
+      program: """
+        DELETE(some_key)
+      """,
+      expected:
+        quote(
+          do: fn %State{
+                   variables: %{}
+                 } ->
+            true
+          end
+        ),
+      register: Driver.initial() |> Memory.store(:some_key, 5)
+    ],
     finish_1: [
       program: """
         LOAD(ExampleProcess),
