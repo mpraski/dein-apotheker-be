@@ -99,9 +99,8 @@ defmodule Chat.Driver do
            type: :PN,
            action: action
          },
-         selection
-       )
-       when is_list(selection) do
+         _selection
+       ) do
     Interpreter.interpret(action).(state)
   end
 
