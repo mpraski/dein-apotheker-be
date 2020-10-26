@@ -337,6 +337,19 @@ defmodule Chat.Language.Interpreter.Test do
         ]
       }
     ],
+    join_where_brands_not_found: [
+      program: """
+        SELECT *
+        FROM Products p
+        JOIN Brands b ON p.brand_id == b.id
+        WHERE p.id == '20'
+      """,
+      expected: %Chat.Database{
+        headers: [:id, :name, :price, :brand_id, :api, :"b.name"],
+        id: :Products,
+        rows: []
+      }
+    ],
     join_where_brands_inverse: [
       program: """
         SELECT *
