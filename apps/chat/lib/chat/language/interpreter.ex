@@ -235,6 +235,17 @@ defmodule Chat.Language.Interpreter do
     data |> evaluate_where_expr({:equals, v, i}) |> Kernel.not()
   end
 
+  defp evaluate_where_expr({_, r} = d, {:in, v, i}) do
+    {_, v} = d |> interpret_expr(v)
+    {_, i} = d |> interpret_expr(i)
+
+    v =
+      Keyword.get(r, normalize_column(v)) ||
+        Keyword.get(r, possibly_qualified_column(v))
+
+    Enum.member?(i, v)
+  end
+
   defp evaluate_on_expr(data, {:lor, a, b}) do
     a = data |> evaluate_on_expr(a)
     b = data |> evaluate_on_expr(b)

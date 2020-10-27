@@ -290,6 +290,27 @@ defmodule Chat.Language.Interpreter.Test do
         ]
       }
     ],
+    select_id_name_products_in: [
+      program: "SELECT id, name FROM Products WHERE id IN LIST('1', '2')",
+      expected: %Chat.Database{
+        headers: [:id, :name],
+        id: :Products,
+        rows: [
+          ["1", "Product 1"],
+          ["2", "Product 2"]
+        ]
+      }
+    ],
+    select_id_name_products_in_2: [
+      program: "SELECT id, name FROM Products WHERE id IN LIST('3')",
+      expected: %Chat.Database{
+        headers: [:id, :name],
+        id: :Products,
+        rows: [
+          ["3", "Product 3"]
+        ]
+      }
+    ],
     basic_join_brands: [
       program: """
         SELECT *
@@ -395,6 +416,25 @@ defmodule Chat.Language.Interpreter.Test do
         headers: [:id, :"b.name"],
         id: :Products,
         rows: [
+          ["2", "Brand 2"]
+        ]
+      }
+    ],
+    select_columns_join_where_brands_variable_in: [
+      program: """
+        col1 = id,
+        col2 = 'b.name',
+        args = LIST('1', '2'),
+        SELECT [col1], [col2]
+        FROM Products p
+        JOIN Brands b ON p.brand_id == b.id
+        WHERE p.id IN [args]
+      """,
+      expected: %Chat.Database{
+        headers: [:id, :"b.name"],
+        id: :Products,
+        rows: [
+          ["1", "Brand 1"],
           ["2", "Brand 2"]
         ]
       }

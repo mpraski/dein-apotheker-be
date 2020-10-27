@@ -6,7 +6,7 @@ for_expr logical_expr comp_expr function_expr select_expr
 where_expr on_expr join_expr join_expr_list select_list column_list 
 qualified_database maybe_qualified_database eq_op comp_op logical_op 
 identifier qualified_identifier maybe_qualified_identifier
-variable string number column.
+variable string number column in_op.
 
 Terminals
 dot comma assign lif elif then else for in do 
@@ -59,6 +59,7 @@ select_expr -> select select_list from maybe_qualified_database join_expr_list w
 where_expr -> maybe_qualified_identifier eq_op number                 : {'$2', '$1', '$3'}.
 where_expr -> maybe_qualified_identifier eq_op string                 : {'$2', '$1', '$3'}.
 where_expr -> maybe_qualified_identifier eq_op variable               : {'$2', '$1', '$3'}.
+where_expr -> maybe_qualified_identifier in_op expr                   : {'$2', '$1', '$3'}.
 where_expr -> left_paren where_expr logical_op where_expr right_paren : {'$3', '$2', '$4'}.
 
 on_expr -> qualified_identifier eq_op qualified_identifier   : {'$2', '$1', '$3'}.
@@ -98,6 +99,8 @@ maybe_qualified_identifier -> identifier dot identifier : {qualified_ident, '$1'
 
 eq_op -> equals     : action('$1').
 eq_op -> not_equals : action('$1').
+
+in_op -> in : action('$1').
 
 comp_op -> equals        : action('$1').
 comp_op -> not_equals    : action('$1').

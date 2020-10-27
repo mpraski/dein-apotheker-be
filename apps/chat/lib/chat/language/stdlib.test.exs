@@ -34,6 +34,18 @@ defmodule Chat.Language.StdLib.Test do
       program: "a = 1, b = 2, LIST([a], [b], c)",
       expected: [1, 2, :c]
     ],
+    index_1: [
+      program: "a = 1, b = 2, l = LIST([a], [b], c), INDEX(0, [l])",
+      expected: 1
+    ],
+    index_2: [
+      program: "a = 1, b = 2, l = LIST([a], [b], c), INDEX(1, [l])",
+      expected: 2
+    ],
+    index_3: [
+      program: "a = 1, b = 2, l = LIST([a], [b], c), INDEX(2, [l])",
+      expected: :c
+    ],
     size_1: [
       program: "SIZE(LIST(a, 'b', 3))",
       expected: 3

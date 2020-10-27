@@ -51,6 +51,7 @@ defmodule Chat.Language.StdLib do
       COLS: &cols/1,
       SIZE: &size/1,
       LIST: &list/1,
+      INDEX: &index/1,
       ADD: &add/1,
       MATCH: &match/1,
       CART: &cart/1
@@ -212,6 +213,8 @@ defmodule Chat.Language.StdLib do
 
   defp list(%Call{args: [_ | items]}), do: items
 
+  defp index(%Call{args: [_, index, items]}), do: items |> Enum.at(index)
+
   defp match(%Call{
          args: [
            _,
@@ -262,9 +265,12 @@ defmodule Chat.Language.StdLib do
 
     forms = prog.(args) |> Database.single_column_rows()
 
-    products
-    |> Database.where(:APIID, api)
-    |> Database.where_in(:MedFormID, forms)
+    matches =
+      products
+      |> Database.where(:APIID, api)
+      |> Database.where_in(:MedFormID, forms)
+
+    [forms, matches]
   end
 
   defp cart(%Call{args: [state | _], memory: mem}) do
