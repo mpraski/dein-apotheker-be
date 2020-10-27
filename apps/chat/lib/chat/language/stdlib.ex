@@ -224,8 +224,7 @@ defmodule Chat.Language.StdLib do
            transport,
            fly,
            single
-         ],
-         memory: mem
+         ]
        }) do
     query = """
       SELECT ID FROM MedForm WHERE (
@@ -256,21 +255,30 @@ defmodule Chat.Language.StdLib do
       single: single
     }
 
-    products = Chat.database(:Products)
-
     prog =
       query
       |> Parser.parse()
-      |> Interpreter.interpret(mem)
+      |> Interpreter.interpret(args)
 
-    forms = prog.(args) |> Database.single_column_rows()
+    forms = prog.(nil) |> Database.single_column_rows()
 
-    matches =
-      products
-      |> Database.where(:APIID, api)
-      |> Database.where_in(:MedFormID, forms)
+    queryMatch = """
+      SELECT *
+      FROM Products
+      WHERE (APIID == [api] AND MedFormID IN [forms])
+    """
 
-    [forms, matches]
+    args = %{
+      api: api,
+      forms: forms
+    }
+
+    prog =
+      queryMatch
+      |> Parser.parse()
+      |> Interpreter.interpret(args)
+
+    [forms, prog.(nil)]
   end
 
   defp cart(%Call{args: [state | _], memory: mem}) do
