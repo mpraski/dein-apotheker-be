@@ -9,6 +9,7 @@ defmodule Chat.Driver do
   alias Chat.State.Process, as: StateProcess
   alias Chat.Language.Memory
   alias Chat.Language.Interpreter
+  alias Chat.Language.Parser
 
   @prev_question :previous_question
 
@@ -99,9 +100,17 @@ defmodule Chat.Driver do
            type: :PN,
            action: action
          },
-         _selection
+         products
        ) do
-    Interpreter.interpret(action).(state)
+    args = %{
+      products: products
+    }
+
+    prog = "CART_MANY([products])" |> Parser.parse()
+
+    state
+    |> Interpreter.interpret(prog, args).()
+    |> Interpreter.interpret(action).()
   end
 
   defp advance(

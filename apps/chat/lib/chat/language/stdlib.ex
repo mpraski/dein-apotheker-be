@@ -54,7 +54,8 @@ defmodule Chat.Language.StdLib do
       INDEX: &index/1,
       ADD: &add/1,
       MATCH: &match/1,
-      CART: &cart/1
+      CART: &cart/1,
+      CART_MANY: &cart_many/1
     }
   end
 
@@ -286,6 +287,14 @@ defmodule Chat.Language.StdLib do
     {:ok, product_id} = mem |> Memory.load(:product_id)
 
     items = (items ++ [product_id]) |> Enum.uniq()
+
+    state |> Memory.store(:cart, items)
+  end
+
+  defp cart_many(%Call{args: [state | product_ids]}) do
+    {:ok, items} = state |> Memory.load(:cart)
+
+    items = (items ++ product_ids) |> Enum.uniq()
 
     state |> Memory.store(:cart, items)
   end
