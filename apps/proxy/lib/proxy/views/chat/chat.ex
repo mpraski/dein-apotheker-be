@@ -7,7 +7,7 @@ defmodule Proxy.Views.Chat do
   alias Chat.State.Process, as: StateProcess
   alias Chat.Scenario.{Question, Answer, Text}
   alias Chat.Database
-  alias Chat.Language.Interpreter
+  alias Chat.Language.{Memory, Interpreter}
 
   alias Proxy.Views.Chat.{Product, Brand, API, Message}
   alias Proxy.Views.Chat.State, as: Representation
@@ -27,7 +27,11 @@ defmodule Proxy.Views.Chat do
 
     message = question |> create_message(state, render_text)
 
-    Representation.new(id, message)
+    {:ok, cart} = state |> Memory.load(State.cart())
+
+    cart = cart |> create_cart()
+
+    Representation.new(id, message, cart)
   end
 
   defp create_message(
@@ -170,5 +174,13 @@ defmodule Proxy.Views.Chat do
     {:ok, image} = row |> Keyword.fetch(:Image)
 
     {id, name, image}
+  end
+
+  defp create_cart(cart) do
+    %Database{id: id} = prods = Chat.database(:Products)
+
+    prods
+    |> Database.where_in(:ID, cart)
+    |> Enum.map(&map_row(id, &1))
   end
 end
