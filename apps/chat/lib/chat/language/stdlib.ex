@@ -261,16 +261,16 @@ defmodule Chat.Language.StdLib do
 
     forms = prog.(nil) |> Database.single_column_rows()
 
+    args = %{
+      api: api,
+      forms: forms
+    }
+
     match_query = ~p"""
       SELECT *
       FROM Products
       WHERE (APIID == [api] AND MedFormID IN [forms])
     """
-
-    args = %{
-      api: api,
-      forms: forms
-    }
 
     prog = match_query |> Interpreter.interpret(args)
 
