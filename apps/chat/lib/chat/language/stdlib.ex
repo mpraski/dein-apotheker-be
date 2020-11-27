@@ -228,27 +228,31 @@ defmodule Chat.Language.StdLib do
          ]
        }) do
     query = """
+      w = TO_TEXT([water]),
+      s = TO_TEXT([swallow]),
+      t = TO_TEXT([transport]),
+      f = TO_TEXT([fly]),
+      i = TO_TEXT([single]),
       SELECT ID FROM MedForm WHERE (
         (
             (
-                WithoutWater == [water]
+                WithoutWater == [w]
                 AND
-                SwallowingProblems == [swallow]
+                SwallowingProblems == [s]
             )
             AND
             (
-                Portable == [transport]
+                Portable == [t]
                 AND
-                GoodForFlight == [fly]
+                GoodForFlight == [f]
             )
         )
         AND
-            DosedIndividually == [single]
+            DosedIndividually == [i]
         )
     """
 
     args = %{
-      api: api,
       water: water,
       swallow: swallow,
       transport: transport,
