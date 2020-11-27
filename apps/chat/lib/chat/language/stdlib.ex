@@ -295,8 +295,11 @@ defmodule Chat.Language.StdLib do
     state |> Memory.store(:cart, items)
   end
 
-  defp cart_many(%Call{args: [state | product_ids]}) do
+  defp cart_many(%Call{args: [state, product_ids]}) do
     {:ok, items} = state |> Memory.load(:cart)
+
+    IO.inspect(state)
+    IO.inspect(product_ids)
 
     items = (items ++ product_ids) |> Enum.uniq()
 
