@@ -9,4 +9,6 @@ defmodule Chat.Language.Parser do
 
     ast
   end
+
+  defmacro sigil_p({:<<>>, _meta, [source]}, []), do: Macro.escape(parse(source))
 end

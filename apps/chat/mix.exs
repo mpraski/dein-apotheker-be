@@ -29,7 +29,8 @@ defmodule Chat.MixProject do
   defp deps do
     [
       {:typed_struct, "~> 0.2.1", runtime: false},
-      {:xlsxir, "~> 1.6.4", runtime: false}
+      {:xlsxir, "~> 1.6.4", runtime: false},
+      {:elixir_uuid, "~> 1.2"}
     ]
   end
 

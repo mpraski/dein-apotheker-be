@@ -5,6 +5,8 @@ defmodule Chat.Language.Parser.Test do
   alias Chat.Language.Parser
   alias Chat.Language.Interpreter
 
+  import Parser
+
   test "parse nil program" do
     catch_error(Parser.parse(nil))
   end
@@ -15,6 +17,25 @@ defmodule Chat.Language.Parser.Test do
 
   test "parse valid program" do
     prog = Parser.parse("'hello there'")
+    prog = Interpreter.interpret(prog)
+
+    assert is_function(prog)
+    assert prog.(nil) == "hello there"
+  end
+
+  test "use sigil" do
+    prog = ~p/'hello there'/
+    prog = Interpreter.interpret(prog)
+
+    assert is_function(prog)
+    assert prog.(nil) == "hello there"
+  end
+
+  test "use multiline sigil" do
+    prog = ~p"""
+      'hello there'
+    """
+
     prog = Interpreter.interpret(prog)
 
     assert is_function(prog)

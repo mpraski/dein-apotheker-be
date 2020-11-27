@@ -11,6 +11,8 @@ defmodule Chat.Driver do
   alias Chat.Language.Interpreter
   alias Chat.Language.Parser
 
+  import Parser
+
   @prev_question :previous_question
 
   def next(
@@ -106,7 +108,7 @@ defmodule Chat.Driver do
       products: products
     }
 
-    prog = "CART_MANY([products])" |> Parser.parse()
+    prog = ~p/CART_MANY([products])/
 
     state
     |> Interpreter.interpret(prog, args).()

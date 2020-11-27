@@ -467,6 +467,18 @@ defmodule Chat.Language.Interpreter.Test do
         TO_TEXT([res])
       """,
       expected: "Brand 2"
+    ],
+    select_columns_join_where_expr: [
+      program: """
+        col2 = 'b.name',
+        prod_api = akut,
+        res = SELECT [col2]
+          FROM Products p
+          JOIN Brands b ON p.brand_id == b.id
+          WHERE p.api == TO_TEXT([prod_api]),
+        TO_TEXT([res])
+      """,
+      expected: "Brand 2"
     ]
   ]
 

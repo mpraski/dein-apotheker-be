@@ -13,6 +13,8 @@ defmodule Chat.Language.StdLib do
   alias Chat.Language.Parser
   alias Chat.Language.Interpreter
 
+  import Parser
+
   defmodule Call do
     @moduledoc """
     Call represents a function call runtime context
@@ -227,31 +229,6 @@ defmodule Chat.Language.StdLib do
            single
          ]
        }) do
-    query = """
-      w = TO_TEXT([water]),
-      s = TO_TEXT([swallow]),
-      t = TO_TEXT([transport]),
-      f = TO_TEXT([fly]),
-      i = TO_TEXT([single]),
-      SELECT ID FROM MedForm WHERE (
-        (
-            (
-                WithoutWater == [w]
-                AND
-                SwallowingProblems == [s]
-            )
-            AND
-            (
-                Portable == [t]
-                AND
-                GoodForFlight == [f]
-            )
-        )
-        AND
-            DosedIndividually == [i]
-        )
-    """
-
     args = %{
       water: water,
       swallow: swallow,
@@ -260,14 +237,31 @@ defmodule Chat.Language.StdLib do
       single: single
     }
 
-    prog =
-      query
-      |> Parser.parse()
-      |> Interpreter.interpret(args)
+    med_form_query = ~p"""
+      SELECT ID FROM MedForm WHERE (
+        (
+            (
+                WithoutWater == TO_TEXT([water])
+                AND
+                SwallowingProblems == TO_TEXT([swallow])
+            )
+            AND
+            (
+                Portable == TO_TEXT([transport])
+                AND
+                GoodForFlight == TO_TEXT([fly])
+            )
+        )
+        AND
+            DosedIndividually == TO_TEXT([single])
+        )
+    """
+
+    prog = med_form_query |> Interpreter.interpret(args)
 
     forms = prog.(nil) |> Database.single_column_rows()
 
-    queryMatch = """
+    match_query = ~p"""
       SELECT *
       FROM Products
       WHERE (APIID == [api] AND MedFormID IN [forms])
@@ -278,10 +272,7 @@ defmodule Chat.Language.StdLib do
       forms: forms
     }
 
-    prog =
-      queryMatch
-      |> Parser.parse()
-      |> Interpreter.interpret(args)
+    prog = match_query |> Interpreter.interpret(args)
 
     [forms, prog.(nil)]
   end
