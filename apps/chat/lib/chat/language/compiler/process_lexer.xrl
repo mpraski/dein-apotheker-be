@@ -9,6 +9,8 @@ LeftParen = \(
 RightParen = \)
 LeftBracket = \[
 RightBracket = \]
+LeftAngle = {
+RightAngle = }
 Dot = \.
 Comma = ,
 Separator = ;
@@ -74,6 +76,8 @@ Rules.
 {NotEquals}    : {token, {not_equals, TokenLine}}.
 {LeftParen}    : {token, {left_paren, TokenLine}}.
 {RightParen}   : {token, {right_paren, TokenLine}}.
+{LeftAngle}    : {token, {left_angle, TokenLine}}.
+{RightAngle}   : {token, {right_angle, TokenLine}}.
 {All}          : {token, {all, TokenLine}}.
 {Select}       : {token, {select, TokenLine}}.
 {From}         : {token, {from, TokenLine}}.

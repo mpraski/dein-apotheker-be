@@ -2,8 +2,8 @@
 
 Nonterminals
 expr simple_expr decl_expr if_expr elif_expr 
-for_expr function_expr expr_list arg_list select_expr 
-where_expr on_expr join_expr join_expr_list select_list column_list 
+for_expr list_expr function_expr expr_list arg_list pattern_match_expr
+select_expr where_expr on_expr join_expr join_expr_list select_list column_list 
 qualified_database maybe_qualified_database identifier 
 qualified_identifier maybe_qualified_identifier variable 
 string number column eq_op comp_op logical_op in_op.
@@ -12,7 +12,8 @@ Terminals
 dot sep comma assign lif elif then else for in do 
 land lor equals not_equals greater greater_equal 
 lower lower_equal left_paren right_paren ident 
-var str num all select from where join on.
+left_angle right_angle var str num all select 
+from where join on.
 
 Rootsymbol expr_list.
 
@@ -29,13 +30,14 @@ expr -> simple_expr : '$1'.
 expr -> decl_expr   : '$1'.
 expr -> if_expr     : '$1'.
 expr -> for_expr    : '$1'.
-expr -> select_expr : '$1'.
 
 simple_expr -> identifier                          : '$1'.
 simple_expr -> variable                            : '$1'.
 simple_expr -> string                              : '$1'.
 simple_expr -> number                              : '$1'.
 simple_expr -> function_expr                       : '$1'.
+simple_expr -> list_expr                           : '$1'.
+simple_expr -> select_expr                         : '$1'.
 simple_expr -> simple_expr eq_op       simple_expr : {'$2', '$1', '$3'}.
 simple_expr -> simple_expr comp_op     simple_expr : {'$2', '$1', '$3'}.
 simple_expr -> simple_expr logical_op  simple_expr : {'$2', '$1', '$3'}.
@@ -44,10 +46,15 @@ simple_expr -> left_paren  simple_expr right_paren : '$2'.
 arg_list -> expr                : ['$1'].
 arg_list -> expr comma arg_list : ['$1'|'$3'].
 
+list_expr -> left_angle arg_list right_angle : {list, '$2' }.
+
 function_expr -> identifier left_paren          right_paren : {call, '$1', []  }.
 function_expr -> identifier left_paren arg_list right_paren : {call, '$1', '$3'}.
 
-decl_expr -> identifier assign expr : {action('$2'), '$1', '$3'}.
+pattern_match_expr -> identifier : '$1'.
+pattern_match_expr -> list_expr  : '$1'.
+
+decl_expr -> pattern_match_expr assign simple_expr : {action('$2'), '$1', '$3'}.
 
 if_expr -> lif expr then expr_list           else expr_list : {lif, [{'$2', '$4'}       ], '$6'}.
 if_expr -> lif expr then expr_list elif_expr else expr_list : {lif, [{'$2', '$4'} | '$5'], '$7'}.

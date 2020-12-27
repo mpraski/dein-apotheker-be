@@ -239,11 +239,11 @@ defmodule Chat.Language.StdLib do
 
     med_form_query = ~p"""
       SELECT ID FROM MedForm WHERE
-        WithoutWater == TO_TEXT([water]) AND
+        WithoutWater       == TO_TEXT([water]) AND
         SwallowingProblems == TO_TEXT([swallow]) AND
-        Portable == TO_TEXT([transport]) AND
-        GoodForFlight == TO_TEXT([fly]) AND
-        DosedIndividually == TO_TEXT([single]);
+        Portable           == TO_TEXT([transport]) AND
+        GoodForFlight      == TO_TEXT([fly]) AND
+        DosedIndividually  == TO_TEXT([single]);
     """
 
     prog = med_form_query |> Interpreter.interpret(args)

@@ -114,7 +114,7 @@ defmodule Chat.Language.Interpreter.Test do
           ELSE 3
       """,
       expected: 3
-    ],Parser.parse('1 == 1 OR 2 == 1')
+    ],
     if_expression_7: [
       program: """
         var1 = 'val';
@@ -161,6 +161,29 @@ defmodule Chat.Language.Interpreter.Test do
       [j];
       """,
       expected: 6
+    ],
+    list_expr_1: [
+      program: "l = {0}; [l];",
+      expected: [0]
+    ],
+    list_expr_2: [
+      program: "l = {0, 1, 'mustard', a}; [l];",
+      expected: [0, 1, "mustard", :a]
+    ],
+    pattern_match_expr_1: [
+      program: """
+        l = {0, 1, 'mustard', a};
+        {0, 1, m, i} = [l];
+        TO_TEXT([m], [i])
+      """,
+      expected: "mustard a"
+    ],
+    pattern_match_expr_2: [
+      program: """
+        {0, 1, m, i} = {0, 1, 'mustard', a};
+        TO_TEXT([m], [i])
+      """,
+      expected: "mustard a"
     ],
     select_all_products: [
       program: "SELECT * FROM Products",

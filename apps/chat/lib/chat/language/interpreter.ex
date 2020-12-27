@@ -54,11 +54,11 @@ defmodule Chat.Language.Interpreter do
     data |> call_func(f, args)
   end
 
-  defp interpret_expr({c, r} = d, {:assign, name, expr}) do
+  defp interpret_expr(d, {:assign, name, expr}) do
     {_, n} = d |> interpret_expr(name)
     {_, e} = d |> interpret_expr(expr)
 
-    {Memory.store(c, n, e), r}
+    interpret_pattern_match(d, n, e)
   end
 
   defp interpret_expr({c, _}, {:ident, i}) when is_atom(i), do: {c, i}
@@ -68,6 +68,8 @@ defmodule Chat.Language.Interpreter do
   defp interpret_expr({c, _}, {:number, n}) when is_integer(n), do: {c, n}
 
   defp interpret_expr({c, _} = d, {:var, v}) when is_atom(v), do: {c, get(d, v)}
+
+  defp interpret_expr({c, _} = d, {:list, items}) when is_list(items), do: {c, evaluate_exprs(d, items)}
 
   defp interpret_expr({c, _}, {:qualified_db, {:ident, d}, {:ident, n}}) do
     {c, {:qualified_db, d, n}}
@@ -167,6 +169,25 @@ defmodule Chat.Language.Interpreter do
     |> Enum.reduce(data, &interpret_join(&2, &1))
     |> interpret_where(where)
     |> interpret_select(columns)
+  end
+
+  defp interpret_pattern_match({c, r}, i, v) when is_atom(i) do
+    {Memory.store(c, i, v), r}
+  end
+
+  defp interpret_pattern_match({c, r}, i, v) when is_list(i) and is_list(v) and length(i) == length(v) do
+    reducer = fn
+      {a, b}, acc when is_atom(a) -> Memory.store(acc, a, b)
+      {a, b}, acc -> if a == b, do: acc, else: raise "Pattern match error on #{a} == #{b}"
+    end
+
+    memory = Enum.zip(i, v) |> Enum.reduce(c, reducer)
+
+    {memory, r}
+  end
+
+  defp interpret_pattern_match(_, i, v) do
+    raise "Pattern match cannot succed on #{i} = #{v}"
   end
 
   defp interpret_select({c, %Database{} = db}, :all), do: {c, db}
