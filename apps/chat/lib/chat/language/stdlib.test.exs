@@ -111,7 +111,7 @@ defmodule Chat.Language.StdLib.Test do
     ],
     load_with_2: [
       program: """
-        l = LIST('v1', 'v2', 'v3');
+        l = {'v1', 'v2', 'v3'};
         FOR v IN [l] DO
           LOAD_WITH(SomeProcess, v)
       """,
@@ -242,7 +242,7 @@ defmodule Chat.Language.StdLib.Test do
       program: """
         a = 4;
         b = 'val';
-        c = LIST(a, [b], c);
+        c = {a, [b], c};
         SAVE(a);
         SAVE(b);
         SAVE(c)
@@ -295,7 +295,7 @@ defmodule Chat.Language.StdLib.Test do
     ],
     cart_1: [
       program: """
-        cart = LIST('1', '2', '3');
+        cart = {'1', '2', '3'};
         SAVE(cart);
         product_id = '4';
         CART()
@@ -316,7 +316,7 @@ defmodule Chat.Language.StdLib.Test do
     ],
     cart_2: [
       program: """
-        cart = LIST('1', '2', '3');
+        cart = {'1', '2', '3'};
         SAVE(cart);
         product_id = '2';
         CART()
@@ -337,7 +337,7 @@ defmodule Chat.Language.StdLib.Test do
     ],
     cart_3: [
       program: """
-        cart = LIST();
+        cart = {};
         SAVE(cart);
         product_id = '2';
         CART()

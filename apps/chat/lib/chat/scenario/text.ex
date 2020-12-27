@@ -13,7 +13,7 @@ defmodule Chat.Scenario.Text do
     field(:substitutes, list(any()), enforce: true, default: [])
   end
 
-  @substitute_regex ~r/\{([^\}]+)\}/
+  @substitute_regex ~r/\{\{\-(.+)\-\}\}/
 
   def new(text) do
     %__MODULE__{

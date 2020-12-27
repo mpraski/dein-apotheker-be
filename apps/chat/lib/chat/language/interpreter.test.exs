@@ -186,7 +186,7 @@ defmodule Chat.Language.Interpreter.Test do
     for_expr_1: [
       program: """
       j = 0;
-      FOR i IN LIST(1, 2, 3)
+      FOR i IN {1, 2, 3}
         DO j = ADD([j], [i]);
       [j];
       """,
@@ -194,11 +194,11 @@ defmodule Chat.Language.Interpreter.Test do
     ],
     for_expr_2: [
       program: """
-      j = 0;
-      l = LIST(1, 2, 3);
-      FOR i IN [l]
-        DO j = ADD([j], [i]);
-      [j];
+        j = 0;
+        l = {1, 2, 3};
+        FOR i IN [l]
+          DO j = ADD([j], [i]);
+        [j];
       """,
       expected: 6
     ],
@@ -348,7 +348,7 @@ defmodule Chat.Language.Interpreter.Test do
       }
     ],
     select_id_name_products_in: [
-      program: "SELECT id, name FROM Products WHERE id IN LIST('1', '2')",
+      program: "SELECT id, name FROM Products WHERE id IN {'1', '2'}",
       expected: %Chat.Database{
         headers: [:id, :name],
         id: :Products,
@@ -359,7 +359,7 @@ defmodule Chat.Language.Interpreter.Test do
       }
     ],
     select_id_name_products_in_2: [
-      program: "SELECT id, name FROM Products WHERE id IN LIST('3')",
+      program: "SELECT id, name FROM Products WHERE id IN {'3'}",
       expected: %Chat.Database{
         headers: [:id, :name],
         id: :Products,
@@ -481,7 +481,7 @@ defmodule Chat.Language.Interpreter.Test do
       program: """
         col1 = id;
         col2 = 'b.name';
-        args = LIST('1', '2');
+        args = {'1', '2'};
         SELECT [col1], [col2]
           FROM Products p
           JOIN Brands b ON p.brand_id == b.id
