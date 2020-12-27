@@ -69,7 +69,8 @@ defmodule Chat.Language.Interpreter do
 
   defp interpret_expr({c, _} = d, {:var, v}) when is_atom(v), do: {c, get(d, v)}
 
-  defp interpret_expr({c, _} = d, {:list, items}) when is_list(items), do: {c, evaluate_exprs(d, items)}
+  defp interpret_expr({c, _} = d, {:list, items}) when is_list(items),
+    do: {c, evaluate_exprs(d, items)}
 
   defp interpret_expr({c, _}, {:qualified_db, {:ident, d}, {:ident, n}}) do
     {c, {:qualified_db, d, n}}
@@ -133,6 +134,42 @@ defmodule Chat.Language.Interpreter do
     {c, v <= i}
   end
 
+  defp interpret_expr({c, _} = data, {:plus, a, b}) do
+    {_, a} = data |> interpret_expr(a)
+    {_, b} = data |> interpret_expr(b)
+
+    if is_list(a) and is_list(b) do
+      {c, a ++ b}
+    else
+      {c, a + b}
+    end
+  end
+
+  defp interpret_expr({c, _} = data, {:minus, a, b}) do
+    {_, a} = data |> interpret_expr(a)
+    {_, b} = data |> interpret_expr(b)
+
+    if is_list(a) and is_list(b) do
+      {c, a -- b}
+    else
+      {c, a - b}
+    end
+  end
+
+  defp interpret_expr({c, _} = data, {:all, a, b}) do
+    {_, a} = data |> interpret_expr(a)
+    {_, b} = data |> interpret_expr(b)
+
+    {c, a * b}
+  end
+
+  defp interpret_expr({c, _} = data, {:divides, a, b}) do
+    {_, a} = data |> interpret_expr(a)
+    {_, b} = data |> interpret_expr(b)
+
+    {c, a / b}
+  end
+
   defp interpret_expr(data, {:select, columns, database, [], nil}) do
     data
     |> dump_register()
@@ -175,10 +212,11 @@ defmodule Chat.Language.Interpreter do
     {Memory.store(c, i, v), r}
   end
 
-  defp interpret_pattern_match({c, r}, i, v) when is_list(i) and is_list(v) and length(i) == length(v) do
+  defp interpret_pattern_match({c, r}, i, v)
+       when is_list(i) and is_list(v) and length(i) == length(v) do
     reducer = fn
       {a, b}, acc when is_atom(a) -> Memory.store(acc, a, b)
-      {a, b}, acc -> if a == b, do: acc, else: raise "Pattern match error on #{a} == #{b}"
+      {a, b}, acc -> if a == b, do: acc, else: raise("Pattern match error on #{a} == #{b}")
     end
 
     memory = Enum.zip(i, v) |> Enum.reduce(c, reducer)

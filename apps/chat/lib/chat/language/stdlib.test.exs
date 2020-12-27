@@ -27,27 +27,27 @@ defmodule Chat.Language.StdLib.Test do
       expected: "a b 3"
     ],
     to_text_5: [
-      program: "TO_TEXT(LIST(a, b, c, LIST(d, e, LIST(f))))",
+      program: "TO_TEXT({a, b, c, {d, e, {f}}})",
       expected: "a b c d e f"
     ],
     list_1: [
-      program: "a = 1; b = 2; LIST([a], [b], c)",
+      program: "a = 1; b = 2; {[a], [b], c}",
       expected: [1, 2, :c]
     ],
     index_1: [
-      program: "a = 1; b = 2; l = LIST([a], [b], c); INDEX(0, [l])",
+      program: "a = 1; b = 2; l = {[a], [b], c}; INDEX(0, [l])",
       expected: 1
     ],
     index_2: [
-      program: "a = 1; b = 2; l = LIST([a], [b], c); INDEX(1, [l])",
+      program: "a = 1; b = 2; l = {[a], [b], c}; INDEX(1, [l])",
       expected: 2
     ],
     index_3: [
-      program: "a = 1; b = 2; l = LIST([a], [b], c); INDEX(2, [l])",
+      program: "a = 1; b = 2; l = {[a], [b], c}; INDEX(2, [l])",
       expected: :c
     ],
     size_1: [
-      program: "SIZE(LIST(a, 'b', 3))",
+      program: "SIZE({a, 'b', 3})",
       expected: 3
     ],
     cols_1: [
@@ -59,7 +59,7 @@ defmodule Chat.Language.StdLib.Test do
       expected: 3
     ],
     add_1: [
-      program: "a = 1; b = 2; ADD([a], [b])",
+      program: "a = 1; b = 2; [a] + [b]",
       expected: 3
     ],
     go_1: [

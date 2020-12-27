@@ -23,6 +23,46 @@ defmodule Chat.Language.Interpreter.Test do
       program: "[undefined]",
       expected: nil
     ],
+    arith_expr_1: [
+      program: "1 + 2",
+      expected: 3
+    ],
+    arith_expr_2: [
+      program: "1 - 2",
+      expected: -1
+    ],
+    arith_expr_3: [
+      program: "3 * 2",
+      expected: 6
+    ],
+    arith_expr_4: [
+      program: "3 / 2",
+      expected: 1.5
+    ],
+    arith_expr_5: [
+      program: "{} + {1}",
+      expected: [1]
+    ],
+    arith_expr_6: [
+      program: "{1,2} + {1,3,4}",
+      expected: [1, 2, 1, 3, 4]
+    ],
+    arith_expr_7: [
+      program: "{1,2} - {1,3,4}",
+      expected: [2]
+    ],
+    arith_expr_8: [
+      program: "{a} = {1,2} - {1,3,4}; [a]",
+      expected: 2
+    ],
+    arith_expr_9: [
+      program: """
+        a = 2;
+        b = 3;
+        IF [a] * [b] > 5 THEN 1 ELSE 2;
+      """,
+      expected: 1
+    ],
     comp_expression_1: [
       program: "2 > 1",
       expected: true

@@ -30,6 +30,9 @@ Greater = >
 GreaterEqual = >\=
 Lower = <
 LowerEqual = <\=
+Plus = \+
+Minus = -
+Divides = \/
 
 %% Data query
 All = \*
@@ -78,6 +81,9 @@ Rules.
 {RightParen}   : {token, {right_paren, TokenLine}}.
 {LeftAngle}    : {token, {left_angle, TokenLine}}.
 {RightAngle}   : {token, {right_angle, TokenLine}}.
+{Plus}         : {token, {plus, TokenLine}}.
+{Minus}        : {token, {minus, TokenLine}}.s
+{Divides}      : {token, {divides, TokenLine}}.
 {All}          : {token, {all, TokenLine}}.
 {Select}       : {token, {select, TokenLine}}.
 {From}         : {token, {from, TokenLine}}.

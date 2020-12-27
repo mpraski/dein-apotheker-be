@@ -16,7 +16,6 @@ defmodule Chat.Scenario.Text.Test do
     assert render(t) == "some text"
   end
 
-
   test "some text with basic expression" do
     t = Text.new("some text {l = LIST(a, b, c, 1); TO_TEXT([l])}")
 
