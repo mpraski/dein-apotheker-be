@@ -63,6 +63,10 @@ defmodule Chat.Language.Interpreter.Test do
       """,
       expected: 1
     ],
+    arith_expr_10: [
+      program: "'kick' + 'ass'",
+      expected: "kickass"
+    ],
     comp_expression_1: [
       program: "2 > 1",
       expected: true
@@ -169,7 +173,7 @@ defmodule Chat.Language.Interpreter.Test do
       program: """
         var1 = 'val';
         var2 = 'val3';
-        IF [var1] THEN a = 5; ADD([a], 1)
+        IF [var1] THEN a = 5; [a] + 1
           ELIF [var2] THEN 2
           ELSE 3;
       """,
@@ -177,9 +181,9 @@ defmodule Chat.Language.Interpreter.Test do
     ],
     if_expression_9: [
       program: """
-        IF [var1] THEN a = 5; ADD([a], 1)
+        IF [var1] THEN a = 5; [a] + 1
           ELIF [var2] THEN 2
-          ELSE a = 1; ADD([a], 1);
+          ELSE a = 1; [a] + 1;
       """,
       expected: 2
     ],
@@ -187,7 +191,7 @@ defmodule Chat.Language.Interpreter.Test do
       program: """
       j = 0;
       FOR i IN {1, 2, 3}
-        DO j = ADD([j], [i]);
+        DO j = [j] + [i];
       [j];
       """,
       expected: 6
@@ -197,7 +201,7 @@ defmodule Chat.Language.Interpreter.Test do
         j = 0;
         l = {1, 2, 3};
         FOR i IN [l]
-          DO j = ADD([j], [i]);
+          DO j = [j] + [i];
         [j];
       """,
       expected: 6
@@ -224,6 +228,13 @@ defmodule Chat.Language.Interpreter.Test do
         TO_TEXT([m], [i])
       """,
       expected: "mustard a"
+    ],
+    pattern_match_expr_3: [
+      program: """
+        {0, 1, m, i} = {0, 1, 'mustard', 'a'};
+        [m] + [i]
+      """,
+      expected: "mustarda"
     ],
     select_all_products: [
       program: "SELECT * FROM Products",

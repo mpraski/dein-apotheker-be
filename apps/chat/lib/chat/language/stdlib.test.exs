@@ -35,15 +35,15 @@ defmodule Chat.Language.StdLib.Test do
       expected: [1, 2, :c]
     ],
     index_1: [
-      program: "a = 1; b = 2; l = {[a], [b], c}; INDEX(0, [l])",
+      program: "a = 1; b = 2; l = {[a], [b], c}; AT(0, [l])",
       expected: 1
     ],
     index_2: [
-      program: "a = 1; b = 2; l = {[a], [b], c}; INDEX(1, [l])",
+      program: "a = 1; b = 2; l = {[a], [b], c}; AT(1, [l])",
       expected: 2
     ],
     index_3: [
-      program: "a = 1; b = 2; l = {[a], [b], c}; INDEX(2, [l])",
+      program: "a = 1; b = 2; l = {[a], [b], c}; AT(2, [l])",
       expected: :c
     ],
     size_1: [

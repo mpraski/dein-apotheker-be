@@ -52,8 +52,8 @@ defmodule Chat.Language.StdLib do
       ROWS: &rows/1,
       COLS: &cols/1,
       SIZE: &size/1,
-      INDEX: &index/1,
-      ADD: &add/1,
+      COUNT: &count/1,
+      AT: &at/1,
       MATCH: &match/1,
       CART: &cart/1,
       CART_MANY: &cart_many/1
@@ -205,15 +205,15 @@ defmodule Chat.Language.StdLib do
 
   defp to_text(%Call{}), do: ""
 
+  defp count(%Call{args: [_, i, l]}) when is_list(l), do: Enum.count(l, &(&1 == i))
+
   defp size(%Call{args: [_, v]}) when is_list(v), do: length(v)
 
   defp rows(%Call{args: [_, db]}), do: Database.height(db)
 
   defp cols(%Call{args: [_, db]}), do: Database.width(db)
 
-  defp add(%Call{args: [_, a, b]}), do: a + b
-
-  defp index(%Call{args: [_, index, items]}), do: items |> Enum.at(index)
+  defp at(%Call{args: [_, index, items]}), do: items |> Enum.at(index)
 
   defp match(%Call{
          args: [

@@ -1,13 +1,12 @@
 %% process.yrl
 
 Nonterminals
-expr simple_expr decl_expr if_expr elif_expr 
-for_expr list_expr function_expr expr_list arg_list pattern_match_expr
-select_expr where_expr on_expr join_expr join_expr_list select_list column_list 
-qualified_database maybe_qualified_database identifier 
-qualified_identifier maybe_qualified_identifier variable 
-string number column eq_op comp_op logical_op 
-additive_op multiplicative_op in_op.
+stmt stmt_list expr decl_expr if_expr elif_expr 
+for_expr list_expr function_expr arg_list pattern_match_expr
+select_expr where_expr on_expr join_expr join_expr_list select_list 
+column_list qualified_database maybe_qualified_database identifier 
+qualified_identifier maybe_qualified_identifier variable string 
+number column eq_op comp_op logical_op additive_op multiplicative_op in_op.
 
 Terminals
 dot sep comma assign lif elif then else for in do 
@@ -16,7 +15,7 @@ lower lower_equal left_paren right_paren ident
 left_angle right_angle var str num all select 
 from where join on plus minus divides.
 
-Rootsymbol expr_list.
+Rootsymbol stmt_list.
 
 Right 100 assign.
 Left 300 logical_op in_op.
@@ -25,28 +24,28 @@ Nonassoc 500 eq_op.
 Left 600 additive_op.
 Left 700 multiplicative_op.
 
-expr_list -> expr               : ['$1'].
-expr_list -> expr sep           : ['$1'].
-expr_list -> expr sep expr_list : ['$1'|'$3'].
+stmt_list -> stmt               : ['$1'].
+stmt_list -> stmt sep           : ['$1'].
+stmt_list -> stmt sep stmt_list : ['$1'|'$3'].
 
-expr -> simple_expr : '$1'.
-expr -> decl_expr   : '$1'.
-expr -> if_expr     : '$1'.
-expr -> for_expr    : '$1'.
+stmt -> expr : '$1'.
+stmt -> decl_expr   : '$1'.
+stmt -> if_expr     : '$1'.
+stmt -> for_expr    : '$1'.
 
-simple_expr -> identifier                                : '$1'.
-simple_expr -> variable                                  : '$1'.
-simple_expr -> string                                    : '$1'.
-simple_expr -> number                                    : '$1'.
-simple_expr -> function_expr                             : '$1'.
-simple_expr -> list_expr                                 : '$1'.
-simple_expr -> select_expr                               : '$1'.
-simple_expr -> simple_expr eq_op             simple_expr : {'$2', '$1', '$3'}.
-simple_expr -> simple_expr comp_op           simple_expr : {'$2', '$1', '$3'}.
-simple_expr -> simple_expr logical_op        simple_expr : {'$2', '$1', '$3'}.
-simple_expr -> simple_expr additive_op       simple_expr : {'$2', '$1', '$3'}.
-simple_expr -> simple_expr multiplicative_op simple_expr : {'$2', '$1', '$3'}.
-simple_expr -> left_paren  simple_expr right_paren       : '$2'.
+expr -> identifier                  : '$1'.
+expr -> variable                    : '$1'.
+expr -> string                      : '$1'.
+expr -> number                      : '$1'.
+expr -> list_expr                   : '$1'.
+expr -> select_expr                 : '$1'.
+expr -> function_expr               : '$1'.
+expr -> expr eq_op             expr : {'$2', '$1', '$3'}.
+expr -> expr comp_op           expr : {'$2', '$1', '$3'}.
+expr -> expr logical_op        expr : {'$2', '$1', '$3'}.
+expr -> expr additive_op       expr : {'$2', '$1', '$3'}.
+expr -> expr multiplicative_op expr : {'$2', '$1', '$3'}.
+expr -> left_paren expr right_paren : '$2'.
 
 arg_list -> expr                : ['$1'].
 arg_list -> expr comma arg_list : ['$1'|'$3'].
@@ -60,25 +59,25 @@ function_expr -> identifier left_paren arg_list right_paren : {call, '$1', '$3'}
 pattern_match_expr -> identifier : '$1'.
 pattern_match_expr -> list_expr  : '$1'.
 
-decl_expr -> pattern_match_expr assign simple_expr : {action('$2'), '$1', '$3'}.
+decl_expr -> pattern_match_expr assign expr : {action('$2'), '$1', '$3'}.
 
-if_expr -> lif expr then expr_list           else expr_list : {lif, [{'$2', '$4'}       ], '$6'}.
-if_expr -> lif expr then expr_list elif_expr else expr_list : {lif, [{'$2', '$4'} | '$5'], '$7'}.
+if_expr -> lif expr then stmt_list           else stmt_list : {lif, [{'$2', '$4'}       ], '$6'}.
+if_expr -> lif expr then stmt_list elif_expr else stmt_list : {lif, [{'$2', '$4'} | '$5'], '$7'}.
 
-elif_expr -> elif expr then expr_list           : [{'$2', '$4'}     ].
-elif_expr -> elif expr then expr_list elif_expr : [{'$2', '$4'} | '$5'].
+elif_expr -> elif expr then stmt_list           : [{'$2', '$4'}     ].
+elif_expr -> elif expr then stmt_list elif_expr : [{'$2', '$4'} | '$5'].
 
-for_expr -> for identifier in expr do expr_list : {action('$1'), '$2', '$4', '$6'}.
+for_expr -> for identifier in expr do stmt_list : {action('$1'), '$2', '$4', '$6'}.
 
 select_expr -> select select_list from maybe_qualified_database                                 : {action('$1'), '$2', '$4',   [],  nil}.
 select_expr -> select select_list from maybe_qualified_database                where where_expr : {action('$1'), '$2', '$4',   [], '$6'}.
 select_expr -> select select_list from maybe_qualified_database join_expr_list                  : {action('$1'), '$2', '$4', '$5',  nil}.
 select_expr -> select select_list from maybe_qualified_database join_expr_list where where_expr : {action('$1'), '$2', '$4', '$5', '$7'}.
 
-where_expr -> maybe_qualified_identifier eq_op simple_expr : {'$2', '$1', '$3'}.
-where_expr -> maybe_qualified_identifier in_op simple_expr : {'$2', '$1', '$3'}.
-where_expr -> where_expr logical_op where_expr             : {'$2', '$1', '$3'}.
-where_expr -> left_paren where_expr right_paren            : '$2'.
+where_expr -> maybe_qualified_identifier eq_op expr : {'$2', '$1', '$3'}.
+where_expr -> maybe_qualified_identifier in_op expr : {'$2', '$1', '$3'}.
+where_expr -> where_expr logical_op where_expr      : {'$2', '$1', '$3'}.
+where_expr -> left_paren where_expr right_paren     : '$2'.
 
 on_expr -> qualified_identifier eq_op qualified_identifier : {'$2', '$1', '$3'}.
 on_expr -> on_expr logical_op on_expr                      : {'$2', '$1', '$3'}.

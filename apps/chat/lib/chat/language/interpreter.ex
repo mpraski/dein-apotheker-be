@@ -138,11 +138,14 @@ defmodule Chat.Language.Interpreter do
     {_, a} = data |> interpret_expr(a)
     {_, b} = data |> interpret_expr(b)
 
-    if is_list(a) and is_list(b) do
-      {c, a ++ b}
-    else
-      {c, a + b}
-    end
+    r =
+      cond do
+        is_list(a) and is_list(b) -> a ++ b
+        is_binary(a) and is_binary(b) -> a <> b
+        true -> a + b
+      end
+
+    {c, r}
   end
 
   defp interpret_expr({c, _} = data, {:minus, a, b}) do
@@ -225,7 +228,7 @@ defmodule Chat.Language.Interpreter do
   end
 
   defp interpret_pattern_match(_, i, v) do
-    raise "Pattern match cannot succed on #{i} = #{v}"
+    raise "Pattern match cannot succeed on #{i} = #{v}"
   end
 
   defp interpret_select({c, %Database{} = db}, :all), do: {c, db}
