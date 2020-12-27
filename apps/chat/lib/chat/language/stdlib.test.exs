@@ -23,7 +23,7 @@ defmodule Chat.Language.StdLib.Test do
       expected: "a b"
     ],
     to_text_4: [
-      program: "c = 3, TO_TEXT(a, 'b', [c])",
+      program: "c = 3; TO_TEXT(a, 'b', [c])",
       expected: "a b 3"
     ],
     to_text_5: [
@@ -31,19 +31,19 @@ defmodule Chat.Language.StdLib.Test do
       expected: "a b c d e f"
     ],
     list_1: [
-      program: "a = 1, b = 2, LIST([a], [b], c)",
+      program: "a = 1; b = 2; LIST([a], [b], c)",
       expected: [1, 2, :c]
     ],
     index_1: [
-      program: "a = 1, b = 2, l = LIST([a], [b], c), INDEX(0, [l])",
+      program: "a = 1; b = 2; l = LIST([a], [b], c); INDEX(0, [l])",
       expected: 1
     ],
     index_2: [
-      program: "a = 1, b = 2, l = LIST([a], [b], c), INDEX(1, [l])",
+      program: "a = 1; b = 2; l = LIST([a], [b], c); INDEX(1, [l])",
       expected: 2
     ],
     index_3: [
-      program: "a = 1, b = 2, l = LIST([a], [b], c), INDEX(2, [l])",
+      program: "a = 1; b = 2; l = LIST([a], [b], c); INDEX(2, [l])",
       expected: :c
     ],
     size_1: [
@@ -59,7 +59,7 @@ defmodule Chat.Language.StdLib.Test do
       expected: 3
     ],
     add_1: [
-      program: "a = 1, b = 2, ADD([a], [b])",
+      program: "a = 1; b = 2; ADD([a], [b])",
       expected: 3
     ],
     go_1: [
@@ -86,8 +86,8 @@ defmodule Chat.Language.StdLib.Test do
     ],
     load_with_1: [
       program: """
-        a = 5,
-        b = 'val',
+        a = 5;
+        b = 'val';
         LOAD_WITH(SomeProcess, a, b)
       """,
       expected:
@@ -111,7 +111,7 @@ defmodule Chat.Language.StdLib.Test do
     ],
     load_with_2: [
       program: """
-        l = LIST('v1', 'v2', 'v3'),
+        l = LIST('v1', 'v2', 'v3');
         FOR v IN [l] DO
           LOAD_WITH(SomeProcess, v)
       """,
@@ -170,7 +170,7 @@ defmodule Chat.Language.StdLib.Test do
     ],
     inject_with_1: [
       program: """
-        LOAD(ExampleProcess),
+        LOAD(ExampleProcess);
         FOR item IN [cart] DO
           INJECT_WITH(Explain, item)
       """,
@@ -219,7 +219,7 @@ defmodule Chat.Language.StdLib.Test do
       register: Driver.initial()
     ],
     jump_2: [
-      program: "LOAD(ExampleProcess), JUMP(ExampleProcess)",
+      program: "LOAD(ExampleProcess); JUMP(ExampleProcess)",
       expected:
         quote(
           do: fn %State{
@@ -240,11 +240,11 @@ defmodule Chat.Language.StdLib.Test do
     ],
     save_1: [
       program: """
-        a = 4,
-        b = 'val',
-        c = LIST(a, [b], c),
-        SAVE(a),
-        SAVE(b),
+        a = 4;
+        b = 'val';
+        c = LIST(a, [b], c);
+        SAVE(a);
+        SAVE(b);
         SAVE(c)
       """,
       expected:
@@ -275,7 +275,7 @@ defmodule Chat.Language.StdLib.Test do
     ],
     finish_1: [
       program: """
-        LOAD(ExampleProcess),
+        LOAD(ExampleProcess);
         FINISH()
       """,
       expected:
@@ -295,9 +295,9 @@ defmodule Chat.Language.StdLib.Test do
     ],
     cart_1: [
       program: """
-        cart = LIST('1', '2', '3'),
-        SAVE(cart),
-        product_id = '4',
+        cart = LIST('1', '2', '3');
+        SAVE(cart);
+        product_id = '4';
         CART()
       """,
       expected:
@@ -316,9 +316,9 @@ defmodule Chat.Language.StdLib.Test do
     ],
     cart_2: [
       program: """
-        cart = LIST('1', '2', '3'),
-        SAVE(cart),
-        product_id = '2',
+        cart = LIST('1', '2', '3');
+        SAVE(cart);
+        product_id = '2';
         CART()
       """,
       expected:
@@ -337,9 +337,9 @@ defmodule Chat.Language.StdLib.Test do
     ],
     cart_3: [
       program: """
-        cart = LIST(),
-        SAVE(cart),
-        product_id = '2',
+        cart = LIST();
+        SAVE(cart);
+        product_id = '2';
         CART()
       """,
       expected:

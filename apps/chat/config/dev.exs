@@ -1,5 +1,5 @@
 import Config
 
 config :chat,
-  scenario_path: "../../dein-apotheker-scenarios/scenarios",
-  database_path: "../../dein-apotheker-scenarios/databases"
+  scenario_path: "../../local/scenarios",
+  database_path: "../../local/databases"

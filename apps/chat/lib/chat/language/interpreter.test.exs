@@ -24,147 +24,141 @@ defmodule Chat.Language.Interpreter.Test do
       expected: nil
     ],
     comp_expression_1: [
-      program: "(2 > 1)",
+      program: "2 > 1",
       expected: true
     ],
     comp_expression_2: [
-      program: "(1 > 2)",
+      program: "1 > 2",
       expected: false
     ],
     comp_expression_3: [
-      program: "(3 >= 3)",
+      program: "3 >= 3",
       expected: true
     ],
     comp_expression_4: [
-      program: "(3 <= 3)",
+      program: "3 <= 3",
       expected: true
     ],
     comp_expression_5: [
-      program: "(3 == 3)",
+      program: "3 == 3",
       expected: true
     ],
     comp_expression_6: [
-      program: "(3 != 3)",
+      program: "3 != 3",
       expected: false
     ],
     logical_expression_1: [
-      program: "((1 == 1) OR (2 == 1))",
+      program: "1 == 1 OR 2 == 1",
       expected: true
     ],
     logical_expression_2: [
-      program: "((1 == 1) AND (2 == 1))",
+      program: "1 == 1 AND 2 == 1",
       expected: false
     ],
     decl_expression_1: [
-      program: "v = 1, [v]",
+      program: "v = 1; [v]",
       expected: 1
     ],
     decl_expression_2: [
-      program: "v = 1, c = [v], [c]",
+      program: "v = 1; c = [v]; [c]",
       expected: 1
     ],
     if_expression_1: [
       program: """
-        var1 = 'val',
-        IF ([var1] == 'val') THEN 1 ELSE 2
+        var1 = 'val';
+        IF [var1] == 'val' THEN 1 ELSE 2;
       """,
       expected: 1
     ],
     if_expression_2: [
       program: """
-        var1 = 'val',
-        IF ([var1] != 'val') THEN 1 ELSE 2
+        var1 = 'val';
+        IF [var1] != 'val' THEN 1 ELSE 2;
       """,
       expected: 2
     ],
     if_expression_3: [
       program: """
-        var1 = 'val',
-        var2 = 'val2',
-        IF (
-          ([var1] == 'val2')
-          OR
-          ([var2] == 'val2')
-        ) THEN 1 ELSE 2
+        var1 = 'val';
+        var2 = 'val2';
+        IF [var1] == 'val2' OR [var2] == 'val2'
+        THEN 1 ELSE 2;
       """,
       expected: 1
     ],
     if_expression_4: [
       program: """
-        var1 = 'val',
-        var2 = 'val2',
-        IF (
-          ([var1] == 'val2')
-          AND
-          ([var2] == 'val2')
-        ) THEN 1 ELSE 2
+        var1 = 'val';
+        var2 = 'val2';
+        IF [var1] == 'val2' AND [var2] == 'val2'
+        THEN 1 ELSE 2;
       """,
       expected: 2
     ],
     if_expression_5: [
       program: """
-        var1 = 'val',
-        var2 = 'val2',
-        IF ([var1] == 'val2') THEN 1
-          ELIF ([var2] == 'val2') THEN 2
-          ELSE 3
+        var1 = 'val';
+        var2 = 'val2';
+        IF [var1] == 'val2' THEN 1
+          ELIF [var2] == 'val2' THEN 2
+          ELSE 3;
       """,
       expected: 2
     ],
     if_expression_6: [
       program: """
-        var1 = 'val',
-        var2 = 'val3',
-        IF ([var1] == 'val2') THEN 1
-          ELIF ([var2] == 'val2') THEN 2
+        var1 = 'val';
+        var2 = 'val3';
+        IF [var1] == 'val2' THEN 1
+          ELIF [var2] == 'val2' THEN 2
           ELSE 3
       """,
       expected: 3
-    ],
+    ],Parser.parse('1 == 1 OR 2 == 1')
     if_expression_7: [
       program: """
-        var1 = 'val',
-        var2 = 'val3',
+        var1 = 'val';
+        var2 = 'val3';
         IF [var1] THEN 1
           ELIF [var2] THEN 2
-          ELSE 3
+          ELSE 3;
       """,
       expected: 1
     ],
     if_expression_8: [
       program: """
-        var1 = 'val',
-        var2 = 'val3',
-        IF [var1] THEN (a = 5, ADD([a], 1))
+        var1 = 'val';
+        var2 = 'val3';
+        IF [var1] THEN a = 5; ADD([a], 1)
           ELIF [var2] THEN 2
-          ELSE 3
+          ELSE 3;
       """,
       expected: 6
     ],
     if_expression_9: [
       program: """
-        IF [var1] THEN (a = 5, ADD([a], 1))
+        IF [var1] THEN a = 5; ADD([a], 1)
           ELIF [var2] THEN 2
-          ELSE (a = 1, ADD([a], 1))
+          ELSE a = 1; ADD([a], 1);
       """,
       expected: 2
     ],
     for_expr_1: [
       program: """
-      j = 0,
+      j = 0;
       FOR i IN LIST(1, 2, 3)
-        DO (j = ADD([j], [i])),
-      [j]
+        DO j = ADD([j], [i]);
+      [j];
       """,
       expected: 6
     ],
     for_expr_2: [
       program: """
-      j = 0,
-      l = LIST(1, 2, 3),
+      j = 0;
+      l = LIST(1, 2, 3);
       FOR i IN [l]
-        DO (j = ADD([j], [i])),
-      [j]
+        DO j = ADD([j], [i]);
+      [j];
       """,
       expected: 6
     ],
@@ -255,7 +249,7 @@ defmodule Chat.Language.Interpreter.Test do
       }
     ],
     select_columns_products_where_or: [
-      program: "SELECT id, name FROM Products WHERE (id == '2' OR id == '3')",
+      program: "SELECT id, name FROM Products WHERE id == '2' OR id == '3'",
       expected: %Chat.Database{
         headers: [:id, :name],
         id: :Products,
@@ -269,7 +263,7 @@ defmodule Chat.Language.Interpreter.Test do
       program: """
         SELECT id, name
         FROM Products
-        WHERE (id == '2' AND name == 'Product 2')
+        WHERE id == '2' AND name == 'Product 2'
       """,
       expected: %Chat.Database{
         headers: [:id, :name],
@@ -405,12 +399,12 @@ defmodule Chat.Language.Interpreter.Test do
     ],
     select_columns_join_where_brands_variable: [
       program: """
-        col1 = id,
-        col2 = 'b.name',
+        col1 = id;
+        col2 = 'b.name';
         SELECT [col1], [col2]
-        FROM Products p
-        JOIN Brands b ON p.brand_id == b.id
-        WHERE p.id == '2'
+          FROM Products p
+          JOIN Brands b ON p.brand_id == b.id
+          WHERE p.id == '2';
       """,
       expected: %Chat.Database{
         headers: [:id, :"b.name"],
@@ -422,13 +416,13 @@ defmodule Chat.Language.Interpreter.Test do
     ],
     select_columns_join_where_brands_variable_in: [
       program: """
-        col1 = id,
-        col2 = 'b.name',
-        args = LIST('1', '2'),
+        col1 = id;
+        col2 = 'b.name';
+        args = LIST('1', '2');
         SELECT [col1], [col2]
-        FROM Products p
-        JOIN Brands b ON p.brand_id == b.id
-        WHERE p.id IN [args]
+          FROM Products p
+          JOIN Brands b ON p.brand_id == b.id
+          WHERE p.id IN [args];
       """,
       expected: %Chat.Database{
         headers: [:id, :"b.name"],
@@ -441,12 +435,12 @@ defmodule Chat.Language.Interpreter.Test do
     ],
     select_columns_join_where_brands_variable_inverse_order: [
       program: """
-        col1 = id,
-        col2 = 'b.name',
+        col1 = id;
+        col2 = 'b.name';
         SELECT [col2], [col1]
-        FROM Products p
-        JOIN Brands b ON p.brand_id == b.id
-        WHERE p.id == '2'
+          FROM Products p
+          JOIN Brands b ON p.brand_id == b.id
+          WHERE p.id == '2';
       """,
       expected: %Chat.Database{
         headers: [:"b.name", :id],
@@ -458,24 +452,24 @@ defmodule Chat.Language.Interpreter.Test do
     ],
     select_columns_join_where_brands_to_text: [
       program: """
-        col2 = 'b.name',
-        prod_id = '2',
+        col2 = 'b.name';
+        prod_id = '2';
         res = SELECT [col2]
           FROM Products p
           JOIN Brands b ON p.brand_id == b.id
-          WHERE p.id == [prod_id],
+          WHERE p.id == [prod_id];
         TO_TEXT([res])
       """,
       expected: "Brand 2"
     ],
     select_columns_join_where_expr: [
       program: """
-        col2 = 'b.name',
-        prod_api = akut,
+        col2 = 'b.name';
+        prod_api = akut;
         res = SELECT [col2]
           FROM Products p
           JOIN Brands b ON p.brand_id == b.id
-          WHERE p.api == TO_TEXT([prod_api]),
+          WHERE p.api == TO_TEXT([prod_api]);
         TO_TEXT([res])
       """,
       expected: "Brand 2"
