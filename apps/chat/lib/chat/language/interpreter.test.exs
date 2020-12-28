@@ -64,8 +64,12 @@ defmodule Chat.Language.Interpreter.Test do
       expected: 1
     ],
     arith_expr_10: [
-      program: "'kick' + 'ass'",
-      expected: "kickass"
+      program: "'kick' + 'ass' + 'butt'",
+      expected: "kickassbutt"
+    ],
+    arith_expr_11: [
+      program: "TO_TEXT(a) + ' butt'",
+      expected: "a butt"
     ],
     comp_expression_1: [
       program: "2 > 1",

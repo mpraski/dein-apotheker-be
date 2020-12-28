@@ -1,8 +1,10 @@
-%% process.yrl
+Header "%% Copyright (C)"
+"%% @private"
+"%% @Author Marcin Praski".
 
 Nonterminals
-stmt stmt_list expr decl_expr if_expr elif_expr 
-for_expr list_expr function_expr arg_list pattern_match_expr
+stmt stmt_list expr assign_stmt if_stmt elif_stmt 
+for_stmt list_expr function_expr arg_list pattern_match_expr
 select_expr where_expr on_expr join_expr join_expr_list select_list 
 column_list qualified_database maybe_qualified_database identifier 
 qualified_identifier maybe_qualified_identifier variable string 
@@ -24,14 +26,16 @@ Nonassoc 500 eq_op.
 Left 600 additive_op.
 Left 700 multiplicative_op.
 
+Expect 1.
+    
 stmt_list -> stmt               : ['$1'].
 stmt_list -> stmt sep           : ['$1'].
 stmt_list -> stmt sep stmt_list : ['$1'|'$3'].
 
-stmt -> expr : '$1'.
-stmt -> decl_expr   : '$1'.
-stmt -> if_expr     : '$1'.
-stmt -> for_expr    : '$1'.
+stmt -> expr        : '$1'.
+stmt -> if_stmt     : '$1'.
+stmt -> for_stmt    : '$1'.
+stmt -> assign_stmt   : '$1'.
 
 expr -> identifier                  : '$1'.
 expr -> variable                    : '$1'.
@@ -59,15 +63,15 @@ function_expr -> identifier left_paren arg_list right_paren : {call, '$1', '$3'}
 pattern_match_expr -> identifier : '$1'.
 pattern_match_expr -> list_expr  : '$1'.
 
-decl_expr -> pattern_match_expr assign expr : {action('$2'), '$1', '$3'}.
+assign_stmt -> pattern_match_expr assign expr : {action('$2'), '$1', '$3'}.
 
-if_expr -> lif expr then stmt_list           else stmt_list : {lif, [{'$2', '$4'}       ], '$6'}.
-if_expr -> lif expr then stmt_list elif_expr else stmt_list : {lif, [{'$2', '$4'} | '$5'], '$7'}.
+if_stmt -> lif expr then stmt_list           else stmt_list : {lif, [{'$2', '$4'}       ], '$6'}.
+if_stmt -> lif expr then stmt_list elif_stmt else stmt_list : {lif, [{'$2', '$4'} | '$5'], '$7'}.
 
-elif_expr -> elif expr then stmt_list           : [{'$2', '$4'}     ].
-elif_expr -> elif expr then stmt_list elif_expr : [{'$2', '$4'} | '$5'].
+elif_stmt -> elif expr then stmt_list           : [{'$2', '$4'}     ].
+elif_stmt -> elif expr then stmt_list elif_stmt : [{'$2', '$4'} | '$5'].
 
-for_expr -> for identifier in expr do stmt_list : {action('$1'), '$2', '$4', '$6'}.
+for_stmt -> for identifier in expr do stmt_list : {action('$1'), '$2', '$4', '$6'}.
 
 select_expr -> select select_list from maybe_qualified_database                                 : {action('$1'), '$2', '$4',   [],  nil}.
 select_expr -> select select_list from maybe_qualified_database                where where_expr : {action('$1'), '$2', '$4',   [], '$6'}.

@@ -50,6 +50,18 @@ defmodule Chat.Language.StdLib.Test do
       program: "SIZE({a, 'b', 3})",
       expected: 3
     ],
+    count_1: [
+      program: "l = {yes, yes, no}; COUNT(yes, [l])",
+      expected: 2
+    ],
+    count_2: [
+      program: "l = {yes, yes, yes}; COUNT(yes, [l])",
+      expected: 3
+    ],
+    count_3: [
+      program: "COUNT(yes, {})",
+      expected: 0
+    ],
     cols_1: [
       program: "COLS(SELECT * FROM Products)",
       expected: 5
