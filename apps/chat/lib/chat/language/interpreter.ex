@@ -211,6 +211,10 @@ defmodule Chat.Language.Interpreter do
     |> interpret_select(columns)
   end
 
+  defp interpret_pattern_match({c, r}, i, :null) when is_atom(i) do
+    {Memory.delete(c, i), r}
+  end
+
   defp interpret_pattern_match({c, r}, i, v) when is_atom(i) do
     {Memory.store(c, i, v), r}
   end
@@ -219,6 +223,7 @@ defmodule Chat.Language.Interpreter do
        when is_list(i) and is_list(v) and length(i) == length(v) do
     reducer = fn
       {:_, _}, acc -> acc
+      {a, :null}, acc when is_atom(a) -> Memory.delete(acc, a)
       {a, b}, acc when is_atom(a) -> Memory.store(acc, a, b)
       {a, b}, acc -> if a == b, do: acc, else: raise("Pattern match error on #{a} == #{b}")
     end

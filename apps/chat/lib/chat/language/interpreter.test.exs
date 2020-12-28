@@ -111,6 +111,14 @@ defmodule Chat.Language.Interpreter.Test do
       program: "v = 1; c = [v]; [c]",
       expected: 1
     ],
+    decl_expression_3: [
+      program: """
+        var1 = 'val';
+        var1 = null;
+        IF [var1] THEN 1 ELSE 2;
+      """,
+      expected: 2
+    ],
     if_expression_1: [
       program: """
         var1 = 'val';
