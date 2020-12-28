@@ -240,6 +240,13 @@ defmodule Chat.Language.Interpreter.Test do
       """,
       expected: "mustarda"
     ],
+    pattern_match_expr_4: [
+      program: """
+        {_, _, m, i} = {0, 1, 'mustard', 'a'};
+        [m] + [i]
+      """,
+      expected: "mustarda"
+    ],
     select_all_products: [
       program: "SELECT * FROM Products",
       expected: Chat.database(:Products)
