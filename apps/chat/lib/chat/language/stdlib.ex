@@ -240,7 +240,7 @@ defmodule Chat.Language.StdLib do
         SwallowingProblems == TO_TEXT([swallow]) AND
         Portable           == TO_TEXT([transport]) AND
         GoodForFlight      == TO_TEXT([fly]) AND
-        DosedIndividually  == TO_TEXT([single]);
+        DosedIndividually  == TO_TEXT([single])
     """
 
     prog = med_form_query |> Interpreter.interpret(args)
@@ -255,7 +255,7 @@ defmodule Chat.Language.StdLib do
     match_query = ~p"""
       SELECT *
       FROM Products
-      WHERE APIID == [api] AND MedFormID IN [forms];
+      WHERE APIID == [api] AND MedFormID IN [forms]
     """
 
     prog = match_query |> Interpreter.interpret(args)

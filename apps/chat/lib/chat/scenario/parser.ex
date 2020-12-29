@@ -8,7 +8,7 @@ defmodule Chat.Scenario.Parser do
   alias Chat.Language.Parser, as: LanguageParser
 
   @scenario_header ~w[Process Action]
-  @process_header ~w[ID Type Query Text Action Output]
+  @process_header ~w[ID Type Query Text Action Output Hint Popup]
   @process_columns length(@process_header)
   @empties [nil, ""]
 
@@ -94,7 +94,7 @@ defmodule Chat.Scenario.Parser do
     Process.new(String.to_atom(p), entry.id, questions)
   end
 
-  defp parse_question([id, type, query, text, action, output]) do
+  defp parse_question([id, type, query, text, action, output, hint, popup]) do
     action = parse_program(action)
     query = parse_program(query)
     id = String.to_atom(id)
@@ -107,11 +107,13 @@ defmodule Chat.Scenario.Parser do
       query,
       text,
       action,
-      output
+      output,
+      hint,
+      popup
     )
   end
 
-  defp parse_answer([_, _, _, text, action, output]) do
+  defp parse_answer([_, _, _, text, action, output, _, _]) do
     Answer.new(
       :unknown,
       text,

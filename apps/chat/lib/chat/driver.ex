@@ -108,7 +108,7 @@ defmodule Chat.Driver do
       products: products
     }
 
-    prog = ~p/CART_MANY([products]);/
+    prog = ~p/CART_MANY([products])/
 
     state
     |> Interpreter.interpret(prog, args).()

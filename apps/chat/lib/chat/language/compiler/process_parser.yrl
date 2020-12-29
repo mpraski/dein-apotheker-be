@@ -27,7 +27,7 @@ Left 600 additive_op.
 Left 700 multiplicative_op.
 
 Expect 1.
-    
+
 stmt_list -> stmt               : ['$1'].
 stmt_list -> stmt sep           : ['$1'].
 stmt_list -> stmt sep stmt_list : ['$1'|'$3'].
@@ -35,7 +35,7 @@ stmt_list -> stmt sep stmt_list : ['$1'|'$3'].
 stmt -> expr        : '$1'.
 stmt -> if_stmt     : '$1'.
 stmt -> for_stmt    : '$1'.
-stmt -> assign_stmt   : '$1'.
+stmt -> assign_stmt : '$1'.
 
 expr -> identifier                  : '$1'.
 expr -> variable                    : '$1'.

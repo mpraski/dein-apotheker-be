@@ -15,11 +15,13 @@ defmodule Chat.Scenario.Question do
     field(:answers, list(Answer.t()), enforce: true, default: [])
     field(:query, any())
     field(:output, atom())
+    field(:hint, Text.t())
+    field(:popup, Text.t())
   end
 
   @types ~w[Q N P PN C F CODE]a
 
-  def new(id, type, query, text, action, output) when type in @types do
+  def new(id, type, query, text, action, output, hint, popup) when type in @types do
     %__MODULE__{
       id: id,
       type: type,
@@ -27,7 +29,9 @@ defmodule Chat.Scenario.Question do
       text: Text.new(text || ""),
       action: action,
       output: output,
-      answers: []
+      answers: [],
+      hint: hint,
+      popup: popup
     }
   end
 
