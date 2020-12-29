@@ -19,7 +19,7 @@ defmodule Chat.Scenario.Question do
     field(:popup, Text.t())
   end
 
-  @types ~w[Q N P PN C F CODE]a
+  @types ~w[Q N P PN C D F CODE]a
 
   def new(id, type, query, text, action, output, hint, popup) when type in @types do
     %__MODULE__{
