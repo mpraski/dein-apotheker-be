@@ -54,6 +54,7 @@ defmodule Chat.Language.StdLib do
       SIZE: &size/1,
       COUNT: &count/1,
       AT: &at/1,
+      REM: &rem/1,
       MATCH: &match/1,
       CART: &cart/1,
       CART_MANY: &cart_many/1
@@ -214,6 +215,8 @@ defmodule Chat.Language.StdLib do
   defp cols(%Call{args: [_, db]}), do: Database.width(db)
 
   defp at(%Call{args: [_, index, items]}), do: items |> Enum.at(index)
+
+  defp rem(%Call{args: [_, n, d]}), do: Kernel.rem(n, d)
 
   defp match(%Call{
          args: [

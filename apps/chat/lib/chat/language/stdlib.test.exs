@@ -125,7 +125,8 @@ defmodule Chat.Language.StdLib.Test do
       program: """
         l = {'v1', 'v2', 'v3'};
         FOR v IN [l] DO
-          LOAD_WITH(SomeProcess, v)
+          LOAD_WITH(SomeProcess, v);
+        END
       """,
       expected:
         quote(
@@ -154,7 +155,8 @@ defmodule Chat.Language.StdLib.Test do
     load_with_3: [
       program: """
         FOR item IN [cart] DO
-          LOAD_WITH(Explain, item)
+          LOAD_WITH(Explain, item);
+        END
       """,
       expected:
         quote(
@@ -184,7 +186,8 @@ defmodule Chat.Language.StdLib.Test do
       program: """
         LOAD(ExampleProcess);
         FOR item IN [cart] DO
-          INJECT_WITH(Explain, item)
+          INJECT_WITH(Explain, item);
+        END
       """,
       expected:
         quote(

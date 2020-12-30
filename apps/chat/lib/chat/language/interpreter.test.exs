@@ -95,6 +95,10 @@ defmodule Chat.Language.Interpreter.Test do
       program: "3 != 3",
       expected: false
     ],
+    comp_expression_7: [
+      program: "3 == 3",
+      expected: true
+    ],
     logical_expression_1: [
       program: "1 == 1 OR 2 == 1",
       expected: true
@@ -202,8 +206,9 @@ defmodule Chat.Language.Interpreter.Test do
     for_expr_1: [
       program: """
       j = 0;
-      FOR i IN {1, 2, 3}
-        DO j = [j] + [i];
+      FOR i IN {1, 2, 3} DO
+        j = [j] + [i];
+      END;
       [j];
       """,
       expected: 6
@@ -212,11 +217,68 @@ defmodule Chat.Language.Interpreter.Test do
       program: """
         j = 0;
         l = {1, 2, 3};
-        FOR i IN [l]
-          DO j = [j] + [i];
+        FOR i IN [l] DO
+          j = [j] + [i];
+        END;
         [j];
       """,
       expected: 6
+    ],
+    for_expr_3: [
+      program: """
+        j = 0;
+        l = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        FOR i IN [l] DO
+          IF REM([i], 2) == 0 THEN
+            j = [j] + [i];
+          END
+        END;
+        [j];
+      """,
+      expected: 30
+    ],
+    for_expr_4: [
+      program: """
+        j = 0;
+        l = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        FOR i IN [l] DO
+          IF REM([i], 2) == 0 THEN
+            j = [j] + [i];
+          ELSE
+            j = [j] + [i] * 2;
+        END;
+        [j];
+      """,
+      expected: 80
+    ],
+    for_expr_5: [
+      program: """
+        j = 0;
+        FOR i IN {1..100} DO
+          IF REM([i], 2) == 0 THEN
+            j = [j] + [i];
+          END
+        END;
+        [j];
+      """,
+      expected: 2550
+    ],
+    for_expr_6: [
+      program: """
+        names = {};
+        FOR i IN {1..3} DO
+          db_result = SELECT name
+            FROM Products
+            WHERE id == TO_TEXT([i]);
+          names = [names] + {TO_TEXT([db_result])};
+        END;
+        [names];
+      """,
+      expected: [
+        "Product 1",
+        "Product 2",
+        "Product 3"
+      ]
     ],
     list_expr_1: [
       program: "l = {0}; [l];",

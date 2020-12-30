@@ -10,21 +10,28 @@ defmodule Chat.Language.Interpreter do
 
   def interpret(program, tape \\ Map.new()) do
     fn input ->
-      {tape, input} |> interpret_expr(program) |> elem(1)
+      {tape, input} |> interpret_stmts(program) |> elem(1)
     end
   end
 
-  defp interpret_expr(data, exprs) when is_list(exprs) do
-    Enum.reduce(exprs, data, &interpret_expr(&2, &1))
+  defp interpret_stmts(data, stmts) do
+    Enum.reduce(stmts, data, &interpret_stmt(&2, &1))
   end
 
-  defp interpret_expr(data, {:lif, exprs, otherwise}) do
+  defp interpret_stmt(d, {:assign, name, expr}) do
+    {_, n} = d |> interpret_expr(name)
+    {_, e} = d |> interpret_expr(expr)
+
+    interpret_pattern_match(d, n, e)
+  end
+
+  defp interpret_stmt(data, {:lif, exprs, otherwise}) do
     reduced =
       Enum.reduce_while(exprs, {:next, data}, fn {c, t}, {_, data} ->
         {_, c} = data |> interpret_expr(c)
 
         if c do
-          {:halt, {:done, data |> interpret_expr(t)}}
+          {:halt, {:done, data |> interpret_stmts(t)}}
         else
           {:cont, {:next, data}}
         end
@@ -32,33 +39,34 @@ defmodule Chat.Language.Interpreter do
 
     case reduced do
       {:done, data} -> data
-      {:next, _} -> data |> interpret_expr(otherwise)
+      {:next, _} -> data |> interpret_stmts(otherwise)
     end
   end
 
-  defp interpret_expr(data, {:for, iter, expr, exprs}) do
+  defp interpret_stmt(data, {:for, iter, expr, stmts}) do
     {_, i} = data |> interpret_expr(iter)
     {_, e} = data |> interpret_expr(expr)
 
     {c, s} =
       Enum.reduce(e, data, fn a, {c, s} ->
-        {Memory.store(c, i, a), s} |> interpret_expr(exprs)
+        {Memory.store(c, i, a), s} |> interpret_stmts(stmts)
       end)
 
     {Memory.delete(c, i), s}
+  end
+
+  defp interpret_stmt(data, stmt) do
+    interpret_expr(data, stmt)
+  end
+
+  defp interpret_expr(data, exprs) when is_list(exprs) do
+    Enum.reduce(exprs, data, &interpret_expr(&2, &1))
   end
 
   defp interpret_expr(data, {:call, func, args}) do
     {_, f} = data |> interpret_expr(func)
 
     data |> call_func(f, args)
-  end
-
-  defp interpret_expr(d, {:assign, name, expr}) do
-    {_, n} = d |> interpret_expr(name)
-    {_, e} = d |> interpret_expr(expr)
-
-    interpret_pattern_match(d, n, e)
   end
 
   defp interpret_expr({c, _}, {:ident, i}) when is_atom(i), do: {c, i}
@@ -71,6 +79,13 @@ defmodule Chat.Language.Interpreter do
 
   defp interpret_expr({c, _} = d, {:list, items}) when is_list(items),
     do: {c, evaluate_exprs(d, items)}
+
+  defp interpret_expr({c, _} = d, {:list, a, b}) do
+    {_, a} = d |> interpret_expr(a)
+    {_, b} = d |> interpret_expr(b)
+
+    {c, Enum.into(a..b, [])}
+  end
 
   defp interpret_expr({c, _}, {:qualified_db, {:ident, d}, {:ident, n}}) do
     {c, {:qualified_db, d, n}}

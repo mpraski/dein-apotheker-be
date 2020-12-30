@@ -6,7 +6,6 @@ defmodule Chat.Database.Loader do
   alias Chat.Excel
   alias Chat.Database
 
-  @spec load(any) :: nil
   def load(path) do
     path
     |> File.ls!()

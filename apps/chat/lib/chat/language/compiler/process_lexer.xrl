@@ -22,6 +22,7 @@ Else = ELSE
 For = FOR
 In = IN
 Do = DO
+End = END
 And = AND
 Or = OR
 Equals = \=\=
@@ -69,6 +70,7 @@ Rules.
 {For}          : {token, {for, TokenLine}}.
 {In}           : {token, {in, TokenLine}}.
 {Do}           : {token, {do, TokenLine}}.
+{End}          : {token, {lend, TokenLine}}.
 {And}          : {token, {land, TokenLine}}.
 {Or}           : {token, {lor, TokenLine}}.
 {Equals}       : {token, {equals, TokenLine}}.

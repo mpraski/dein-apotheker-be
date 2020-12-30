@@ -12,7 +12,7 @@ number column eq_op comp_op logical_op additive_op multiplicative_op in_op.
 
 Terminals
 dot sep comma assign lif elif then else for in do 
-land lor equals not_equals greater greater_equal 
+lend land lor equals not_equals greater greater_equal 
 lower lower_equal left_paren right_paren ident 
 left_angle right_angle var str num all select 
 from where join on plus minus divides.
@@ -54,8 +54,9 @@ expr -> left_paren expr right_paren : '$2'.
 arg_list -> expr                : ['$1'].
 arg_list -> expr comma arg_list : ['$1'|'$3'].
 
-list_expr -> left_angle          right_angle : {list, [] }.
-list_expr -> left_angle arg_list right_angle : {list, '$2' }.
+list_expr -> left_angle                       right_angle : {list, [] }.
+list_expr -> left_angle number dot dot number right_angle : {list, '$2','$5'}.
+list_expr -> left_angle arg_list              right_angle : {list, '$2' }.
 
 function_expr -> identifier left_paren          right_paren : {call, '$1', []  }.
 function_expr -> identifier left_paren arg_list right_paren : {call, '$1', '$3'}.
@@ -65,13 +66,14 @@ pattern_match_expr -> list_expr  : '$1'.
 
 assign_stmt -> pattern_match_expr assign expr : {action('$2'), '$1', '$3'}.
 
+if_stmt -> lif expr then stmt_list           lend           : {lif, [{'$2', '$4'}       ], []}.
 if_stmt -> lif expr then stmt_list           else stmt_list : {lif, [{'$2', '$4'}       ], '$6'}.
 if_stmt -> lif expr then stmt_list elif_stmt else stmt_list : {lif, [{'$2', '$4'} | '$5'], '$7'}.
 
 elif_stmt -> elif expr then stmt_list           : [{'$2', '$4'}     ].
 elif_stmt -> elif expr then stmt_list elif_stmt : [{'$2', '$4'} | '$5'].
 
-for_stmt -> for identifier in expr do stmt_list : {action('$1'), '$2', '$4', '$6'}.
+for_stmt -> for identifier in expr do stmt_list lend : {action('$1'), '$2', '$4', '$6'}.
 
 select_expr -> select select_list from maybe_qualified_database                                 : {action('$1'), '$2', '$4',   [],  nil}.
 select_expr -> select select_list from maybe_qualified_database                where where_expr : {action('$1'), '$2', '$4',   [], '$6'}.
