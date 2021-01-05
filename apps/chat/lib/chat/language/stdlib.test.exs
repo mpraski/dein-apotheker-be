@@ -62,6 +62,14 @@ defmodule Chat.Language.StdLib.Test do
       program: "COUNT(yes, {})",
       expected: 0
     ],
+    map_1: [
+      program: "MAP(TO_TEXT, {})",
+      expected: []
+    ],
+    map_2: [
+      program: "MAP(TO_TEXT, {1..5})",
+      expected: ["1", "2", "3", "4", "5"]
+    ],
     cols_1: [
       program: "COLS(SELECT * FROM Products)",
       expected: 5

@@ -49,6 +49,7 @@ defmodule Chat.Language.StdLib do
       SAVE: &save/1,
       DELETE: &delete/1,
       TO_TEXT: &to_text/1,
+      MAP: &map/1,
       ROWS: &rows/1,
       COLS: &cols/1,
       SIZE: &size/1,
@@ -195,6 +196,12 @@ defmodule Chat.Language.StdLib do
 
   defp delete(%Call{args: [m, n]}) do
     Memory.delete(m, n)
+  end
+
+  defp map(%Call{args: [r, func, list]} = c) do
+    {:ok, f} = functions() |> Map.fetch(func)
+    call = &f.(%Call{c | args: [r, &1]})
+    list |> Enum.map(call)
   end
 
   defp to_text(%Call{args: [_ | args]}) do

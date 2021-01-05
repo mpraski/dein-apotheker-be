@@ -40,7 +40,7 @@ defmodule Chat.Database do
       |> Enum.reverse()
     end
 
-    db |> Stream.map(mapper) |> Enum.into(new(id))
+    db |> Stream.map(mapper) |> Enum.into(new(id, [columns]))
   end
 
   def where(%__MODULE__{id: id, headers: hs} = db, column, value) do

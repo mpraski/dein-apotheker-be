@@ -280,6 +280,23 @@ defmodule Chat.Language.Interpreter.Test do
         "Product 3"
       ]
     ],
+    for_expr_7: [
+      program: """
+        names = {};
+        FOR i IN MAP(TO_TEXT, {1..3}) DO
+          db_result = SELECT name
+            FROM Products
+            WHERE id == [i];
+          names = [names] + {TO_TEXT([db_result])};
+        END;
+        [names];
+      """,
+      expected: [
+        "Product 1",
+        "Product 2",
+        "Product 3"
+      ]
+    ],
     list_expr_1: [
       program: "l = {0}; [l];",
       expected: [0]
@@ -426,6 +443,18 @@ defmodule Chat.Language.Interpreter.Test do
         rows: [
           ["2", "Product 2"]
         ]
+      }
+    ],
+    select_columns_products_where_and_none: [
+      program: """
+        SELECT id, name
+        FROM Products
+        WHERE id == '2' AND id == '3'
+      """,
+      expected: %Chat.Database{
+        headers: [:id, :name],
+        id: :Products,
+        rows: []
       }
     ],
     select_columns_products_where_not_equals: [
