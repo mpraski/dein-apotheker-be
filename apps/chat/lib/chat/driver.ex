@@ -85,6 +85,22 @@ defmodule Chat.Driver do
   defp answer(
          state,
          %Question{
+           type: :D,
+           action: action,
+           output: output
+         },
+         date
+       ) do
+    with {:ok, d} <- Date.from_iso8601(date) do
+      state
+      |> Memory.store(output, d)
+      |> Interpreter.interpret(action).()
+    end
+  end
+
+  defp answer(
+         state,
+         %Question{
            type: :N,
            action: action,
            output: output
