@@ -6,6 +6,8 @@ defmodule Proxy.Views.Chat.Message do
 
   use TypedStruct
 
+  alias Proxy.Views.Chat.{Popup}
+
   @derive Jason.Encoder
 
   typedstruct do
@@ -13,6 +15,7 @@ defmodule Proxy.Views.Chat.Message do
     field(:type, atom(), enforce: true)
     field(:text, binary(), enforce: true, default: "")
     field(:input, any(), enforce: true, default: nil)
+    field(:popup, Popup.t(), default: nil)
   end
 
   def new(question, type, text, input \\ nil) do
@@ -22,6 +25,12 @@ defmodule Proxy.Views.Chat.Message do
       text: text,
       input: input
     }
+  end
+
+  def with_popup(%__MODULE__{} = m, nil), do: m
+
+  def with_popup(%__MODULE__{} = m, %Popup{} = p) do
+    %__MODULE__{m | popup: p}
   end
 
   def decode_type(:Q), do: :question

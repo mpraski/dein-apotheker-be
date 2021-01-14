@@ -9,7 +9,7 @@ defmodule Proxy.Views.Chat do
   alias Chat.Database
   alias Chat.Language.{Memory, Interpreter}
 
-  alias Proxy.Views.Chat.{Product, Brand, API, Message}
+  alias Proxy.Views.Chat.{Product, Brand, API, Message, Popup}
   alias Proxy.Views.Chat.State, as: Representation
 
   def present(
@@ -26,6 +26,10 @@ defmodule Proxy.Views.Chat do
     render_text = Keyword.get(args, :render_text, true)
 
     message = question |> create_message(state, render_text)
+
+    popup = question |> create_popup()
+
+    message = message |> Message.with_popup(popup)
 
     {:ok, cart} = state |> Memory.load(State.cart())
 
@@ -122,6 +126,23 @@ defmodule Proxy.Views.Chat do
     text = if render_text, do: Text.render(text, state), else: ""
 
     Message.new(id, :F, text)
+  end
+
+  defp create_popup(
+    %Question{
+      hint: nil
+    }
+  ) do
+    nil
+  end
+
+  defp create_popup(
+    %Question{
+      hint: hint,
+      popup: popup
+    }
+  ) do
+    Popup.new(hint, popup)
   end
 
   defp answers_input(answers) do
