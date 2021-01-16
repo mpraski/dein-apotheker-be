@@ -39,4 +39,5 @@ defmodule Proxy.Views.Chat.Message do
   def decode_type(:P), do: :product
   def decode_type(:C), do: :comment
   def decode_type(:F), do: :free
+  def decode_type(:D), do: :date
 end

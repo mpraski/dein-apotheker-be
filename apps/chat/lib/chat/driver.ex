@@ -91,7 +91,7 @@ defmodule Chat.Driver do
          },
          date
        ) do
-    with {:ok, d} <- Date.from_iso8601(date) do
+    with {:ok, d, _} <- DateTime.from_iso8601(date) do
       state
       |> Memory.store(output, d)
       |> Interpreter.interpret(action).()

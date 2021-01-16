@@ -128,20 +128,30 @@ defmodule Proxy.Views.Chat do
     Message.new(id, :F, text)
   end
 
-  defp create_popup(
-    %Question{
-      hint: nil
-    }
-  ) do
+  defp create_message(
+         %Question{
+           id: id,
+           type: :D,
+           text: text
+         },
+         state,
+         render_text
+       ) do
+    text = if render_text, do: Text.render(text, state), else: ""
+
+    Message.new(id, :D, text)
+  end
+
+  defp create_popup(%Question{
+         hint: nil
+       }) do
     nil
   end
 
-  defp create_popup(
-    %Question{
-      hint: hint,
-      popup: popup
-    }
-  ) do
+  defp create_popup(%Question{
+         hint: hint,
+         popup: popup
+       }) do
     Popup.new(hint, popup)
   end
 

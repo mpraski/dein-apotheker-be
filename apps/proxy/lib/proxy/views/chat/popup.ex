@@ -15,7 +15,7 @@ defmodule Proxy.Views.Chat.Popup do
   def new(hint, content) do
     %__MODULE__{
       hint: hint,
-      content: content,
+      content: content
     }
   end
 end
