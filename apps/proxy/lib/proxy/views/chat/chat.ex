@@ -50,7 +50,7 @@ defmodule Proxy.Views.Chat do
        ) do
     text = if render_text, do: Text.render(text, state), else: ""
 
-    Message.new(id, :Q, text, answers_input(answers))
+    Message.new(id, :Q, text, answers_input(answers, state))
   end
 
   defp create_message(
@@ -94,7 +94,7 @@ defmodule Proxy.Views.Chat do
 
     input = %{
       product: map_row(:Products, product),
-      answers: answers_input(answers)
+      answers: answers_input(answers, state)
     }
 
     Message.new(id, :P, text, input)
@@ -155,12 +155,12 @@ defmodule Proxy.Views.Chat do
     Popup.new(hint, popup)
   end
 
-  defp answers_input(answers) do
+  defp answers_input(answers, state) do
     answers
     |> Enum.map(fn %Answer{id: id, text: text} ->
       %{
         id: id,
-        text: Text.render(text)
+        text: Text.render(text, state)
       }
     end)
   end

@@ -155,15 +155,15 @@ defmodule Chat.Driver do
     end
   end
 
-  @cough :cough
+  @initial_scenario :bladder
 
   def initial() do
-    {:ok, %Process{id: pid} = p} = Chat.scenario(@cough) |> Scenario.entry()
+    {:ok, %Process{id: pid} = p} = Chat.scenario(@initial_scenario) |> Scenario.entry()
     {:ok, %Question{id: qid}} = Process.entry(p)
 
     State.new(
       qid,
-      [@cough],
+      [@initial_scenario],
       [StateProcess.new(pid)],
       %{cart: []}
     )

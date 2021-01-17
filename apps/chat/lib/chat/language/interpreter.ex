@@ -391,11 +391,13 @@ defmodule Chat.Language.Interpreter do
   defp qualified_col_alias(db, col), do: :"#{db}.#{col}"
 
   defp call_func({c, r} = data, n, args) do
-    {:ok, f} = StdLib.functions() |> Map.fetch(n)
+    with {:ok, f} <- StdLib.functions() |> Map.fetch(n) do
+      call = [r | data |> evaluate_exprs(args)] |> Call.new(c)
 
-    call = [r | data |> evaluate_exprs(args)] |> Call.new(c)
-
-    {c, f.(call)}
+      {c, f.(call)}
+    else
+      _ -> raise("Function #{n} is not defined in stdlib")
+    end
   end
 
   defp evaluate_exprs(data, exprs) do
